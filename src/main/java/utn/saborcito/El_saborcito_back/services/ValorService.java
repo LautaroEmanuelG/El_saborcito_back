@@ -13,10 +13,6 @@ public class ValorService {
     @Autowired
     private ValorRepository valorRepository;
 
-    public List<Valor> listarValores() {
-        return valorRepository.findAll();
-    }
-
     public Valor buscarValorPorId(Long id) {
         return valorRepository.findById(id).orElse(null);
     }

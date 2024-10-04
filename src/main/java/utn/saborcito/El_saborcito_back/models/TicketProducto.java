@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class TicketProducto {
 
     @ManyToOne
     @JoinColumn(name = "ticketId")
+    @JsonIgnore
     private Ticket ticket;
 
     @ManyToOne

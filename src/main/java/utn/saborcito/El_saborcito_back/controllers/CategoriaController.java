@@ -38,24 +38,7 @@ public class CategoriaController {
         if (result.hasErrors()) {
             return validation(result);
         }
-
-        Categoria categoriaCompleta;
-        if (categoria.getId() != null) {
-            // Update existing category
-            categoriaCompleta = categoriaService.buscarCategoriaPorId(categoria.getId());
-            if (categoriaCompleta == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro la categoria con ID: " + categoria.getId());
-            }
-            categoriaCompleta.setNombre(categoria.getNombre());
-            categoriaCompleta.setDescripcion(categoria.getDescripcion());
-        } else {
-            // Create new category
-            categoriaCompleta = new Categoria();
-            categoriaCompleta.setNombre(categoria.getNombre());
-            categoriaCompleta.setDescripcion(categoria.getDescripcion());
-        }
-
-        Categoria savedCategoria = categoriaService.guardarCategoria(categoriaCompleta);
+        Categoria savedCategoria = categoriaService.guardarCategoria(categoria);
         return ResponseEntity.ok(savedCategoria);
     }
 

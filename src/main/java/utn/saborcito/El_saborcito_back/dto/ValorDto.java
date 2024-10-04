@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class ValorDto {
-    private Long id;
     private Double precio;
     private Double costo;
 }

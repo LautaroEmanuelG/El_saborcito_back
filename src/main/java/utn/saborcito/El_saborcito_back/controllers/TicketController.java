@@ -13,6 +13,7 @@ import utn.saborcito.El_saborcito_back.services.ProductoService;
 import utn.saborcito.El_saborcito_back.services.TicketService;
 import utn.saborcito.El_saborcito_back.services.TransaccionService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,35 +36,7 @@ public class TicketController {
 
     @PostMapping("/nuevo")
     @Transactional
-    public ResponseEntity<Ticket> crearTicket(@RequestBody TicketDto ticketDto) {
-        List<TicketProducto> ticketProductos = ticketDto.getProducts().stream()
-                .map(pq -> {
-                    Producto producto = productoService.buscarProductoPorId(pq.getProductId());
-                    if (producto == null || producto.getStock() < pq.getQuantity()) {
-                        throw new IllegalArgumentException("Producto no encontrado o stock insuficiente");
-                    }
-                    producto.setStock(producto.getStock() - pq.getQuantity());
-                    productoService.guardarProducto(producto);
-
-                    TicketProducto ticketProducto = new TicketProducto();
-                    ticketProducto.setProducto(producto);
-                    ticketProducto.setCantidad(pq.getQuantity());
-                    return ticketProducto;
-                })
-                .collect(Collectors.toList());
-
-        Ticket ticket = new Ticket();
-        ticket.setTicketProductos(ticketProductos);
-        ticket = ticketService.guardarTicket(ticket);
-
-        for (TicketProducto ticketProducto : ticketProductos) {
-            ticketProducto.setTicket(ticket);
-        }
-
-        Transaccion transaccion = new Transaccion();
-        transaccion.setTicket(ticket);
-        transaccionService.guardarTransaccion(transaccion);
-
-        return ResponseEntity.ok(ticket);
+    public ResponseEntity<?> guardarTicket(@RequestBody TicketDto ticket) {
+        return ResponseEntity.ok(ticketService.guardarTicket(ticket));
     }
 }
