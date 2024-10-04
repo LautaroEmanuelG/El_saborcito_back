@@ -34,11 +34,29 @@ public class CategoriaController {
     }
 
     @PostMapping("/guardar")
-    public ResponseEntity<?> saveCategoria(@RequestBody Categoria categoria,BindingResult result) {
-        if(result.hasErrors()) {
+    public ResponseEntity<?> saveCategoria(@RequestBody Categoria categoria, BindingResult result) {
+        if (result.hasErrors()) {
             return validation(result);
         }
-        return ResponseEntity.ok(categoriaService.guardarCategoria(categoria));
+
+        Categoria categoriaCompleta;
+        if (categoria.getId() != null) {
+            // Update existing category
+            categoriaCompleta = categoriaService.buscarCategoriaPorId(categoria.getId());
+            if (categoriaCompleta == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro la categoria con ID: " + categoria.getId());
+            }
+            categoriaCompleta.setNombre(categoria.getNombre());
+            categoriaCompleta.setDescripcion(categoria.getDescripcion());
+        } else {
+            // Create new category
+            categoriaCompleta = new Categoria();
+            categoriaCompleta.setNombre(categoria.getNombre());
+            categoriaCompleta.setDescripcion(categoria.getDescripcion());
+        }
+
+        Categoria savedCategoria = categoriaService.guardarCategoria(categoriaCompleta);
+        return ResponseEntity.ok(savedCategoria);
     }
 
     @PostMapping("/eliminar")

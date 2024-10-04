@@ -17,9 +17,4 @@ public class Categoria {
     private Long id;
     private String nombre;
     private String descripcion;
-
-    //Metodos
-    public void addProducto(Producto producto){
-        producto.setCategoria(this);
-    }
 }
