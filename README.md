@@ -2,7 +2,21 @@
 
 ## Descripción del Proyecto
 
-Este proyecto consiste en el desarrollo de un sistema web para un restaurante que permite gestionar ventas y administrar finanzas de manera eficiente. El backend está construido utilizando Java y Spring Boot, y se conecta a una base de datos H2 para el almacenamiento de datos.  
+Este proyecto consiste en el desarrollo de un sistema web para un restaurante que permite gestionar ventas y administrar finanzas de manera eficiente. El backend está construido utilizando Java y Spring Boot, y se conecta a una base de datos H2 para el almacenamiento de datos.
+
+## Base de Datos H2 y JPA (Local)
+
+La base de datos H2 es una base de datos en memoria que se configura automáticamente al iniciar la aplicación. La consola de H2 está disponible en:
+
+![Base de Datos El Saborcito](./data/El%20saborcito.png)
+
+- URL: [http://localhost:5252/h2-console](http://localhost:8080/h2-console)
+
+### Configuración de la Base de Datos (Local)
+
+- **JDBC URL**: `jdbc:h2:mem:testdb`
+- **Usuario**: `sa`
+- **Contraseña**: (dejar en blanco)
 
 ## Tecnologías Utilizadas
 
@@ -15,38 +29,39 @@ Este proyecto consiste en el desarrollo de un sistema web para un restaurante qu
 
 ## Configuración del Entorno
 
-1. Clonar el repositorio:  
+1. Clonar el repositorio:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
-cd <NOMBRE_DEL_PROYECTO>
+git clone https://github.com/LautaroEmanuelG/El_saborcito_back.git
 ```
 
-2. Construir el proyecto:  
+2. Construir el proyecto:
 
 ```bash
 ./gradlew build
 ```
 
-3. Ejecutar la aplicación:  
+3. Ejecutar la aplicación:
 
 ```bash
 ./gradlew bootRun
 ```
 
-4. Acceder a la aplicación: La aplicación estará disponible 
+4. Acceder a la aplicación: La aplicación estará disponible
 - Base de datos H2: http://localhost:5252/h2-console
-- Swagger UI: http://localhost:8080/swagger-ui.html
+- Swagger UI: http://localhost:5252/swagger-ui.html
 
 ## Base de Datos
 
-La base de datos utilizada es H2, una base de datos en memoria que se configura automáticamente al iniciar la aplicación. La consola de H2 está disponible en http://localhost:5252/h2-console.  
+La base de datos utilizada es H2, una base de datos en memoria que se configura automáticamente al iniciar la aplicación. La consola de H2 está disponible en http://localhost:5252/h2-console.
 
 - JDBC URL: jdbc:h2:mem:testdb
 - User: sa
 - Password: (dejar en blanco)
 
-## Endpoints de la API
+## Endpoints de la API Swagger
+
+La documentación de la API se encuentra disponible en Swagger UI en http://localhost:5252/swagger-ui.html
 
 ### Productos
 
@@ -71,10 +86,3 @@ La base de datos utilizada es H2, una base de datos en memoria que se configura 
 - POST /transacciones: Crear una nueva transacción.
 - PUT /transacciones/{id}: Actualizar una transacción existente.
 - DELETE /transacciones/{id}: Eliminar una transacción por ID.
-
-## Consideraciones Importantes
-
-- Manejo de Enums: Asegúrese de que los enums se almacenen correctamente en la base de datos utilizando la anotación @Enumerated(EnumType.STRING).
-- Transacciones: Utilice la anotación @Transactional para asegurar la consistencia de las operaciones de base de datos.
-- Validaciones: Asegúrese de validar los datos de entrada para evitar errores y mantener la integridad de los datos.
-- Seguridad: Implemente medidas de seguridad adecuadas para proteger los endpoints, especialmente los que son accesibles solo para administradores.
