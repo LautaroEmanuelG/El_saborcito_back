@@ -79,10 +79,11 @@ La documentación de la API se encuentra disponible en Swagger UI en http://loca
 - PUT /transacciones/{id}: Actualizar una transacción existente.
 - DELETE /transacciones/{id}: Eliminar una transacción por ID.
 
-🔗 Uso de una Tabla Intermedia Explícita
+## 🔗 Uso de una Tabla Intermedia Explícita
+
 En este proyecto, se utiliza una tabla intermedia explícita para gestionar la relación muchos a muchos entre Ticket y Producto. En lugar de usar @ManyToMany con @JoinTable, se ha creado una entidad llamada TicketProducto que representa esta relación. Esta entidad no solo contiene las claves foráneas, sino que también incluye atributos adicionales relevantes para la relación, como la cantidad de productos en un ticket.
 
-Ejemplo de la Entidad TicketProducto:
+- Ejemplo de la Entidad TicketProducto:
 
 ```java
 Copiar código
