@@ -1,5 +1,5 @@
 // src/main/java/utn/saborcito/El_saborcito_back/config/OpenApiConfig.java
-package utn.saborcito.El_saborcito_back;
+package utn.saborcito.El_saborcito_back.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/ticket")
+@CrossOrigin(origins = "http://localhost:5173")
 public class TicketController {
     @Autowired
     private ProductoService productoService;
