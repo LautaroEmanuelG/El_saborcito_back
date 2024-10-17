@@ -3,6 +3,7 @@
 build/
 !gradle/wrapper/gradle-wrapper.jar
 out/
+.gradle
 
 # IntelliJ IDEA
 .idea/
