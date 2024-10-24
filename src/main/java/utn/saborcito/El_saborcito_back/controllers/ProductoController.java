@@ -27,7 +27,7 @@ public class ProductoController {
     }
 
     @GetMapping("/id")
-    public ResponseEntity<Producto> buscarProductoPorId(Long id) {
+    public ResponseEntity<Producto> buscarProductoPorId(@RequestParam Long id) {
         Producto producto = productoService.buscarProductoPorId(id);
         if (producto == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro el producto con ID: " + id);
@@ -36,7 +36,7 @@ public class ProductoController {
     }
 
     @GetMapping("/categoria")
-    public ResponseEntity<List<Producto>> listarProductosPorCategoria(Long id) {
+    public ResponseEntity<List<Producto>> listarProductosPorCategoria(@RequestParam Long id) {
         return ResponseEntity.ok(productoService.listarProductosPorCategoria(id));
     }
 
@@ -50,7 +50,7 @@ public class ProductoController {
     }
 
     @PostMapping("/eliminar")
-    public ResponseEntity<String> eliminarProductoPorId(Long id) {
+    public ResponseEntity<String> eliminarProductoPorId(@RequestParam Long id) {
         if (productoService.buscarProductoPorId(id) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro el producto con ID: " + id);
         }

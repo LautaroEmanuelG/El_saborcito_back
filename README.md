@@ -14,7 +14,7 @@ La base de datos H2 es una base de datos en memoria que se configura automática
 
 ### ⚙️ Configuración de la Base de Datos (Local)
 
-- **JDBC URL**: `jdbc:h2:mem:testdb`
+- **JDBC URL**: `jdbc:h2:file:./data/saborcito_db`
 - **Usuario**: `sa`
 - **Contraseña**: (dejar en blanco)
 

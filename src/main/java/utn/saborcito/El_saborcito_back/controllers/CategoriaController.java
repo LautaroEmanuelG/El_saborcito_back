@@ -44,7 +44,7 @@ public class CategoriaController {
     }
 
     @PostMapping("/eliminar")
-    public ResponseEntity<String> deleteCategoria(Long id) {
+    public ResponseEntity<String> deleteCategoria(@RequestParam Long id) {
         if (categoriaService.buscarCategoriaPorId(id) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro la categoria con ID: " + id);
         }
