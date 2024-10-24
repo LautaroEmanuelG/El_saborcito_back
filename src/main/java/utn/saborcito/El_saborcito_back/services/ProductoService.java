@@ -26,7 +26,7 @@ public class ProductoService {
     private CategoriaService categoriaService;
 
     public List<Producto> listarProductos() {
-        return productoRepository.findAll();
+        return productoRepository.findByIsDeletedFalse();
     }
 
     public Producto buscarProductoPorId(Long id) {
@@ -100,10 +100,14 @@ public class ProductoService {
 
     @Transactional
     public void eliminarProductoPorId(Long id) {
-        productoRepository.deleteById(id);
+        Producto producto = productoRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró el producto con ID: " + id)
+        );
+        producto.setIsDeleted(true);
+        productoRepository.save(producto);
     }
 
     public List<Producto> listarProductosPorCategoria(Long id) {
-        return productoRepository.findByCategoriaId(id);
+        return productoRepository.findByCategoriaIdAndIsDeletedFalse(id);
     }
 }

@@ -26,7 +26,7 @@ public class CategoriaController {
     }
 
     @GetMapping("/id")
-    public ResponseEntity<Categoria> getCategoriaById(Long id) {
+    public ResponseEntity<Categoria> getCategoriaById(@RequestParam Long id) {
         Categoria categoria = categoriaService.buscarCategoriaPorId(id);
         if (categoria == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro la categoria con ID: " + id);

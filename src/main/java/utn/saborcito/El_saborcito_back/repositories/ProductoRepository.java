@@ -7,6 +7,7 @@ import utn.saborcito.El_saborcito_back.models.Producto;
 import java.util.List;
 
 @Repository
-public interface ProductoRepository extends JpaRepository<Producto,Long> {
-    List<Producto> findByCategoriaId(Long categoriaId);
+public interface ProductoRepository extends JpaRepository<Producto, Long> {
+    List<Producto> findByCategoriaIdAndIsDeletedFalse(Long categoriaId);
+    List<Producto> findByIsDeletedFalse();
 }

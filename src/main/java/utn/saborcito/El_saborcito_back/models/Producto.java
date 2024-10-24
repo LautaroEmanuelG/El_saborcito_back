@@ -19,6 +19,7 @@ public class Producto {
     private String descripcion;
     private Integer stock;
     private Date fechaCreacion;
+    private Boolean isDeleted = false;
 
     @OneToOne
     @JoinColumn(name="valorId")

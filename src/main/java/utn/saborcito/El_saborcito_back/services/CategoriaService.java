@@ -16,7 +16,7 @@ public class CategoriaService {
     private CategoriaRepository categoriaRepository;
 
     public List<Categoria> listarCategorias() {
-        return categoriaRepository.findAll();
+        return categoriaRepository.findByIsDeletedFalse();
     }
 
     public Categoria buscarCategoriaPorId(Long id) {
@@ -47,7 +47,10 @@ public class CategoriaService {
 
     @Transactional
     public void eliminarCategoriaPorId(Long id) {
-        categoriaRepository.deleteById(id);
+        Categoria categoria = categoriaRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró la categoría con ID: " + id)
+        );
+        categoria.setIsDeleted(true);
+        categoriaRepository.save(categoria);
     }
-
 }
