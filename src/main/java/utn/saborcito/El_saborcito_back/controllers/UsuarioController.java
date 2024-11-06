@@ -16,14 +16,18 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String email, @RequestParam String contraseña) {
+    public ResponseEntity<String> login(
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "contraseña") String contraseña
+    ) {
         Optional<Usuario> usuario = usuarioService.login(email, contraseña);
         if (usuario.isPresent()) {
-            return ResponseEntity.ok("Login exitoso. Bienvenido, " + usuario.get().getNombre());
+            return ResponseEntity.ok("Login Exitoso. Nombre usuario: " + usuario.get().getNombre() + " Rol: " + usuario.get().getRol());
         } else {
             return ResponseEntity.status(401).body("Credenciales inválidas.");
         }
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<Usuario> register(@RequestBody Usuario usuario) {
