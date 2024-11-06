@@ -18,6 +18,8 @@ out/
 
 # VS Code
 .vscode/
+.idea
+.idea/
 
 # Logs
 *.log
