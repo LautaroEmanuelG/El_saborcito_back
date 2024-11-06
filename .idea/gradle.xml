@@ -6,6 +6,10 @@
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="$PROJECT_DIR$/../../../Downloads/gradle-8.9-rc-2" />
+<<<<<<< Updated upstream
+=======
+        <option name="gradleJvm" value="17" />
+>>>>>>> Stashed changes
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
