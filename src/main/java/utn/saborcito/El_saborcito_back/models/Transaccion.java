@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import utn.saborcito.El_saborcito_back.enums.TransaccionTipo;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,4 +22,6 @@ public class Transaccion {
     @ManyToOne
     @JoinColumn(name = "ticketId")
     private Ticket ticket;
+
+    private Date fecha=new Date();;
 }
