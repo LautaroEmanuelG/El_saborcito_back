@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import utn.saborcito.El_saborcito_back.enums.TransaccionTipo;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +19,7 @@ public class Transaccion {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private TransaccionTipo tipo;
+    private TransaccionTipo tipo ;
 
     // Nuevo campo preferenciaId para vincular con MercadoPago
     private String preferenciaId;
@@ -28,6 +30,8 @@ public class Transaccion {
     @ManyToOne
     @JoinColumn(name = "ticketId")
     private Ticket ticket;
+
+    private Date fecha=new Date();;
 
     // Getters y Setters para el nuevo campo preferenciaId
     public String getPreferenciaId() {

@@ -23,7 +23,7 @@ public class ElSaborcitoBackApplication {
 	CommandLineRunner initData(CategoriaRepository categoriaRepo, ProductoRepository productoRepo, ValorRepository valorRepo) {
 		return args -> {
 			// Crear Categorías
-			Categoria hamburguesas = new Categoria(null, "Hamburguesas", "Diferentes estilos, tipos y tamaños, pensadas para sacarte el hambre.", false);
+		/*	Categoria hamburguesas = new Categoria(null, "Hamburguesas", "Diferentes estilos, tipos y tamaños, pensadas para sacarte el hambre.", false);
 			Categoria pizza = new Categoria(null, "Pizza", "Al estilo Italianas.", false);
 			Categoria bebidas = new Categoria(null, "Bebidas", "Las más refrescantes.", false);
 
@@ -72,7 +72,7 @@ public class ElSaborcitoBackApplication {
 			productoRepo.save(new Producto(null, "Hamburguesa con Queso", "Hamburguesa con carne de res, queso cheddar y cebolla.", 20, new Date(), false, valorHamburguesasConQueso, hamburguesas));
 			productoRepo.save(new Producto(null, "Hamburguesa BBQ", "Hamburguesa con carne de res, queso, cebolla caramelizada y salsa BBQ.", 18, new Date(), false, valorHamburguesasBBQ, hamburguesas));
 			productoRepo.save(new Producto(null, "Hamburguesa Vegetariana", "Hamburguesa con base de garbanzos, lechuga, tomate y guacamole.", 22, new Date(), false, valorHamburguesasVegetariana, hamburguesas));
-		};
+*/		};
 	}
 
 }
