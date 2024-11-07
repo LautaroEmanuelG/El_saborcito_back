@@ -21,7 +21,7 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "adminId")
-    private Admin admin;
+    private Caja admin;
 
     @OneToMany(mappedBy = "ticket",cascade = CascadeType.ALL)
     private List<TicketProducto> ticketProductos;

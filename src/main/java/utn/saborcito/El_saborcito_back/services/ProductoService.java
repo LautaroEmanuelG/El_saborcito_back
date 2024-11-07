@@ -126,7 +126,7 @@ public class ProductoService {
         // Crear y guardar Transaccion
         Transaccion transaccion = new Transaccion();
         transaccion.setTicket(ticket);
-        transaccion.setTipo(TransaccionTipo.GASTO);
+        transaccion.setTipo(TransaccionTipo.MERCADERIA);
         transaccionService.guardarTransaccion(transaccion);
 
         return productoActualizado;
