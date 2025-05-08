@@ -35,5 +35,7 @@ Thumbs.db
 # Spring Boot
 target/
 
-# Ignore environment variables file
+# Env
+*.env
+*.env.local
 .env

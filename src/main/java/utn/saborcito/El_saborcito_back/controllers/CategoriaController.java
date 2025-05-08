@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -15,48 +16,33 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categorias")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequiredArgsConstructor
 public class CategoriaController {
-    @Autowired
-    private CategoriaService categoriaService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Categoria>> getCategorias() {
-        return ResponseEntity.ok(categoriaService.listarCategorias());
+    private final CategoriaService service;
+
+    @GetMapping
+    public List<Categoria> getAll() {
+        return service.findAll();
     }
 
-    @GetMapping("/id")
-    public ResponseEntity<Categoria> getCategoriaById(@RequestParam Long id) {
-        Categoria categoria = categoriaService.buscarCategoriaPorId(id);
-        if (categoria == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro la categoria con ID: " + id);
-        }
-        return ResponseEntity.ok(categoria);
+    @GetMapping("/{id}")
+    public Categoria getOne(@PathVariable Long id) {
+        return service.findById(id);
     }
 
-    @PostMapping("/guardar")
-    public ResponseEntity<?> saveCategoria(@RequestBody Categoria categoria, BindingResult result) {
-        if (result.hasErrors()) {
-            return validation(result);
-        }
-        Categoria savedCategoria = categoriaService.guardarCategoria(categoria);
-        return ResponseEntity.ok(savedCategoria);
+    @PostMapping
+    public Categoria create(@RequestBody Categoria categoria) {
+        return service.save(categoria);
     }
 
-    @PostMapping("/eliminar")
-    public ResponseEntity<String> deleteCategoria(@RequestParam Long id) {
-        if (categoriaService.buscarCategoriaPorId(id) == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro la categoria con ID: " + id);
-        }
-        categoriaService.eliminarCategoriaPorId(id);
-        return ResponseEntity.ok("Categoria eliminada");
+    @PutMapping("/{id}")
+    public Categoria update(@PathVariable Long id, @RequestBody Categoria categoria) {
+        return service.update(id, categoria);
     }
 
-    private ResponseEntity<?> validation(BindingResult result) {
-        Map<String, String> errors = new HashMap<>();
-        result.getFieldErrors().forEach(e -> {
-            errors.put(e.getField(), e.getDefaultMessage());
-        });
-        return ResponseEntity.badRequest().body(errors);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 }
