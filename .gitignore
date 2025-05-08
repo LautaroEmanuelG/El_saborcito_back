@@ -1,9 +1,9 @@
 # Gradle
+.gradle/
+build/
 !gradle/wrapper/gradle-wrapper.jar
 out/
-.idea
 .gradle
-build
 
 # IntelliJ IDEA
 .idea/
@@ -18,8 +18,6 @@ build
 
 # VS Code
 .vscode/
-.idea
-.idea/
 
 # Logs
 *.log
@@ -36,6 +34,3 @@ Thumbs.db
 
 # Spring Boot
 target/
-
-# Ignore environment variables file
-.env
