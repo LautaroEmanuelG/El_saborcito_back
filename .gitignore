@@ -19,6 +19,9 @@ out/
 # VS Code
 .vscode/
 
+# Enviroments
+.env
+
 # Logs
 *.log
 
