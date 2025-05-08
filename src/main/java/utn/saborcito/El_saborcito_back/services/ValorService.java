@@ -3,10 +3,7 @@ package utn.saborcito.El_saborcito_back.services;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utn.saborcito.El_saborcito_back.models.Valor;
 import utn.saborcito.El_saborcito_back.repositories.ValorRepository;
-
-import java.util.List;
 
 @Service
 public class ValorService {
