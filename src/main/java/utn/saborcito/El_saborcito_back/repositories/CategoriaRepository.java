@@ -8,4 +8,5 @@ import java.util.List;
 
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria,Long> {
+    List<Categoria> findByIsDeletedFalse();
 }

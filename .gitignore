@@ -19,9 +19,6 @@ out/
 # VS Code
 .vscode/
 
-# Enviroments
-.env
-
 # Logs
 *.log
 
@@ -37,3 +34,6 @@ Thumbs.db
 
 # Spring Boot
 target/
+
+# Ignore environment variables file
+.env

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.dto.ProductoDto;
 import utn.saborcito.El_saborcito_back.models.Categoria;
+import utn.saborcito.El_saborcito_back.models.Producto;
+import utn.saborcito.El_saborcito_back.models.Valor;
 import utn.saborcito.El_saborcito_back.repositories.ProductoRepository;
 
 import java.util.Date;

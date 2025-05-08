@@ -1,36 +1,24 @@
 package utn.saborcito.El_saborcito_back.models;
 
-import jakarta.persistence.*;
-import lombok.*;
-import utn.saborcito.El_saborcito_back.enums.Rol;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
+@Entity
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String auth0Id;
-    private String username;
-    private String email;
-    private String password;
     private String nombre;
-    private String apellido;
-    private String telefono;
-    private LocalDate fechaNacimiento;
-
-    @Enumerated(EnumType.STRING)
-    private Rol rol;
-
-    private Boolean estado;
-    private LocalDateTime fechaRegistro;
-    private LocalDateTime fechaUltimaModificacion;
+    private String email;  // Email o nombre de usuario
+    private String contraseña;
+    private String rol;
 }
