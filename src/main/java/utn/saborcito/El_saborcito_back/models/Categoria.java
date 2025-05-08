@@ -1,29 +1,21 @@
 package utn.saborcito.El_saborcito_back.models;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
 
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
+@Entity
 public class Categoria {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
-
-    private String denominacion;
-
-    @ManyToOne
-    @JoinColumn(name = "tipo_categoria_id")
-    private Categoria tipoCategoria;
-
-    @ManyToOne
-    @JoinColumn(name = "sucursal_id")
-    private Sucursal sucursal;
+    private String nombre;
+    private String descripcion;
+    private Boolean isDeleted = false;
 }

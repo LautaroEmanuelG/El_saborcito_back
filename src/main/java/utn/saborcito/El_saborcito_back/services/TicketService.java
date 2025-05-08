@@ -3,12 +3,13 @@ package utn.saborcito.El_saborcito_back.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.ProductoDto;
 import utn.saborcito.El_saborcito_back.dto.TicketDto;
-import utn.saborcito.El_saborcito_back.enums.TransaccionTipo;
+import utn.saborcito.El_saborcito_back.dto.TicketProductoDto;
 import utn.saborcito.El_saborcito_back.models.*;
 import utn.saborcito.El_saborcito_back.repositories.ProductoRepository;
 import utn.saborcito.El_saborcito_back.repositories.TicketRepository;
+import utn.saborcito.El_saborcito_back.repositories.TransaccionRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -31,7 +32,6 @@ public class TicketService {
     public List<Ticket> listarTickets() {
         return ticketRepository.findAll();
     }
-
     @Transactional
     public Ticket guardarTicket(TicketDto ticketDto) {
         List<TicketProducto> ticketProductos = ticketDto.getProductos().stream()
@@ -56,6 +56,7 @@ public class TicketService {
 
         Ticket ticket = new Ticket();
         ticket.setFecha(new Date());
+//        ticket.setAdmin(new Admin(1));
         ticket.setTotal(total);
         ticket.setTicketProductos(ticketProductos);
         ticket = ticketRepository.save(ticket);
@@ -66,7 +67,6 @@ public class TicketService {
 
         Transaccion transaccion = new Transaccion();
         transaccion.setTicket(ticket);
-        transaccion.setTipo(TransaccionTipo.valueOf(ticketDto.getPago().toUpperCase())); // Set the transaction type based on payment method
         transaccionService.guardarTransaccion(transaccion);
 
         return ticket;
