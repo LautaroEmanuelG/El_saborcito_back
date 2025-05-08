@@ -2,30 +2,38 @@
 
 ## 📜 Descripción del Proyecto
 
-Este proyecto consiste en el desarrollo de un sistema web para un restaurante que permite gestionar ventas y administrar finanzas de manera eficiente. El backend está construido utilizando Java y Spring Boot, y se conecta a una base de datos H2 para el almacenamiento de datos.
+Este proyecto consiste en el desarrollo de un sistema web para un restaurante que permite gestionar ventas y administrar finanzas de manera eficiente. El backend está construido utilizando Java y Spring Boot, y se conecta a una base de datos MySQL para el almacenamiento de datos.
 
-## 🗄️ Base de Datos H2 y JPA (Local)
+## 🗄️ Base de Datos MySQL
 
-La base de datos H2 es una base de datos en memoria que se configura automáticamente al iniciar la aplicación. La consola de H2 está disponible en:
+La aplicación utiliza MySQL como sistema de gestión de base de datos para el almacenamiento persistente de datos.
 
 ![Base de Datos El Saborcito](./data/El%20saborcito.png)
 
-- URL: [http://localhost:5252/h2-console](http://localhost:8080/h2-console)
+## 🔐 Variables de Entorno
 
-### ⚙️ Configuración de la Base de Datos (Local)
+El proyecto utiliza un archivo `.env` para gestionar variables de entorno sensibles. Para configurar tu entorno:
 
-- **JDBC URL**: `jdbc:h2:file:./data/saborcito_db`
-- **Usuario**: `sa`
-- **Contraseña**: (dejar en blanco)
+1. Crea un archivo `.env` en la raíz del proyecto basándote en el archivo `.env.example`
+2. Completa las variables con tus propios valores
+
+```properties
+# Ejemplo de configuración en .env
+DB_URL=jdbc:mysql://localhost:3306/saborcito_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_contraseña
+DB_DRIVER=com.mysql.cj.jdbc.Driver
+JPA_DIALECT=org.hibernate.dialect.MySQLDialect
+SERVER_PORT=5252
+```
 
 ## 🛠️ Tecnologías Utilizadas
 
 - Java
 - Spring Boot
 - Gradle
-- H2 Database
+- MySQL
 - Swagger
-- (Proximamente) PostgreSQL
 
 ## 🚀 Configuración del Entorno
 
@@ -35,21 +43,22 @@ La base de datos H2 es una base de datos en memoria que se configura automática
 git clone https://github.com/LautaroEmanuelG/El_saborcito_back.git
 ```
 
-2. Construir el proyecto:
+2. Configurar MySQL y crear el archivo `.env` (ver sección de Variables de Entorno)
+
+3. Construir el proyecto:
 
 ```bash
 ./gradlew build
 ```
 
-3. Ejecutar la aplicación:
+4. Ejecutar la aplicación:
 
 ```bash
 ./gradlew bootRun
 ```
 
-4. Acceder a la aplicación: La aplicación estará disponible
-- Base de datos H2: http://localhost:5252/h2-console
-- Swagger UI: http://localhost:5252/swagger-ui.html
+5. Acceder a la aplicación:
+   - Swagger UI: http://localhost:5252/swagger-ui.html
 
 ## 📄 Endpoints de la API Swagger
 
@@ -86,7 +95,6 @@ En este proyecto, se utiliza una tabla intermedia explícita para gestionar la r
 - Ejemplo de la Entidad TicketProducto:
 
 ```java
-Copiar código
 @Entity
 public class TicketProducto {
     @Id
