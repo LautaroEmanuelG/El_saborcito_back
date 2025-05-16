@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.enums.Rol;
 import utn.saborcito.El_saborcito_back.models.Cliente;
 import utn.saborcito.El_saborcito_back.repositories.ClienteRepository;
 
@@ -24,8 +25,12 @@ public class ClienteService {
     }
 
     public Cliente save(Cliente cliente) {
+        if (cliente.getUsuario() == null || cliente.getUsuario().getRol() != Rol.CLIENTE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario debe tener rol CLIENTE.");
+        }
         return repo.save(cliente);
     }
+
 
     public Cliente update(Long id, Cliente dto) {
         dto.setId(id);
