@@ -9,6 +9,7 @@ import utn.saborcito.El_saborcito_back.models.Categoria;
 import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,13 @@ public class CategoriaService {
     }
 
     public Categoria save(Categoria categoria) {
+        Optional<Categoria> existente = repo.findByDenominacionIgnoreCase(categoria.getDenominacion());
+        if (existente.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe una categoría con ese nombre");
+        }
         return repo.save(categoria);
     }
+
 
     public Categoria update(Long id, Categoria dto) {
         Categoria existing = findById(id);
