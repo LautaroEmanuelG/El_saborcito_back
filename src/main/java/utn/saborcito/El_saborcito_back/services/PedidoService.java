@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.enums.TipoEnvio;
+import utn.saborcito.El_saborcito_back.models.ArticuloManufacturado;
 import utn.saborcito.El_saborcito_back.models.Pedido;
 import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
 import utn.saborcito.El_saborcito_back.models.DetallePedido;
 
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -22,13 +25,27 @@ public class PedidoService {
     }
     public Pedido save(Pedido pedido) {
         calcularTotal(pedido);
+        calcularHoraEstimada(pedido);
         return repo.save(pedido);
     }
 
     public Pedido update(Long id, Pedido pedido) {
         pedido.setId(id);
         calcularTotal(pedido);
+        calcularHoraEstimada(pedido);
         return repo.save(pedido);
+    }
+
+    private void calcularHoraEstimada(Pedido pedido) {
+        int minutosCocina = pedido.getDetalles().stream()
+                .filter(det -> det.getArticulo() instanceof ArticuloManufacturado)
+                .map(det -> ((ArticuloManufacturado) det.getArticulo()).getTiempoEstimadoMinutos() * det.getCantidad())
+                .reduce(0, Integer::sum);
+
+        int minutosDelivery = pedido.getTipoEnvio() == TipoEnvio.DELIVERY ? 30 : 0;
+
+        LocalTime horaEstimada = LocalTime.now().plusMinutes(minutosCocina + minutosDelivery);
+        pedido.setHorasEstimadaFinalizacion(horaEstimada);
     }
 
     private void calcularTotal(Pedido pedido) {
