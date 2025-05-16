@@ -72,6 +72,12 @@ public class NotaCreditoService {
     }
 
     public NotaCredito update(Long id, NotaCredito n) {
+        NotaCredito existing = findById(id);
+
+        if (!n.getFechaEmision().equals(existing.getFechaEmision())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede modificar la fecha de emisión.");
+        }
+
         n.setId(id);
         return repo.save(n);
     }
