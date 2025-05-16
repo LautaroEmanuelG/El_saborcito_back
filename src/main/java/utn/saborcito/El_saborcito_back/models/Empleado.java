@@ -16,7 +16,6 @@ public class Empleado {
 
     private String legajo;
     private LocalDate fechaIngreso;
-    private Long sucursalAsignada;
 
     @ManyToOne
     @JoinColumn(name = "sucursal_id")
