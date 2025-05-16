@@ -19,7 +19,7 @@ public class Sucursal {
     private String nombre;
 
     // Uno a uno con Domicilio
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "domicilio_id", referencedColumnName = "id")
     private Domicilio domicilio;
 
