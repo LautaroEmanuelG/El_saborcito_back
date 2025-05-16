@@ -5,9 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.enums.Estado;
-import utn.saborcito.El_saborcito_back.models.Factura;
-import utn.saborcito.El_saborcito_back.models.NotaCredito;
-import utn.saborcito.El_saborcito_back.models.Pedido;
+import utn.saborcito.El_saborcito_back.models.*;
+import utn.saborcito.El_saborcito_back.repositories.ArticuloInsumoRepository;
 import utn.saborcito.El_saborcito_back.repositories.FacturaRepository;
 import utn.saborcito.El_saborcito_back.repositories.NotaCreditoRepository;
 import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
@@ -20,6 +19,7 @@ public class NotaCreditoService {
     private final NotaCreditoRepository repo;
     private final FacturaRepository facturaRepository;
     private final PedidoRepository pedidoRepository;
+    private final ArticuloInsumoRepository articuloInsumoRepository;
 
     public List<NotaCredito> findAll() { return repo.findAll(); }
     public NotaCredito findById(Long id) {
@@ -58,6 +58,17 @@ public class NotaCreditoService {
             pedido.setEstado(Estado.CANCELADO); // o ESTADO_AJUSTADO, si tenés uno más específico
             pedidoRepository.save(pedido);
         }
+
+        for (DetallePedido detalle : pedido.getDetalles()) {
+            Articulo articulo = detalle.getArticulo();
+
+            if (articulo instanceof ArticuloInsumo insumo) {
+                insumo.setStockActual(insumo.getStockActual() + detalle.getCantidad());
+                articuloInsumoRepository.save(insumo);
+            }
+            // Para manufacturados: stock de insumos en detalleManufacturado si querés ir más profundo
+        }
+
     }
 
     public NotaCredito update(Long id, NotaCredito n) {
