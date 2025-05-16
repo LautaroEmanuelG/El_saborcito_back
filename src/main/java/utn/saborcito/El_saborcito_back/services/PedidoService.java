@@ -30,11 +30,29 @@ public class PedidoService {
     }
 
     public Pedido update(Long id, Pedido pedido) {
-        pedido.setId(id);
-        calcularTotal(pedido);
-        calcularHoraEstimada(pedido);
-        return repo.save(pedido);
+        Pedido existing = findById(id);
+
+        existing.getDetalles().clear();
+
+        if (pedido.getDetalles() != null) {
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                detalle.setPedido(existing);
+                existing.getDetalles().add(detalle);
+            }
+        }
+
+        existing.setTipoEnvio(pedido.getTipoEnvio());
+        existing.setFormaPago(pedido.getFormaPago());
+        existing.setSucursal(pedido.getSucursal());
+        existing.setCliente(pedido.getCliente());
+        existing.setEstado(pedido.getEstado());
+
+        calcularTotal(existing);
+        calcularHoraEstimada(existing);
+
+        return repo.save(existing);
     }
+
 
     private void calcularHoraEstimada(Pedido pedido) {
         int minutosCocina = pedido.getDetalles().stream()
