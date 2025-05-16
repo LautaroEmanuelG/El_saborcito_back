@@ -20,11 +20,15 @@ public class Factura {
     private Integer mpMerchantOrderId;
     private String mpPreferenceId;
     private String mpPaymentType;
+    private Double montoTotalAcreditado = 0.0;
+    private Boolean ajustada = false;
+
 
     @Enumerated(EnumType.STRING)
     private FormaPago formaPago;
 
     private Double totalVenta;
+
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")
