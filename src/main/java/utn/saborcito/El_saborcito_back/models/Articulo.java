@@ -19,4 +19,8 @@ public abstract class Articulo {
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @ManyToOne
+    @JoinColumn(name = "unidad_medida_id")
+    private UnidadMedida unidadMedida;
 }
