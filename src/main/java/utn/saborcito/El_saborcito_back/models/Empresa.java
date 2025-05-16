@@ -17,6 +17,6 @@ public class Empresa {
 
     private String nombre;
     private String razonSocial;
-    private Integer cuil;
+    private String  cuil;
 
 }
