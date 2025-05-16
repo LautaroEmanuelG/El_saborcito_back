@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.models.ArticuloInsumo;
+import utn.saborcito.El_saborcito_back.models.Imagen;
 import utn.saborcito.El_saborcito_back.repositories.ArticuloInsumoRepository;
+import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 
 import java.util.List;
 
@@ -13,12 +15,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArticuloInsumoService {
     private final ArticuloInsumoRepository repo;
+    private final ImagenRepository imagenRepository;
 
     public List<ArticuloInsumo> findAll() { return repo.findAll(); }
     public ArticuloInsumo findById(Long id) {
         return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
-    public ArticuloInsumo save(ArticuloInsumo i) { return repo.save(i); }
+    public ArticuloInsumo save(ArticuloInsumo insumo) {
+        if (insumo.getImagen() != null && insumo.getImagen().getId() != null) {
+            Imagen img = imagenRepository.findById(insumo.getImagen().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Imagen no encontrada"));
+            insumo.setImagen(img);
+        }
+
+        return repo.save(insumo);
+    }
     public ArticuloInsumo update(Long id, ArticuloInsumo i) {
         i.setId(id);
         return repo.save(i);
