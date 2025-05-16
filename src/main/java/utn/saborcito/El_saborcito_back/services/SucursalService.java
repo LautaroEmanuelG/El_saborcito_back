@@ -32,8 +32,7 @@ public class SucursalService {
     public Sucursal update(Long id, Sucursal dto) {
         Sucursal existing = findById(id);
         existing.setNombre(dto.getNombre());
-        existing.setHorarioApertura(dto.getHorarioApertura());
-        existing.setHorarioCierre(dto.getHorarioCierre());
+        existing.setHorarios(dto.getHorarios());
         existing.setDomicilio(dto.getDomicilio());
         existing.setEmpresa(dto.getEmpresa());
         return repo.save(existing);
