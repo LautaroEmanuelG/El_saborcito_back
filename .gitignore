@@ -18,6 +18,12 @@ out/
 
 # VS Code
 .vscode/
+<<<<<<< HEAD
+
+# Enviroments
+.env
+=======
+>>>>>>> main
 
 # Logs
 *.log
@@ -33,9 +39,13 @@ Thumbs.db
 *.ear
 
 # Spring Boot
+<<<<<<< HEAD
+target/
+=======
 target/
 
 # Env
 *.env
 *.env.local
 .env
+>>>>>>> main

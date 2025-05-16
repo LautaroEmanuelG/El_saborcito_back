@@ -24,12 +24,21 @@ public class DetallePedidoService {
     }
 
     public DetallePedido save(DetallePedido detalle) {
+        calcularSubtotal(detalle);
         return repo.save(detalle);
     }
 
-    public DetallePedido update(Long id, DetallePedido dto) {
-        dto.setId(id);
-        return repo.save(dto);
+    public DetallePedido update(Long id, DetallePedido detalle) {
+        detalle.setId(id);
+        calcularSubtotal(detalle);
+        return repo.save(detalle);
+    }
+
+    private void calcularSubtotal(DetallePedido d) {
+        if (d.getArticulo() == null || d.getCantidad() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe especificar artículo y cantidad");
+        }
+        d.setSubTotal(d.getCantidad() * d.getArticulo().getPrecioVenta().doubleValue());
     }
 
     public void delete(Long id) {

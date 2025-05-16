@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Articulo {
+public abstract class Articulo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,10 +21,6 @@ public class Articulo {
     private Categoria categoria;
 
     @ManyToOne
-    @JoinColumn(name = "detalle_producto_id")
-    private ArticuloManufacturado detalleProducto;
-
-    @ManyToOne
-    @JoinColumn(name = "articulo_insumo_id")
-    private ArticuloInsumo articuloInsumo;
+    @JoinColumn(name = "unidad_medida_id")
+    private UnidadMedida unidadMedida;
 }

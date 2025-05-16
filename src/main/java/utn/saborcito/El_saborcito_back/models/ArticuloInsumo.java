@@ -7,12 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ArticuloInsumo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ArticuloInsumo extends Articulo{
 
-    private String denominacion;
     private Double precioCompra;
     private Integer stockActual;
     private Integer stockMaximo;

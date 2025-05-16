@@ -15,7 +15,4 @@ public class UnidadMedida {
 
     private String denominacion;
 
-    @ManyToOne
-    @JoinColumn(name = "articulo_id")
-    private Articulo articulo;
 }
