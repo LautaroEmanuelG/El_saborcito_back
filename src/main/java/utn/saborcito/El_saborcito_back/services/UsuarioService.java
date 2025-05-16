@@ -33,8 +33,10 @@ public class UsuarioService {
     }
 
     public void delete(Long id) {
-        if (!repo.existsById(id))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado con id " + id);
+        }
         repo.deleteById(id);
     }
+
 }
