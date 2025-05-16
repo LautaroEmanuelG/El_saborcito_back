@@ -28,8 +28,15 @@ public class ClienteService {
         if (cliente.getUsuario() == null || cliente.getUsuario().getRol() != Rol.CLIENTE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario debe tener rol CLIENTE.");
         }
+
+        if (cliente.getHistorialPedidos() != null && !cliente.getHistorialPedidos().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se permite setear historial de pedidos manualmente.");
+        }
+
+        cliente.setHistorialPedidos("[]"); // opcional: dejarlo vacío
         return repo.save(cliente);
     }
+
 
 
     public Cliente update(Long id, Cliente dto) {
