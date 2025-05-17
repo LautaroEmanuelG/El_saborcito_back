@@ -2,7 +2,6 @@ package utn.saborcito.El_saborcito_back.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -19,7 +18,7 @@ public class Sucursal {
     private String nombre;
 
     // Uno a uno con Domicilio
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "domicilio_id", referencedColumnName = "id")
     private Domicilio domicilio;
 

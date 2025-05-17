@@ -2,12 +2,14 @@ package utn.saborcito.El_saborcito_back.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder // Añadido SuperBuilder
 public abstract class Articulo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
