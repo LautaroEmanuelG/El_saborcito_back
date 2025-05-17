@@ -20,7 +20,9 @@ public class Factura {
     private Integer mpMerchantOrderId;
     private String mpPreferenceId;
     private String mpPaymentType;
+    @Builder.Default
     private Double montoTotalAcreditado = 0.0;
+    @Builder.Default
     private Boolean ajustada = false;
 
 
