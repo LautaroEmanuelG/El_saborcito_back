@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 import utn.saborcito.El_saborcito_back.models.Empresa;
 
 @Repository
-public interface EmpresaRepository extends JpaRepository<Empresa, Long> { }
+public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
+    boolean existsByCuil(String cuil);
+}
