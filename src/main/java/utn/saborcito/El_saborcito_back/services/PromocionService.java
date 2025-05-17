@@ -18,11 +18,24 @@ public class PromocionService {
     public Promocion findById(Long id) {
         return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
-    public Promocion save(Promocion p) { return repo.save(p); }
-    public Promocion update(Long id, Promocion p) {
-        Promocion existing = findById(id);
-        p.setId(id);
+    public Promocion save(Promocion p) {
+        validarPromocion(p);
         return repo.save(p);
+    }
+
+    public Promocion update(Long id, Promocion p) {
+        p.setId(id);
+        validarPromocion(p);
+        return repo.save(p);
+    }
+
+    private void validarPromocion(Promocion p) {
+        boolean tieneDescuento = p.getDescuento() != null && p.getDescuento() > 0;
+        boolean tienePrecioPromocional = p.getPrecioPromocional() != null && p.getPrecioPromocional() > 0;
+
+        if (tieneDescuento && tienePrecioPromocional) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puede usar descuento y precio promocional al mismo tiempo.");
+        }
     }
     public void delete(Long id) { repo.deleteById(id); }
 }

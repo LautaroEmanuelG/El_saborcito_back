@@ -2,6 +2,7 @@ package utn.saborcito.El_saborcito_back.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import utn.saborcito.El_saborcito_back.dto.ArticuloDTO;
 import utn.saborcito.El_saborcito_back.models.Articulo;
 import utn.saborcito.El_saborcito_back.services.ArticuloService;
 
@@ -15,9 +16,10 @@ public class ArticuloController {
     private final ArticuloService service;
 
     @GetMapping
-    public List<Articulo> getAll() {
+    public List<ArticuloDTO> getAll() {
         return service.findAll();
     }
+
 
     @GetMapping("/{id}")
     public Articulo getOne(@PathVariable Long id) {
