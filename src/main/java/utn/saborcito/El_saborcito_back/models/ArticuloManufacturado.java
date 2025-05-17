@@ -7,16 +7,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ArticuloManufacturado {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ArticuloManufacturado extends Articulo {
 
-    private String denominacion;
     private String descripcion;
     private Integer tiempoEstimadoMinutos;
     private String preparacion;
-    private Double precioVenta;
 
     @ManyToOne
     @JoinColumn(name = "imagen_id")

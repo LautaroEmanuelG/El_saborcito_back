@@ -42,7 +42,8 @@ public class Pedido {
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<DetallePedido> detalles;
+
 
 }

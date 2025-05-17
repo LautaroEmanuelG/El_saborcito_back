@@ -27,14 +27,20 @@ public class UsuarioService {
         return repo.save(usuario);
     }
 
-    public Usuario update(Long id, Usuario dto) {
-        dto.setId(id);
-        return repo.save(dto);
+    public Usuario update(Long id, Usuario usuario) {
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado con id " + id);
+        }
+        usuario.setId(id);
+        return repo.save(usuario);
     }
 
+
     public void delete(Long id) {
-        if (!repo.existsById(id))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado con id " + id);
+        }
         repo.deleteById(id);
     }
+
 }

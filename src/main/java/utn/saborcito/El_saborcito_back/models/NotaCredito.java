@@ -13,7 +13,7 @@ public class NotaCredito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private Double monto;
     private LocalDate fechaEmision;
     private String motivo;
 

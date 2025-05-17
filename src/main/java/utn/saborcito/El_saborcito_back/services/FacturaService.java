@@ -20,9 +20,16 @@ public class FacturaService {
     }
     public Factura save(Factura f) { return repo.save(f); }
     public Factura update(Long id, Factura f) {
+        Factura existing = findById(id);
+
+        if (!f.getFechaFacturacion().equals(existing.getFechaFacturacion())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede modificar la fecha de facturación.");
+        }
+
         f.setId(id);
         return repo.save(f);
     }
+
     public void delete(Long id) {
         if (!repo.existsById(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         repo.deleteById(id);

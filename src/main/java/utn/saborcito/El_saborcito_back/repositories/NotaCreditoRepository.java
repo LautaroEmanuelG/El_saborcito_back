@@ -6,4 +6,5 @@ import utn.saborcito.El_saborcito_back.models.NotaCredito;
 
 @Repository
 
-public interface NotaCreditoRepository extends JpaRepository<NotaCredito, Long> {}
+public interface NotaCreditoRepository extends JpaRepository<NotaCredito, Long> {boolean existsByFacturaIdAndMonto(Long facturaId, Double monto);
+}
