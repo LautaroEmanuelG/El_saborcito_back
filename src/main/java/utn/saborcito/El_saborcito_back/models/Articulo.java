@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 public abstract class Articulo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_articulo;
 
     private String denominacion;
     private Integer precioVenta;

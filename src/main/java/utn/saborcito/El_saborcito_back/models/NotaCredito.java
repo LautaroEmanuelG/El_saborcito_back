@@ -13,7 +13,7 @@ import java.time.LocalDateTime; // Asegurar que este import esté presente
 public class NotaCredito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_NotaCredito;
     private Double monto;
     private LocalDateTime fechaEmision; // Tipo cambiado a LocalDateTime
     private String motivo;

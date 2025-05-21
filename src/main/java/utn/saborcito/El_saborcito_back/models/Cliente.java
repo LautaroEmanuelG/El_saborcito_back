@@ -10,7 +10,7 @@ import lombok.*;
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_Cliente;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")

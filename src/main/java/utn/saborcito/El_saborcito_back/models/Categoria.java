@@ -15,7 +15,7 @@ import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_Categoria;
 
     private String denominacion;
 

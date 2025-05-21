@@ -29,7 +29,7 @@ public class ImagenService {
     }
 
     public Imagen update(Long id, Imagen dto) {
-        dto.setId(id);
+        dto.setId_Imagen(id);
         return repo.save(dto);
     }
 
