@@ -9,5 +9,5 @@ import utn.saborcito.El_saborcito_back.models.NotaCredito;
 public interface NotaCreditoRepository extends JpaRepository<NotaCredito, Long> {
     boolean existsByFacturaIdAndMonto(Long facturaId, Double monto);
 
-    boolean existsByFacturaIdAndMontoAndMotivo(Long facturaId, Double monto, String motivo); // <--- AÑADIDO
+    boolean existsByFactura_IdFacturaAndMontoAndMotivo(Long facturaId, Double monto, String motivo); // <--- MODIFICADO
 }

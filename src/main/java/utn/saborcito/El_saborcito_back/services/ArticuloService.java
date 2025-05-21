@@ -50,20 +50,20 @@ public class ArticuloService {
             return null;
         }
         ArticuloDTO dto = new ArticuloDTO();
-        dto.setId(articulo.getId_articulo()); // getId() en Long no debería ser null si la entidad está gestionada
+        dto.setId(articulo.getId()); // getId() en Long no debería ser null si la entidad está gestionada
         dto.setDenominacion(articulo.getDenominacion());
         dto.setPrecioVenta(articulo.getPrecioVenta());
 
-        if (articulo.getCategoria() != null && articulo.getCategoria().getId_Categoria() != null) {
-            dto.setCategoriaId(articulo.getCategoria().getId_Categoria());
+        if (articulo.getCategoria() != null && articulo.getCategoria().getId() != null) {
+            dto.setCategoriaId(articulo.getCategoria().getId());
         } else {
             // Opción 1: Dejarlo null en el DTO
             // Opción 2: Lanzar advertencia/error si la categoría es mandatoria
             // Opción 3: Asignar un ID por defecto o indicativo de "sin categoría"
         }
 
-        if (articulo.getUnidadMedida() != null && articulo.getUnidadMedida().getId_UnidadMedida() != null) {
-            dto.setUnidadMedidaId(articulo.getUnidadMedida().getId_UnidadMedida());
+        if (articulo.getUnidadMedida() != null && articulo.getUnidadMedida().getId() != null) {
+            dto.setUnidadMedidaId(articulo.getUnidadMedida().getId());
         }
 
         // Si ArticuloDTO necesita más campos (ej. tipo de artículo, imagenUrl para
@@ -88,35 +88,35 @@ public class ArticuloService {
         }
 
         // Validar y asegurar la existencia de Categoria
-        if (articulo.getCategoria() == null || articulo.getCategoria().getId_Categoria() == null) {
+        if (articulo.getCategoria() == null || articulo.getCategoria().getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La categoría del artículo es obligatoria.");
         }
-        Categoria categoria = categoriaRepository.findById(articulo.getCategoria().getId_Categoria())
+        Categoria categoria = categoriaRepository.findById(articulo.getCategoria().getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Categoría no encontrada con ID: " + articulo.getCategoria().getId_Categoria()));
+                        "Categoría no encontrada con ID: " + articulo.getCategoria().getId()));
         articulo.setCategoria(categoria);
 
         // Validar y asegurar la existencia de UnidadMedida
-        if (articulo.getUnidadMedida() == null || articulo.getUnidadMedida().getId() == null) {
+        if (articulo.getUnidadMedida() == null || articulo.getUnidadMedida().getId_UnidadMedida() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La unidad de medida del artículo es obligatoria.");
         }
-        UnidadMedida unidadMedida = unidadMedidaRepository.findById(articulo.getUnidadMedida().getId_UnidadMedida())
+        UnidadMedida unidadMedida = unidadMedidaRepository.findById(articulo.getUnidadMedida().getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Unidad de medida no encontrada con ID: " + articulo.getUnidadMedida().getId_UnidadMedida()));
+                        "Unidad de medida no encontrada con ID: " + articulo.getUnidadMedida().getId()));
         articulo.setUnidadMedida(unidadMedida);
 
         // Validaciones específicas para ArticuloInsumo (ej. imagen)
         if (articulo instanceof ArticuloInsumo insumo) {
             // CORRECCIÓN 24: Si la imagen es obligatoria para ArticuloInsumo
-            if (insumo.getImagen() == null || insumo.getImagen().getId_Imagen() == null) {
+            if (insumo.getImagen() == null || insumo.getImagen().getId() == null) {
                 // Si es opcional, se puede quitar esta validación o manejarla diferente
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "La imagen es obligatoria para un artículo de tipo insumo.");
             }
-            Imagen imagen = imagenRepository.findById(insumo.getImagen().getId_Imagen())
+            Imagen imagen = imagenRepository.findById(insumo.getImagen().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Imagen no encontrada con ID: " + insumo.getImagen().getId_Imagen()));
+                            "Imagen no encontrada con ID: " + insumo.getImagen().getId()));
             insumo.setImagen(imagen);
 
             if (insumo.getPrecioCompra() == null || insumo.getPrecioCompra() < 0) {
@@ -162,20 +162,20 @@ public class ArticuloService {
         }
 
         // Actualizar Categoria si se proporciona
-        if (articuloActualizado.getCategoria() != null && articuloActualizado.getCategoria().getId_Categoria() != null) {
-            Categoria categoria = categoriaRepository.findById(articuloActualizado.getCategoria().getId_Categoria())
+        if (articuloActualizado.getCategoria() != null && articuloActualizado.getCategoria().getId() != null) {
+            Categoria categoria = categoriaRepository.findById(articuloActualizado.getCategoria().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Categoría para actualizar no encontrada con ID: "
-                                    + articuloActualizado.getCategoria().getId_Categoria()));
+                                    + articuloActualizado.getCategoria().getId()));
             articuloExistente.setCategoria(categoria);
         }
 
         // Actualizar UnidadMedida si se proporciona
-        if (articuloActualizado.getUnidadMedida() != null && articuloActualizado.getUnidadMedida().getId_UnidadMedida() != null) {
-            UnidadMedida unidadMedida = unidadMedidaRepository.findById(articuloActualizado.getUnidadMedida().getId_UnidadMedida())
+        if (articuloActualizado.getUnidadMedida() != null && articuloActualizado.getUnidadMedida().getId() != null) {
+            UnidadMedida unidadMedida = unidadMedidaRepository.findById(articuloActualizado.getUnidadMedida().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Unidad de medida para actualizar no encontrada con ID: "
-                                    + articuloActualizado.getUnidadMedida().getId_UnidadMedida()));
+                                    + articuloActualizado.getUnidadMedida().getId()));
             articuloExistente.setUnidadMedida(unidadMedida);
         }
 
@@ -197,11 +197,11 @@ public class ArticuloService {
                 insumoExistente.setEsParaElaborar(insumoActualizado.getEsParaElaborar());
             }
             // Actualizar Imagen para ArticuloInsumo si se proporciona
-            if (insumoActualizado.getImagen() != null && insumoActualizado.getImagen().getId_Imagen() != null) {
-                Imagen imagen = imagenRepository.findById(insumoActualizado.getImagen().getId_Imagen())
+            if (insumoActualizado.getImagen() != null && insumoActualizado.getImagen().getId() != null) {
+                Imagen imagen = imagenRepository.findById(insumoActualizado.getImagen().getId())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Imagen para actualizar no encontrada con ID: "
-                                        + insumoActualizado.getImagen().getId_Imagen()));
+                                        + insumoActualizado.getImagen().getId()));
                 insumoExistente.setImagen(imagen);
             } else if (insumoActualizado.getImagen() == null && insumoExistente.getImagen() != null) { // Solo si se
                                                                                                        // intenta poner

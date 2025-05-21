@@ -30,7 +30,7 @@ public class ArticuloManufacturadoService {
     }
 
     public ArticuloManufacturado update(Long id, ArticuloManufacturado dto) {
-        dto.setId_articulo(id);
+        dto.setId(id);
         return repo.save(dto);
     }
 

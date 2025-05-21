@@ -11,7 +11,7 @@ import lombok.*;
 public class Imagen {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Imagen;
+    private Long id;
 
     private String url;
 

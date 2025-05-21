@@ -10,7 +10,10 @@ import lombok.*;
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Cliente;
+    private Long id;
+
+    @Lob
+    private String historialPedidos; // Representa el JSON como texto
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")

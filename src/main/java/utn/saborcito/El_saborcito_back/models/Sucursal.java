@@ -13,13 +13,13 @@ import java.util.List;
 public class Sucursal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Sucursal;
+    private Long id;
 
     private String nombre;
 
     // Uno a uno con Domicilio
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "domicilio_id", referencedColumnName = "id")
+    @JoinColumn(name = "domicilio_id", referencedColumnName = "id_Domicilio")
     private Domicilio domicilio;
 
     // MUCHOS A UNO: cada sucursal pertenece a una empresa
