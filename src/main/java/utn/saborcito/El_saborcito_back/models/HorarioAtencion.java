@@ -17,7 +17,7 @@ import java.time.LocalTime;
 public class HorarioAtencion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_HorarioAtencion;
 
     @Enumerated(EnumType.STRING)
     private DiaSemana diaSemana;

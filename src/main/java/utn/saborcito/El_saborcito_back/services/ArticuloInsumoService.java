@@ -22,8 +22,8 @@ public class ArticuloInsumoService {
         return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
     public ArticuloInsumo save(ArticuloInsumo insumo) {
-        if (insumo.getImagen() != null && insumo.getImagen().getId() != null) {
-            Imagen img = imagenRepository.findById(insumo.getImagen().getId())
+        if (insumo.getImagen() != null && insumo.getImagen().getId_Imagen() != null) {
+            Imagen img = imagenRepository.findById(insumo.getImagen().getId_Imagen())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Imagen no encontrada"));
             insumo.setImagen(img);
         }
@@ -31,7 +31,7 @@ public class ArticuloInsumoService {
         return repo.save(insumo);
     }
     public ArticuloInsumo update(Long id, ArticuloInsumo i) {
-        i.setId(id);
+        i.setId_articulo(id);
         return repo.save(i);
     }
     public void delete(Long id) {

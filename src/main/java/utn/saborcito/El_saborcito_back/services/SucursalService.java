@@ -29,11 +29,11 @@ public class SucursalService {
     }
 
     public Sucursal create(Sucursal suc) {
-        if (suc.getDomicilio() != null && suc.getDomicilio().getId() != null) {
-            Domicilio domicilioExistente = domicilioRepository.findById(suc.getDomicilio().getId())
+        if (suc.getDomicilio() != null && suc.getDomicilio().getId_Domicilio() != null) {
+            Domicilio domicilioExistente = domicilioRepository.findById(suc.getDomicilio().getId_Domicilio())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                             "Domicilio proporcionado para la nueva sucursal no encontrado con ID: "
-                                    + suc.getDomicilio().getId()));
+                                    + suc.getDomicilio().getId_Domicilio()));
             suc.setDomicilio(domicilioExistente);
         } else if (suc.getDomicilio() != null) {
             // Si el domicilio no tiene ID, se asume que es nuevo y se guardará por cascada.
@@ -45,7 +45,7 @@ public class SucursalService {
             // Por ahora, se permite la creación de un nuevo domicilio.
         }
         // Validar que la empresa exista si se proporciona
-        if (suc.getEmpresa() != null && suc.getEmpresa().getId() == null) {
+        if (suc.getEmpresa() != null && suc.getEmpresa().getId_Empresa() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La empresa asociada a la sucursal debe tener un ID válido.");
         }
@@ -56,8 +56,8 @@ public class SucursalService {
     }
 
     public Sucursal update(Long id, Sucursal dto) {
-        if (dto.getDomicilio() != null && dto.getDomicilio().getId() != null) {
-            Domicilio domicilioExistente = domicilioRepository.findById(dto.getDomicilio().getId())
+        if (dto.getDomicilio() != null && dto.getDomicilio().getId_Domicilio() != null) {
+            Domicilio domicilioExistente = domicilioRepository.findById(dto.getDomicilio().getId_Domicilio())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Domicilio no encontrado"));
             dto.setDomicilio(domicilioExistente);
         }

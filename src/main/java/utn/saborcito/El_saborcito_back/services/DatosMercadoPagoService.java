@@ -20,7 +20,7 @@ public class DatosMercadoPagoService {
     }
     public DatosMercadoPago save(DatosMercadoPago dmp) { return repo.save(dmp); }
     public DatosMercadoPago update(Long id, DatosMercadoPago dmp) {
-        dmp.setId(id);
+        dmp.setId_DatosMercadoPago(id);
         return repo.save(dmp);
     }
     public void delete(Long id) {

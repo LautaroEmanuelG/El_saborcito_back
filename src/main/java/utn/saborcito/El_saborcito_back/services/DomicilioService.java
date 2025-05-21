@@ -36,7 +36,7 @@ public class DomicilioService {
         if (dom.getCalle() == null || dom.getCalle().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La calle no puede estar vacía.");
         }
-        if (dom.getLocalidad() == null || dom.getLocalidad().getId() == null) {
+        if (dom.getLocalidad() == null || dom.getLocalidad().getId_Localidad() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La localidad es obligatoria.");
         }
         return repo.save(dom);
@@ -56,13 +56,13 @@ public class DomicilioService {
             domicilioExistente.setCp(domicilioActualizado.getCp());
         }
         // Validar que la localidad exista si se proporciona una nueva.
-        if (domicilioActualizado.getLocalidad() != null && domicilioActualizado.getLocalidad().getId() != null) {
+        if (domicilioActualizado.getLocalidad() != null && domicilioActualizado.getLocalidad().getId_Localidad() != null) {
             // Aquí se podría verificar si la localidad existe en la base de datos
-            Localidad localidad = localidadRepository.findById(domicilioActualizado.getLocalidad().getId())
+            Localidad localidad = localidadRepository.findById(domicilioActualizado.getLocalidad().getId_Localidad())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Localidad no válida."));
             domicilioExistente.setLocalidad(localidad);
             domicilioExistente.setLocalidad(domicilioActualizado.getLocalidad());
-        } else if (domicilioActualizado.getLocalidad() != null && domicilioActualizado.getLocalidad().getId() == null) {
+        } else if (domicilioActualizado.getLocalidad() != null && domicilioActualizado.getLocalidad().getId_Localidad() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "ID de Localidad no puede ser nulo si se proporciona el objeto Localidad.");
         }

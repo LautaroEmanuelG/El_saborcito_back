@@ -80,7 +80,7 @@ public class FacturaService {
             // modificar el total de venta de una factura existente.");
         }
         if (facturaActualizada.getPedido() != null && (facturaExistente.getPedido() == null
-                || !facturaActualizada.getPedido().getId().equals(facturaExistente.getPedido().getId()))) {
+                || !facturaActualizada.getPedido().getId_Pedido().equals(facturaExistente.getPedido().getId_Pedido()))) {
             // Considerar si esto debe ser un error o simplemente no se actualiza
             // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede
             // modificar el pedido asociado a una factura existente.");
