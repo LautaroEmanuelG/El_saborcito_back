@@ -72,7 +72,7 @@ public class NotaCreditoService {
         // si se permiten múltiples notas por diferentes motivos.
         // Considerar una lógica más robusta si es necesario, por ejemplo, incluyendo el
         // motivo o permitiendo N notas hasta cubrir el total.
-        boolean yaExiste = repo.existsByFactura_IdFacturaAndMontoAndMotivo(nota.getFactura().getId(),
+        boolean yaExiste = repo.existsByFactura_IdAndMontoAndMotivo(nota.getFactura().getId(),
                 nota.getMonto(),
                 nota.getMotivo());
 
