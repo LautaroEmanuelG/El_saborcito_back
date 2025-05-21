@@ -13,7 +13,7 @@ import java.util.List;
 public class Empresa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_Empresa;
 
     private String nombre;
     private String razonSocial;

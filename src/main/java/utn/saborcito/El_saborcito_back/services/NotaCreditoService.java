@@ -38,17 +38,17 @@ public class NotaCreditoService {
 
         // CORRECCIÓN 13: Validar que la NotaCredito esté asociada a una Factura (y por
         // ende a un Pedido)
-        if (nota.getFactura() == null || nota.getFactura().getId() == null) {
+        if (nota.getFactura() == null || nota.getFactura().getId_Factura() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La nota de crédito debe estar asociada a una factura válida.");
         }
-        Factura factura = facturaRepository.findById(nota.getFactura().getId())
+        Factura factura = facturaRepository.findById(nota.getFactura().getId_Factura())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Factura asociada no encontrada con ID: " + nota.getFactura().getId()));
+                        "Factura asociada no encontrada con ID: " + nota.getFactura().getId_Factura()));
 
         if (factura.getPedido() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "La factura con ID: " + factura.getId()
+                    "La factura con ID: " + factura.getId_Factura()
                             + " no está asociada a ningún pedido. No se puede crear la nota de crédito.");
         }
         nota.setFactura(factura); // Asegurar que el objeto completo esté en la nota
@@ -72,7 +72,7 @@ public class NotaCreditoService {
         // si se permiten múltiples notas por diferentes motivos.
         // Considerar una lógica más robusta si es necesario, por ejemplo, incluyendo el
         // motivo o permitiendo N notas hasta cubrir el total.
-        boolean yaExiste = repo.existsByFacturaIdAndMontoAndMotivo(nota.getFactura().getId(), nota.getMonto(),
+        boolean yaExiste = repo.existsByFacturaIdAndMontoAndMotivo(nota.getFactura().getId_Factura(), nota.getMonto(),
                 nota.getMotivo());
 
         if (yaExiste) {
@@ -170,7 +170,7 @@ public class NotaCreditoService {
         // Y luego guardar 'existing':
         // return repo.save(existing);
         // Por ahora, mantengo la lógica original para enfocarme en la pregunta.
-        n.setId(id);
+        n.setId_NotaCredito(id);
         return repo.save(n);
     }
 

@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class Factura {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_Factura;
 
     private LocalDate fechaFacturacion;
     private Integer mpPaymentId;

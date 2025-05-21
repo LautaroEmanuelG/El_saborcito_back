@@ -37,7 +37,7 @@ public class PromocionService {
 
     public Promocion update(Long id, Promocion p) {
         Promocion existingPromocion = findById(id);
-        p.setId(id);
+        p.setId_Promocion(id);
         validarPromocion(p, true);
         // Copiar campos actualizables de p a existingPromocion
         existingPromocion.setDenominacion(p.getDenominacion());
@@ -106,13 +106,13 @@ public class PromocionService {
         }
 
         // Validación de Artículo
-        if (p.getArticulo() == null || p.getArticulo().getId() == null) {
+        if (p.getArticulo() == null || p.getArticulo().getId_articulo() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La promoción debe estar asociada a un artículo.");
         }
-        Articulo articulo = articuloRepository.findById(p.getArticulo().getId())
+        Articulo articulo = articuloRepository.findById(p.getArticulo().getId_articulo())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Artículo asociado no encontrado con ID: " + p.getArticulo().getId()));
+                        "Artículo asociado no encontrado con ID: " + p.getArticulo().getId_articulo()));
         p.setArticulo(articulo); // Asegurar que el objeto completo esté en la promoción
 
         if (tienePrecioPromocional && articulo.getPrecioVenta() != null
@@ -123,10 +123,10 @@ public class PromocionService {
 
         // Validación de Sucursal (si aplica, puede ser opcional si la promoción es
         // general)
-        if (p.getSucursal() != null && p.getSucursal().getId() != null) {
-            Sucursal sucursal = sucursalRepository.findById(p.getSucursal().getId())
+        if (p.getSucursal() != null && p.getSucursal().getId_Sucursal() != null) {
+            Sucursal sucursal = sucursalRepository.findById(p.getSucursal().getId_Sucursal())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Sucursal asociada no encontrada con ID: " + p.getSucursal().getId()));
+                            "Sucursal asociada no encontrada con ID: " + p.getSucursal().getId_Sucursal()));
             p.setSucursal(sucursal); // Asegurar que el objeto completo esté en la promoción
         }
         // Si la sucursal es opcional y no se provee, se podría dejar

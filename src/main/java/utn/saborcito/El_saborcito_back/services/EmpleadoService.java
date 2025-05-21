@@ -33,13 +33,13 @@ public class EmpleadoService {
         // Si el ID de la sucursal es 0 o nulo, se asume que el empleado no está
         // asignado a una sucursal.
         if (empleado.getSucursal() != null
-                && (empleado.getSucursal().getId() == null || empleado.getSucursal().getId() == 0)) {
+                && (empleado.getSucursal().getId_Sucursal() == null || empleado.getSucursal().getId_Sucursal() == 0)) {
             empleado.setSucursal(null);
-        } else if (empleado.getSucursal() != null && empleado.getSucursal().getId() != null) {
+        } else if (empleado.getSucursal() != null && empleado.getSucursal().getId_Sucursal() != null) {
             // Validar que la sucursal exista si se proporciona un ID
-            Sucursal sucursal = sucursalRepository.findById(empleado.getSucursal().getId())
+            Sucursal sucursal = sucursalRepository.findById(empleado.getSucursal().getId_Sucursal())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Sucursal asignada no válida. ID: " + empleado.getSucursal().getId()));
+                            "Sucursal asignada no válida. ID: " + empleado.getSucursal().getId_Sucursal()));
             empleado.setSucursal(sucursal);
         }
 
@@ -93,13 +93,13 @@ public class EmpleadoService {
 
         // Manejo de la asignación de sucursal con validación
         if (empleadoActualizado.getSucursal() != null &&
-                (empleadoActualizado.getSucursal().getId() == null || empleadoActualizado.getSucursal().getId() == 0)) {
+                (empleadoActualizado.getSucursal().getId_Sucursal() == null || empleadoActualizado.getSucursal().getId_Sucursal() == 0)) {
             empleadoExistente.setSucursal(null); // Desasigna si el ID es 0 o nulo
-        } else if (empleadoActualizado.getSucursal() != null && empleadoActualizado.getSucursal().getId() != null) {
+        } else if (empleadoActualizado.getSucursal() != null && empleadoActualizado.getSucursal().getId_Sucursal() != null) {
             // Validar que la sucursal exista
-            Sucursal sucursal = sucursalRepository.findById(empleadoActualizado.getSucursal().getId())
+            Sucursal sucursal = sucursalRepository.findById(empleadoActualizado.getSucursal().getId_Sucursal())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Sucursal asignada no válida. ID: " + empleadoActualizado.getSucursal().getId()));
+                            "Sucursal asignada no válida. ID: " + empleadoActualizado.getSucursal().getId_Sucursal()));
             empleadoExistente.setSucursal(sucursal);
         } else {
             empleadoExistente.setSucursal(null); // Si no se proporciona sucursal en la actualización, se desasigna.
