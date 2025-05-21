@@ -12,7 +12,6 @@ import utn.saborcito.El_saborcito_back.models.Articulo;
 import utn.saborcito.El_saborcito_back.models.Sucursal;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service

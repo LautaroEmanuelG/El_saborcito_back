@@ -2,7 +2,6 @@ package utn.saborcito.El_saborcito_back.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.List;
 
 @Entity
 @Table(name = "empresa")
@@ -17,6 +16,6 @@ public class Empresa {
 
     private String nombre;
     private String razonSocial;
-    private String  cuil;
+    private String cuil;
 
 }

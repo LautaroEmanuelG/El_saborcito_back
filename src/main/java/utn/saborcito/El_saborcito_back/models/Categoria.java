@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
 
 @Entity
 @Data
