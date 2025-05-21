@@ -12,7 +12,7 @@ import lombok.*;
 public class Provincia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Provincia;
+    private Long id;
 
     private String nombre;
 

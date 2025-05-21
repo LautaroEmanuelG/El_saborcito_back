@@ -11,7 +11,7 @@ import lombok.*;
 public class UnidadMedida {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_UnidadMedida;
+    private Long id;
 
     private String denominacion;
 

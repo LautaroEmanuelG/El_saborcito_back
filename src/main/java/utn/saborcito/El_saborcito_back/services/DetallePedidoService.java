@@ -29,7 +29,7 @@ public class DetallePedidoService {
     }
 
     public DetallePedido update(Long id, DetallePedido detalle) {
-        detalle.setId_DetallePedido(id);
+        detalle.setId(id);
         calcularSubtotal(detalle);
         return repo.save(detalle);
     }

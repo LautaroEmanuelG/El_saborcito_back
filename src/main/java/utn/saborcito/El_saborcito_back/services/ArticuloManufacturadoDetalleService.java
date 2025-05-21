@@ -29,7 +29,7 @@ public class ArticuloManufacturadoDetalleService {
     }
 
     public ArticuloManufacturadoDetalle update(Long id, ArticuloManufacturadoDetalle dto) {
-        dto.setId_ManufacturadoDetalle(id);
+        dto.setId(id);
         return repo.save(dto);
     }
 

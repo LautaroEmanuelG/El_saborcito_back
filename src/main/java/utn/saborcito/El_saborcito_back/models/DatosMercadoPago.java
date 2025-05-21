@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class DatosMercadoPago {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_DatosMercadoPago;
+    private Long id;
 
     private LocalDate dateCreate;
     private LocalDate dateApproved;

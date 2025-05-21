@@ -10,7 +10,7 @@ import lombok.*;
 public class DetallePedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_DetallePedido;
+    private Long id;
 
     private Integer cantidad;
     private Double subTotal;

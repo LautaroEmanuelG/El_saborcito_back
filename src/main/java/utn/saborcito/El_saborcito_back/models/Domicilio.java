@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class Domicilio implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Domicilio;
+    private Long id;
 
     private String calle;
     private Integer numero;

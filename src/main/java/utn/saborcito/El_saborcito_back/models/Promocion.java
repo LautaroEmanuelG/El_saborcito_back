@@ -15,7 +15,7 @@ import java.time.LocalTime;
 public class Promocion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Promocion;
+    private Long id;
 
     private String denominacion;
     private LocalDate fechaDesde;

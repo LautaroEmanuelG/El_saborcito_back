@@ -13,7 +13,7 @@ import java.util.List;
 public class Sucursal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Sucursal;
+    private Long id;
 
     private String nombre;
 
