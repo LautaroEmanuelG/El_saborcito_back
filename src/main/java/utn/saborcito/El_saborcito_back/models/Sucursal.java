@@ -19,7 +19,7 @@ public class Sucursal {
 
     // Uno a uno con Domicilio
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "domicilio_id", referencedColumnName = "id_Domicilio")
+    @JoinColumn(name = "domicilio_id")
     private Domicilio domicilio;
 
     // MUCHOS A UNO: cada sucursal pertenece a una empresa

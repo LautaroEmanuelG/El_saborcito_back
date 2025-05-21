@@ -97,7 +97,7 @@ public class ArticuloService {
         articulo.setCategoria(categoria);
 
         // Validar y asegurar la existencia de UnidadMedida
-        if (articulo.getUnidadMedida() == null || articulo.getUnidadMedida().getId_UnidadMedida() == null) {
+        if (articulo.getUnidadMedida() == null || articulo.getUnidadMedida().getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La unidad de medida del artículo es obligatoria.");
         }
