@@ -31,6 +31,12 @@ public class ClienteService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "El usuario asociado al cliente debe existir y tener el rol CLIENTE.");
         }
+
+        // CORRECCIÓN 21: Validar que no se permita setear manualmente historialPedidos.
+        if (cliente.getHistorialPedidos() != null && !cliente.getHistorialPedidos().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El historial de pedidos no se puede asignar manualmente al crear un cliente.");
+        }
         return repo.save(cliente);
     }
 

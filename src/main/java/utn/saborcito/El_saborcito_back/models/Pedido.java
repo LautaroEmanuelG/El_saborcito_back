@@ -18,7 +18,7 @@ import java.util.List;
 public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Pedido;
+    private Long id;
 
     private LocalTime horasEstimadaFinalizacion;
     private Double total;

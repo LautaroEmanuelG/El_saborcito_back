@@ -10,7 +10,7 @@ import lombok.*;
 public class ArticuloManufacturadoDetalle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_ManufacturadoDetalle;
+    private Long id;
 
     private Integer cantidad;
 

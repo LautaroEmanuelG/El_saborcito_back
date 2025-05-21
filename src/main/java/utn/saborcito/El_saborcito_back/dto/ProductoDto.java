@@ -1,7 +1,6 @@
 package utn.saborcito.El_saborcito_back.dto;
 
 import lombok.Data;
-import utn.saborcito.El_saborcito_back.models.Categoria;
 
 @Data
 public class ProductoDto {

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
 
 @Entity
 @Data
@@ -15,7 +14,7 @@ import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Categoria;
+    private Long id;
 
     private String denominacion;
 

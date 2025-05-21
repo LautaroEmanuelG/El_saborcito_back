@@ -12,7 +12,6 @@ import utn.saborcito.El_saborcito_back.models.Articulo;
 import utn.saborcito.El_saborcito_back.models.Sucursal;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -37,7 +36,7 @@ public class PromocionService {
 
     public Promocion update(Long id, Promocion p) {
         Promocion existingPromocion = findById(id);
-        p.setId_Promocion(id);
+        p.setId(id);
         validarPromocion(p, true);
         // Copiar campos actualizables de p a existingPromocion
         existingPromocion.setDenominacion(p.getDenominacion());
@@ -106,13 +105,13 @@ public class PromocionService {
         }
 
         // Validación de Artículo
-        if (p.getArticulo() == null || p.getArticulo().getId_articulo() == null) {
+        if (p.getArticulo() == null || p.getArticulo().getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La promoción debe estar asociada a un artículo.");
         }
-        Articulo articulo = articuloRepository.findById(p.getArticulo().getId_articulo())
+        Articulo articulo = articuloRepository.findById(p.getArticulo().getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Artículo asociado no encontrado con ID: " + p.getArticulo().getId_articulo()));
+                        "Artículo asociado no encontrado con ID: " + p.getArticulo().getId()));
         p.setArticulo(articulo); // Asegurar que el objeto completo esté en la promoción
 
         if (tienePrecioPromocional && articulo.getPrecioVenta() != null
@@ -123,10 +122,10 @@ public class PromocionService {
 
         // Validación de Sucursal (si aplica, puede ser opcional si la promoción es
         // general)
-        if (p.getSucursal() != null && p.getSucursal().getId_Sucursal() != null) {
-            Sucursal sucursal = sucursalRepository.findById(p.getSucursal().getId_Sucursal())
+        if (p.getSucursal() != null && p.getSucursal().getId() != null) {
+            Sucursal sucursal = sucursalRepository.findById(p.getSucursal().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Sucursal asociada no encontrada con ID: " + p.getSucursal().getId_Sucursal()));
+                            "Sucursal asociada no encontrada con ID: " + p.getSucursal().getId()));
             p.setSucursal(sucursal); // Asegurar que el objeto completo esté en la promoción
         }
         // Si la sucursal es opcional y no se provee, se podría dejar

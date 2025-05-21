@@ -33,7 +33,7 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "No se puede actualizar: Usuario no encontrado con ID: " + id);
         }
-        usuario.setId_Usuario(id);
+        usuario.setId(id);
         return repo.save(usuario);
     }
 

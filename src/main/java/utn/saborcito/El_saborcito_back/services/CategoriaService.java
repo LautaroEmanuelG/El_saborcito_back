@@ -45,7 +45,7 @@ public class CategoriaService {
             Optional<Categoria> otraCategoriaConMismaDenominacion = repo
                     .findByDenominacionIgnoreCase(categoriaActualizada.getDenominacion());
             if (otraCategoriaConMismaDenominacion.isPresent()
-                    && !otraCategoriaConMismaDenominacion.get().getId_Categoria().equals(id)) {
+                    && !otraCategoriaConMismaDenominacion.get().getId().equals(id)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Ya existe otra categoría con la denominación: " + categoriaActualizada.getDenominacion());
             }

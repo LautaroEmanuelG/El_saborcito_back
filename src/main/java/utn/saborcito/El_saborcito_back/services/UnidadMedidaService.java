@@ -30,7 +30,7 @@ public class UnidadMedidaService {
 
     public UnidadMedida update(Long id, UnidadMedida dto) {
         UnidadMedida existing = findById(id);
-        dto.setId_UnidadMedida(id);
+        dto.setId(id);
         return repo.save(dto);
     }
 

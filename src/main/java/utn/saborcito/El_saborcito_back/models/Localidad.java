@@ -12,7 +12,7 @@ import lombok.*;
 public class Localidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Localidad;
+    private Long id;
 
     private String nombre;
 

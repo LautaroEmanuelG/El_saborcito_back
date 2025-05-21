@@ -2,7 +2,6 @@ package utn.saborcito.El_saborcito_back.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.List;
 
 @Entity
 @Table(name = "empresa")
@@ -13,10 +12,10 @@ import java.util.List;
 public class Empresa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Empresa;
+    private Long id;
 
     private String nombre;
     private String razonSocial;
-    private String  cuil;
+    private String cuil;
 
 }
