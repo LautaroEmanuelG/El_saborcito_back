@@ -2,7 +2,6 @@ package utn.saborcito.El_saborcito_back.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import me.paulschwarz.springdotenv.DotenvPropertySource;
 
 @Configuration
 @PropertySource(value = "file:./.env", ignoreResourceNotFound = true)

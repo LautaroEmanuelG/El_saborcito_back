@@ -2,9 +2,6 @@ package utn.saborcito.El_saborcito_back.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import utn.saborcito.El_saborcito_back.enums.Estado;
-import utn.saborcito.El_saborcito_back.enums.FormaPago;
-import utn.saborcito.El_saborcito_back.enums.TipoEnvio;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,13 +22,16 @@ public class Pedido {
     private Double totalCosto;
     private LocalDate fechaPedido;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "estado_id")
     private Estado estado;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "tipo_envio_id")
     private TipoEnvio tipoEnvio;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "forma_pago_id")
     private FormaPago formaPago;
 
     @ManyToOne
@@ -44,6 +44,4 @@ public class Pedido {
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<DetallePedido> detalles;
-
-
 }

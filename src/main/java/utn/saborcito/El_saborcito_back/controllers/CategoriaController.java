@@ -1,18 +1,11 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 import utn.saborcito.El_saborcito_back.models.Categoria;
 import utn.saborcito.El_saborcito_back.services.CategoriaService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categorias")
