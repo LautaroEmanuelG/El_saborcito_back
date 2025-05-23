@@ -12,6 +12,8 @@ public interface DetallePedidoMapper extends BaseMapper<DetallePedido, DetallePe
 
     @Override
     @Mapping(source = "articulo.id", target = "articulo.id")
+    @Mapping(source = "articulo.categoria.id", target = "articulo.categoriaId")
+    @Mapping(source = "articulo.unidadMedida.id", target = "articulo.unidadMedidaId")
     // Asegúrate de que ArticuloMapper pueda manejar la conversión de Articulo a
     // ArticuloDTO
     // Si ArticuloDTO solo necesita el ID, este mapeo es suficiente.
@@ -21,5 +23,6 @@ public interface DetallePedidoMapper extends BaseMapper<DetallePedido, DetallePe
 
     @Override
     @Mapping(target = "articulo", ignore = true) // Se manejará en la capa de servicio
+    @Mapping(target = "pedido", ignore = true) // Se manejará en la capa de servicio
     DetallePedido toEntity(DetallePedidoDTO dto);
 }

@@ -27,4 +27,5 @@ public class UsuarioDTO {
     private Boolean estado;
     private LocalDateTime fechaRegistro;
     private LocalDateTime fechaUltimaModificacion;
+    private ImagenDTO imagen;
 }

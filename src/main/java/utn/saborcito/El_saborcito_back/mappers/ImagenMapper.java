@@ -1,7 +1,6 @@
 package utn.saborcito.El_saborcito_back.mappers;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import utn.saborcito.El_saborcito_back.dto.ImagenDTO;
 import utn.saborcito.El_saborcito_back.models.Imagen;
@@ -12,6 +11,5 @@ public interface ImagenMapper {
 
     ImagenDTO toDTO(Imagen imagen);
 
-    @Mapping(target = "usuario", ignore = true)
     Imagen toEntity(ImagenDTO imagenDTO);
 }

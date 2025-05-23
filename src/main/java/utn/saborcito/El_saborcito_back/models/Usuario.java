@@ -34,4 +34,9 @@ public class Usuario {
     private Boolean estado;
     private LocalDateTime fechaRegistro;
     private LocalDateTime fechaUltimaModificacion;
+
+    // Relación uno a uno: un usuario puede tener una imagen de perfil
+    @OneToOne
+    @JoinColumn(name = "imagen_id")
+    private Imagen imagen;
 }
