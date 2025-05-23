@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.PedidoDTO;
+import utn.saborcito.El_saborcito_back.mappers.PedidoMapper;
 import utn.saborcito.El_saborcito_back.models.ArticuloManufacturado;
 import utn.saborcito.El_saborcito_back.models.Pedido;
 import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
@@ -12,6 +14,7 @@ import utn.saborcito.El_saborcito_back.models.DetallePedido;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,20 +24,30 @@ public class PedidoService {
     private final EstadoService estadoService;
     private final TipoEnvioService tipoEnvioService;
     private final FormaPagoService formaPagoService;
+    private final PedidoMapper pedidoMapper; // Inyectar el mapper
 
     // Estados constantes para evitar hardcoding
     private static final String ESTADO_CANCELADO = "CANCELADO";
 
-    public List<Pedido> findAll() {
-        return repo.findAll();
+    public List<PedidoDTO> findAll() {
+        return repo.findAll().stream()
+                .map(pedidoMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public Pedido findById(Long id) {
+    public PedidoDTO findById(Long id) {
+        Pedido pedido = repo.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado con ID: " + id));
+        return pedidoMapper.toDTO(pedido);
+    }
+
+    // Nuevo método para obtener la entidad Pedido
+    public Pedido findEntityById(Long id) {
         return repo.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado con ID: " + id));
     }
 
-    public Pedido save(Pedido pedido) {
+    public PedidoDTO save(Pedido pedido) {
         if (pedido.getFechaPedido() == null) {
             pedido.setFechaPedido(LocalDate.now());
         }
@@ -45,11 +58,13 @@ public class PedidoService {
         // Usar el servicio de calculadora para actualizar los totales
         calculadoraService.actualizarTotalesPedido(pedido);
         calcularHoraEstimada(pedido);
-        return repo.save(pedido);
+        return pedidoMapper.toDTO(repo.save(pedido));
     }
 
-    public Pedido update(Long id, Pedido pedido) {
-        Pedido existing = findById(id); // findById ya lanza la excepción si no se encuentra
+    public PedidoDTO update(Long id, Pedido pedido) {
+        Pedido existing = repo.findById(id).orElseThrow( // Simplificado, ya que findById del repo lanza la excepción si
+                                                         // no se encuentra
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado con ID: " + id));
 
         // No permitir la modificación de fechaPedido
         // existing.setFechaPedido(pedido.getFechaPedido());
@@ -76,7 +91,7 @@ public class PedidoService {
         calculadoraService.actualizarTotalesPedido(existing);
         calcularHoraEstimada(existing);
 
-        return repo.save(existing);
+        return pedidoMapper.toDTO(repo.save(existing));
     }
 
     /**
@@ -84,12 +99,13 @@ public class PedidoService {
      * Útil para actualizar el total después de cambios en los detalles.
      *
      * @param id El ID del pedido a recalcular
-     * @return El pedido actualizado
+     * @return El pedido actualizado como DTO
      */
-    public Pedido recalcularTotal(Long id) {
-        Pedido pedido = findById(id);
+    public PedidoDTO recalcularTotal(Long id) {
+        Pedido pedido = repo.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado con ID: " + id));
         calculadoraService.actualizarTotalesPedido(pedido);
-        return repo.save(pedido);
+        return pedidoMapper.toDTO(repo.save(pedido));
     }
 
     /**
@@ -142,8 +158,9 @@ public class PedidoService {
      * @param motivo La razón de la cancelación (opcional)
      * @return El pedido cancelado
      */
-    public Pedido cancelarPedido(Long id, String motivo) {
-        Pedido pedido = findById(id);
+    public PedidoDTO cancelarPedido(Long id, String motivo) {
+        Pedido pedido = repo.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado con ID: " + id));
 
         // Verificar si el pedido ya está cancelado
         if (pedido.getEstado() != null && ESTADO_CANCELADO.equals(pedido.getEstado().getNombre())) {
@@ -161,7 +178,7 @@ public class PedidoService {
         // Notificar al cliente sobre la cancelación (simulado o implementación real)
         notificarClienteSobreCancelacion(pedidoCancelado, motivo);
 
-        return pedidoCancelado;
+        return pedidoMapper.toDTO(pedidoCancelado);
     }
 
     /**

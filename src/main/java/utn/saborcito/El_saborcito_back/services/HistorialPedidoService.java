@@ -39,7 +39,7 @@ public class HistorialPedidoService {
      * @return Lista de registros de historial del pedido
      */
     public List<HistorialPedido> findByPedido(Long pedidoId) {
-        Pedido pedido = pedidoService.findById(pedidoId);
+        Pedido pedido = pedidoService.findEntityById(pedidoId);
         return repo.findByPedidoOrderByFechaRegistroDesc(pedido);
     }
 
@@ -53,7 +53,7 @@ public class HistorialPedidoService {
      */
     public HistorialPedido registrarPedido(Long clienteId, Long pedidoId, String observacion) {
         Cliente cliente = clienteService.findById(clienteId);
-        Pedido pedido = pedidoService.findById(pedidoId);
+        Pedido pedido = pedidoService.findEntityById(pedidoId);
 
         // Verificar si ya existe un registro para este cliente y pedido
         Optional<HistorialPedido> existente = repo.findByClienteAndPedido(cliente, pedido);

@@ -23,7 +23,7 @@ public class DetallePedidoController {
 
     @GetMapping("/pedido/{pedidoId}")
     public List<DetallePedido> getByPedido(@PathVariable Long pedidoId) {
-        Pedido pedido = pedidoService.findById(pedidoId);
+        Pedido pedido = pedidoService.findEntityById(pedidoId); // Usar findEntityById
         return service.findByPedido(pedido);
     }
 
