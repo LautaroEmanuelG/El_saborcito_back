@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 public class ArticuloDTO {
     private Long id;
     private String denominacion;
-    private Integer precioVenta;
+    private Double precioVenta; // Corregido de Integer a Double
     private Long categoriaId;
     private Long unidadMedidaId;
 }

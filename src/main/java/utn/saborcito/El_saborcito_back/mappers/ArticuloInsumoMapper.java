@@ -6,20 +6,17 @@ import utn.saborcito.El_saborcito_back.dto.ArticuloInsumoDTO;
 import utn.saborcito.El_saborcito_back.models.ArticuloInsumo;
 
 @Mapper(componentModel = "spring", uses = { ImagenMapper.class, CategoriaMapper.class, UnidadMedidaMapper.class })
-public interface ArticuloInsumoMapper {
+public interface ArticuloInsumoMapper extends BaseMapper<ArticuloInsumo, ArticuloInsumoDTO> {
+    @Override
     @Mapping(source = "imagen", target = "imagen")
     @Mapping(source = "categoria", target = "categoria")
-    // @Mapping(source = "unidadMedida", target = "unidadMedida") // Descomentar si
-    // se crea UnidadMedidaMapper
+    @Mapping(source = "unidadMedida", target = "unidadMedida")
     ArticuloInsumoDTO toDTO(ArticuloInsumo source);
 
-    @Mapping(target = "precioCompra", ignore = true)
-    @Mapping(target = "stockActual", ignore = true)
-    @Mapping(target = "stockMaximo", ignore = true)
-    // @Mapping(target = "stockMinimo", ignore = true) // Property does not exist in ArticuloInsumo
-    @Mapping(target = "esParaElaborar", ignore = true)
-    @Mapping(target = "unidadMedida", ignore = true) // Ignorar por ahora si no se mapea
-    // @Mapping(target = "articuloManufacturadoDetalles", ignore = true) // Property does not exist in ArticuloInsumo
-    // @Mapping(target = "promocionDetalles", ignore = true) // Property does not exist in ArticuloInsumo
+    @Override
+    @Mapping(target = "id", ignore = true) // El ID se genera automáticamente
+    @Mapping(source = "imagen", target = "imagen")
+    @Mapping(source = "categoria", target = "categoria")
+    @Mapping(source = "unidadMedida", target = "unidadMedida")
     ArticuloInsumo toEntity(ArticuloInsumoDTO source);
 }
