@@ -2,7 +2,7 @@ package utn.saborcito.El_saborcito_back.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import utn.saborcito.El_saborcito_back.dtos.SucursalDTO;
+import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.models.Sucursal;
 
 import java.util.List;

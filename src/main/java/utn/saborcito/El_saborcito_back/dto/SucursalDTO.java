@@ -1,4 +1,4 @@
-package utn.saborcito.El_saborcito_back.dtos;
+package utn.saborcito.El_saborcito_back.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

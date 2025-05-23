@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import utn.saborcito.El_saborcito_back.dtos.SucursalDTO;
+import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.mappers.SucursalMapper;
 import utn.saborcito.El_saborcito_back.models.Domicilio;
 import utn.saborcito.El_saborcito_back.models.Sucursal;

@@ -2,7 +2,7 @@ package utn.saborcito.El_saborcito_back.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import utn.saborcito.El_saborcito_back.dtos.PaisDTO;
+import utn.saborcito.El_saborcito_back.dto.PaisDTO;
 import utn.saborcito.El_saborcito_back.models.Pais;
 
 @Mapper(componentModel = "spring")

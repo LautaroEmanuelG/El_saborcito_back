@@ -1,7 +1,7 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
 import org.springframework.web.bind.annotation.*;
-import utn.saborcito.El_saborcito_back.dtos.SucursalDTO;
+import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.services.SucursalService;
 
 import java.util.List;
