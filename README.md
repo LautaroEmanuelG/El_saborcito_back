@@ -43,26 +43,27 @@ SERVER_PORT=5252
 git clone https://github.com/LautaroEmanuelG/El_saborcito_back.git
 ```
 
-2. Configurar MySQL y crear el archivo `.env` (ver sección de Variables de Entorno)
+2.Configurar MySQL y crear el archivo `.env` (ver sección de Variables de Entorno)
 
-3. Construir el proyecto:
+3.Construir el proyecto:
 
 ```bash
 ./gradlew build
 ```
 
-4. Ejecutar la aplicación:
+4.Ejecutar la aplicación:
 
 ```bash
 ./gradlew bootRun
 ```
 
-5. Acceder a la aplicación:
-   - Swagger UI: http://localhost:5252/swagger-ui.html
+5.Acceder a la aplicación:
+
+   Swagger UI: [http://localhost:5252/swagger-ui.html](http://localhost:5252/swagger-ui.html)
 
 ## 📄 Endpoints de la API Swagger
 
-La documentación de la API se encuentra disponible en Swagger UI en http://localhost:5252/swagger-ui.html
+La documentación de la API se encuentra disponible en Swagger UI en [http://localhost:5252/swagger-ui.html](http://localhost:5252/swagger-ui.html)
 
 ### 🍽️ Productos
 
@@ -113,13 +114,13 @@ public class TicketProducto {
 }
 ```
 
-### ✅ Ventajas:
+### ✅ Ventajas
 
 - Mayor flexibilidad: Permite añadir atributos adicionales a la tabla intermedia, lo que es útil si necesitas almacenar información adicional sobre la relación. Por ejemplo, podrías querer guardar la cantidad de un producto vendido en un ticket.
 - Facilidad de escalabilidad: Si en el futuro surge la necesidad de modificar o ampliar la tabla intermedia, este enfoque permite hacerlo sin romper la estructura existente.
 - Acceso directo a la tabla intermedia: Tener una entidad para la tabla intermedia facilita consultas y operaciones específicas sobre esa relación, como acceder a todos los productos de un ticket en función de atributos adicionales.
 
-### ❌ Desventajas:
+### ❌ Desventajas
 
 - Mayor complejidad: Este enfoque añade complejidad y más código, ya que tienes que definir una entidad adicional para la tabla intermedia y gestionar su persistencia.
 - Overhead inicial: Para relaciones simples, este método puede parecer más complejo de lo necesario si solo estás almacenando las claves foráneas.
