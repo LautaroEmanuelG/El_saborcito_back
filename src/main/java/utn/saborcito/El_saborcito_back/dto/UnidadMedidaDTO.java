@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoriaDTO {
+public class UnidadMedidaDTO {
     private Long id;
     private String denominacion;
-    private CategoriaDTO tipoCategoria; // Para la relación recursiva
 }
