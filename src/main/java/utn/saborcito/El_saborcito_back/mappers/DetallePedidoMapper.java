@@ -12,9 +12,11 @@ public interface DetallePedidoMapper extends BaseMapper<DetallePedido, DetallePe
 
     @Override
     @Mapping(source = "articulo.id", target = "articulo.id")
-    // Asegúrate de que ArticuloMapper pueda manejar la conversión de Articulo a ArticuloDTO
+    // Asegúrate de que ArticuloMapper pueda manejar la conversión de Articulo a
+    // ArticuloDTO
     // Si ArticuloDTO solo necesita el ID, este mapeo es suficiente.
-    // Si ArticuloDTO necesita más campos de Articulo, ArticuloMapper debe configurarse para ello.
+    // Si ArticuloDTO necesita más campos de Articulo, ArticuloMapper debe
+    // configurarse para ello.
     DetallePedidoDTO toDTO(DetallePedido entity);
 
     @Override

@@ -29,13 +29,15 @@ public class DetallePedidoController {
     }
 
     @PostMapping("/pedido/{pedidoId}")
-    public ResponseEntity<DetallePedidoDTO> createDetallePedido(@PathVariable Long pedidoId, @RequestBody DetallePedidoDTO detallePedidoDTO) {
+    public ResponseEntity<DetallePedidoDTO> createDetallePedido(@PathVariable Long pedidoId,
+            @RequestBody DetallePedidoDTO detallePedidoDTO) {
         DetallePedidoDTO nuevoDetalleDTO = detallePedidoService.save(detallePedidoDTO, pedidoId);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDetalleDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DetallePedidoDTO> updateDetallePedido(@PathVariable Long id, @RequestBody DetallePedidoDTO detallePedidoDTO) {
+    public ResponseEntity<DetallePedidoDTO> updateDetallePedido(@PathVariable Long id,
+            @RequestBody DetallePedidoDTO detallePedidoDTO) {
         DetallePedidoDTO detalleActualizadoDTO = detallePedidoService.update(id, detallePedidoDTO);
         return ResponseEntity.ok(detalleActualizadoDTO);
     }

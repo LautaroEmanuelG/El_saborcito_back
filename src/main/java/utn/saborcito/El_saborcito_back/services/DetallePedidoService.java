@@ -22,11 +22,12 @@ public class DetallePedidoService {
     private final DetallePedidoRepository detallePedidoRepository;
     private final DetallePedidoMapper detallePedidoMapper;
     private final ArticuloRepository articuloRepository;
-    private final PedidoRepository pedidoRepository; 
+    private final PedidoRepository pedidoRepository;
 
     @Transactional(readOnly = true)
     public List<DetallePedidoDTO> findAll() {
-        return detallePedidoMapper.toDTOList(detallePedidoRepository.findAll()); // Corregido: toDTOList en lugar de toDTOs
+        return detallePedidoMapper.toDTOList(detallePedidoRepository.findAll()); // Corregido: toDTOList en lugar de
+                                                                                 // toDTOs
     }
 
     @Transactional(readOnly = true)
@@ -44,11 +45,12 @@ public class DetallePedidoService {
             throw new IllegalArgumentException("El ID del artículo es obligatorio para crear un DetallePedido.");
         }
         Articulo articulo = articuloRepository.findById(dto.getArticulo().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Artículo no encontrado con id: " + dto.getArticulo().getId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Artículo no encontrado con id: " + dto.getArticulo().getId()));
         detallePedido.setArticulo(articulo);
 
         Pedido pedido = pedidoRepository.findById(pedidoId)
-            .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con id: " + pedidoId));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con id: " + pedidoId));
         detallePedido.setPedido(pedido);
 
         if (dto.getCantidad() == null || dto.getCantidad() <= 0) {
@@ -71,10 +73,11 @@ public class DetallePedidoService {
         existingDetallePedido.setCantidad(dto.getCantidad());
 
         if (dto.getArticulo() != null && dto.getArticulo().getId() != null) {
-            if (existingDetallePedido.getArticulo() == null || 
-                !existingDetallePedido.getArticulo().getId().equals(dto.getArticulo().getId())) {
+            if (existingDetallePedido.getArticulo() == null ||
+                    !existingDetallePedido.getArticulo().getId().equals(dto.getArticulo().getId())) {
                 Articulo articulo = articuloRepository.findById(dto.getArticulo().getId())
-                        .orElseThrow(() -> new EntityNotFoundException("Artículo no encontrado con id: " + dto.getArticulo().getId()));
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Artículo no encontrado con id: " + dto.getArticulo().getId()));
                 existingDetallePedido.setArticulo(articulo);
             }
         } else {
