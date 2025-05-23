@@ -16,7 +16,7 @@ public abstract class Articulo {
     private Long id;
 
     private String denominacion;
-    private Integer precioVenta;
+    private Double precioVenta; // Corregido de Integer a Double
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")

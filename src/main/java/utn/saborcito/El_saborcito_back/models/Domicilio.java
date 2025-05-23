@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Domicilio implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +20,6 @@ public class Domicilio implements Serializable {
     private String calle;
     private Integer numero;
     private String cp;
-
 
     // Muchos domicilios para un usuario
     @ManyToOne(fetch = FetchType.LAZY)

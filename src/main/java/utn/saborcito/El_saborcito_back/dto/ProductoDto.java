@@ -8,6 +8,6 @@ public class ProductoDto {
     private String nombre;
     private String descripcion;
     private Integer stock;
-    private CategoriaDto categoria;
+    private CategoriaDTO categoria;
     private ValorDto valor;
 }

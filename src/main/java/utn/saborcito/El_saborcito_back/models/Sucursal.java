@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Sucursal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,0 +1,21 @@
+package utn.saborcito.El_saborcito_back.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ArticuloInsumoDTO {
+    private Long id;
+    private String denominacion;
+    private Double precioVenta;
+    private Double precioCompra;
+    private Integer stockActual;
+    private Integer stockMaximo;
+    private Boolean esParaElaborar;
+    private ImagenDTO imagen;
+    private CategoriaDTO categoria;
+    private UnidadMedidaDTO unidadMedida;
+}

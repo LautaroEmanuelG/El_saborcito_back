@@ -1,8 +1,9 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import utn.saborcito.El_saborcito_back.models.Promocion;
+import utn.saborcito.El_saborcito_back.dto.PromocionDTO;
 import utn.saborcito.El_saborcito_back.services.PromocionService;
 
 import java.util.List;
@@ -14,10 +15,29 @@ public class PromocionController {
     private final PromocionService service;
 
     @GetMapping
-    public List<Promocion> getAll() { return service.findAll(); }
-    @GetMapping("/{id}") public Promocion getById(@PathVariable Long id) { return service.findById(id); }
+    public List<PromocionDTO> getAll() {
+        return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public PromocionDTO getById(@PathVariable Long id) {
+        return service.findById(id);
+    }
+
     @PostMapping
-    public Promocion create(@RequestBody Promocion p) { return service.save(p); }
-    @PutMapping("/{id}") public Promocion update(@PathVariable Long id, @RequestBody Promocion p) { return service.update(id, p); }
-    @DeleteMapping("/{id}") public void delete(@PathVariable Long id) { service.delete(id); }
+    @ResponseStatus(HttpStatus.CREATED)
+    public PromocionDTO create(@RequestBody PromocionDTO promocionDTO) {
+        return service.save(promocionDTO);
+    }
+
+    @PutMapping("/{id}")
+    public PromocionDTO update(@PathVariable Long id, @RequestBody PromocionDTO promocionDTO) {
+        return service.update(id, promocionDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
 }

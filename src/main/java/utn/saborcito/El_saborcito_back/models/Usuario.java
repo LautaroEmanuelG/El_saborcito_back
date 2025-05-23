@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import utn.saborcito.El_saborcito_back.enums.Rol;
@@ -7,12 +8,12 @@ import utn.saborcito.El_saborcito_back.enums.Rol;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

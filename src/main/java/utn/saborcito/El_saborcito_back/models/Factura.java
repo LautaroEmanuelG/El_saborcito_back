@@ -1,7 +1,7 @@
 package utn.saborcito.El_saborcito_back.models;
+
 import jakarta.persistence.*;
 import lombok.*;
-import utn.saborcito.El_saborcito_back.enums.FormaPago;
 
 import java.time.LocalDate;
 
@@ -24,13 +24,11 @@ public class Factura {
     private Double montoTotalAcreditado = 0.0;
     @Builder.Default
     private Boolean ajustada = false;
-
-
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "forma_pago_id")
     private FormaPago formaPago;
 
     private Double totalVenta;
-
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")

@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.CategoriaDTO;
+import utn.saborcito.El_saborcito_back.mappers.CategoriaMapper;
 import utn.saborcito.El_saborcito_back.models.Categoria;
 import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 
@@ -15,48 +17,48 @@ import java.util.Optional;
 public class CategoriaService {
 
     private final CategoriaRepository repo;
+    private final CategoriaMapper categoriaMapper;
 
-    public List<Categoria> findAll() {
-        return repo.findAll();
+    public List<CategoriaDTO> findAll() {
+        return categoriaMapper.toDTOList(repo.findAll());
     }
 
-    public Categoria findById(Long id) {
-        return repo.findById(id)
+    public CategoriaDTO findById(Long id) {
+        Categoria categoria = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Categoría no encontrada con ID: " + id));
+        return categoriaMapper.toDTO(categoria);
     }
 
-    public Categoria save(Categoria categoria) {
-        Optional<Categoria> existente = repo.findByDenominacionIgnoreCase(categoria.getDenominacion());
+    public CategoriaDTO save(CategoriaDTO categoriaDTO) {
+        Optional<Categoria> existente = repo.findByDenominacionIgnoreCase(categoriaDTO.getDenominacion());
         if (existente.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Ya existe una categoría con la denominación: " + categoria.getDenominacion());
+                    "Ya existe una categoría con la denominación: " + categoriaDTO.getDenominacion());
         }
-        return repo.save(categoria);
+        Categoria categoria = categoriaMapper.toEntity(categoriaDTO);
+        return categoriaMapper.toDTO(repo.save(categoria));
     }
 
-    public Categoria update(Long id, Categoria categoriaActualizada) {
-        Categoria categoriaExistente = findById(id); // findById ya lanza la excepción si no se encuentra
-
-        // Validar que la nueva denominación no exista ya en otra categoría (excepto en
-        // la actual)
-        if (categoriaActualizada.getDenominacion() != null &&
-                !categoriaActualizada.getDenominacion().equalsIgnoreCase(categoriaExistente.getDenominacion())) {
+    public CategoriaDTO update(Long id, CategoriaDTO categoriaDTO) {
+        Categoria categoriaExistente = repo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Categoría no encontrada con ID: " + id));
+        if (categoriaDTO.getDenominacion() != null &&
+                !categoriaDTO.getDenominacion().equalsIgnoreCase(categoriaExistente.getDenominacion())) {
             Optional<Categoria> otraCategoriaConMismaDenominacion = repo
-                    .findByDenominacionIgnoreCase(categoriaActualizada.getDenominacion());
+                    .findByDenominacionIgnoreCase(categoriaDTO.getDenominacion());
             if (otraCategoriaConMismaDenominacion.isPresent()
                     && !otraCategoriaConMismaDenominacion.get().getId().equals(id)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Ya existe otra categoría con la denominación: " + categoriaActualizada.getDenominacion());
+                        "Ya existe otra categoría con la denominación: " + categoriaDTO.getDenominacion());
             }
-            categoriaExistente.setDenominacion(categoriaActualizada.getDenominacion());
+            categoriaExistente.setDenominacion(categoriaDTO.getDenominacion());
         }
-
         // Actualizar otros campos si los hubiera y fueran modificables
         // Ejemplo:
-        // categoriaExistente.setDescripcion(categoriaActualizada.getDescripcion());
-
-        return repo.save(categoriaExistente);
+        // categoriaExistente.setDescripcion(categoriaDTO.getDescripcion());
+        return categoriaMapper.toDTO(repo.save(categoriaExistente));
     }
 
     public void delete(Long id) {

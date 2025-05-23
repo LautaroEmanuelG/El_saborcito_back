@@ -19,6 +19,10 @@ configurations {
 	}
 }
 
+ext {
+	mapstructVersion = "1.5.5.Final"
+}
+
 repositories {
 	mavenCentral()
 }
@@ -42,6 +46,12 @@ dependencies {
 	// Para soporte de variables de entorno
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+	// MapStruct
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	// Necesario si también usas Lombok y MapStruct juntos
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 }
 
 tasks.named('test') {

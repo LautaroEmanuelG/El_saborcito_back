@@ -2,7 +2,7 @@ package utn.saborcito.El_saborcito_back.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import utn.saborcito.El_saborcito_back.models.ArticuloManufacturado;
+import utn.saborcito.El_saborcito_back.dto.ArticuloManufacturadoDTO;
 import utn.saborcito.El_saborcito_back.services.ArticuloManufacturadoService;
 
 import java.util.List;
@@ -15,23 +15,23 @@ public class ArticuloManufacturadoController {
     private final ArticuloManufacturadoService service;
 
     @GetMapping
-    public List<ArticuloManufacturado> getAll() {
+    public List<ArticuloManufacturadoDTO> getAll() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public ArticuloManufacturado getOne(@PathVariable Long id) {
+    public ArticuloManufacturadoDTO getOne(@PathVariable Long id) {
         return service.findById(id);
     }
 
     @PostMapping
-    public ArticuloManufacturado create(@RequestBody ArticuloManufacturado articulo) {
-        return service.save(articulo);
+    public ArticuloManufacturadoDTO create(@RequestBody ArticuloManufacturadoDTO articuloDTO) {
+        return service.save(articuloDTO);
     }
 
     @PutMapping("/{id}")
-    public ArticuloManufacturado update(@PathVariable Long id, @RequestBody ArticuloManufacturado articulo) {
-        return service.update(id, articulo);
+    public ArticuloManufacturadoDTO update(@PathVariable Long id, @RequestBody ArticuloManufacturadoDTO articuloDTO) {
+        return service.update(id, articuloDTO);
     }
 
     @DeleteMapping("/{id}")
