@@ -1,8 +1,10 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utn.saborcito.El_saborcito_back.models.Factura;
+import utn.saborcito.El_saborcito_back.dto.FacturaDTO;
 import utn.saborcito.El_saborcito_back.services.FacturaService;
 
 import java.util.List;
@@ -11,13 +13,31 @@ import java.util.List;
 @RequestMapping("/api/facturas")
 @RequiredArgsConstructor
 public class FacturaController {
-    private final FacturaService service;
+    private final FacturaService facturaService;
 
     @GetMapping
-    public List<Factura> getAll() { return service.findAll(); }
-    @GetMapping("/{id}") public Factura getById(@PathVariable Long id) { return service.findById(id); }
+    public ResponseEntity<List<FacturaDTO>> getAll() {
+        return ResponseEntity.ok(facturaService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<FacturaDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(facturaService.findById(id));
+    }
+
     @PostMapping
-    public Factura create(@RequestBody Factura f) { return service.save(f); }
-    @PutMapping("/{id}") public Factura update(@PathVariable Long id, @RequestBody Factura f) { return service.update(id, f); }
-    @DeleteMapping("/{id}") public void delete(@PathVariable Long id) { service.delete(id); }
+    public ResponseEntity<FacturaDTO> create(@RequestBody FacturaDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(facturaService.save(dto));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FacturaDTO> update(@PathVariable Long id, @RequestBody FacturaDTO dto) {
+        return ResponseEntity.ok(facturaService.update(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        facturaService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
