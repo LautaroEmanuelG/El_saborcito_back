@@ -17,16 +17,29 @@ public class ClienteController {
     private final ClienteMapper mapper;
 
     @GetMapping
-    public List<ClienteDTO> getAll() { return service.findAll().stream().map(mapper::toDTO).toList(); }
-    @GetMapping("/{id}") public ClienteDTO getById(@PathVariable Long id) { return mapper.toDTO(service.findById(id)); }
+    public List<ClienteDTO> getAll() {
+        return service.findAll().stream().map(mapper::toDTO).toList();
+    }
+
+    @GetMapping("/{id}")
+    public ClienteDTO getById(@PathVariable Long id) {
+        return mapper.toDTO(service.findById(id));
+    }
+
     @PostMapping
-    public ClienteDTO create(@RequestBody ClienteDTO dto) { 
+    public ClienteDTO create(@RequestBody ClienteDTO dto) {
         Cliente cliente = mapper.toEntity(dto);
-        return mapper.toDTO(service.save(cliente)); 
+        return mapper.toDTO(service.save(cliente));
     }
-    @PutMapping("/{id}") public ClienteDTO update(@PathVariable Long id, @RequestBody ClienteDTO dto) { 
+
+    @PutMapping("/{id}")
+    public ClienteDTO update(@PathVariable Long id, @RequestBody ClienteDTO dto) {
         Cliente cliente = mapper.toEntity(dto);
-        return mapper.toDTO(service.update(id, cliente)); 
+        return mapper.toDTO(service.update(id, cliente));
     }
-    @DeleteMapping("/{id}") public void delete(@PathVariable Long id) { service.delete(id); }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
 }
