@@ -8,24 +8,20 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@IdClass(DetallePedidoId.class)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "pedido_id", "articulo_id" }, name = "UK_pedido_articulo"))
 public class DetallePedido {
     @Id
-    @Column(name = "pedido_id", insertable = false, updatable = false)
-    private Long pedidoId;
-
-    @Id
-    @Column(name = "articulo_id", insertable = false, updatable = false)
-    private Long articuloId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private Integer cantidad;
 
     @ManyToOne
-    @JoinColumn(name = "articulo_id", referencedColumnName = "id")
+    @JoinColumn(name = "articulo_id")
     private Articulo articulo;
 
     @ManyToOne
-    @JoinColumn(name = "pedido_id", referencedColumnName = "id")
+    @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 
     /**
@@ -39,19 +35,5 @@ public class DetallePedido {
             return 0.0;
         }
         return cantidad * articulo.getPrecioVenta().doubleValue();
-    }
-
-    /**
-     * Método helper para establecer los valores de la clave primaria compuesta
-     */
-    @PrePersist
-    @PreUpdate
-    public void prePersist() {
-        if (pedido != null) {
-            this.pedidoId = pedido.getId();
-        }
-        if (articulo != null) {
-            this.articuloId = articulo.getId();
-        }
     }
 }

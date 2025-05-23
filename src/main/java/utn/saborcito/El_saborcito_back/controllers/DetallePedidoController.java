@@ -3,7 +3,6 @@ package utn.saborcito.El_saborcito_back.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import utn.saborcito.El_saborcito_back.models.DetallePedido;
-import utn.saborcito.El_saborcito_back.models.DetallePedidoId;
 import utn.saborcito.El_saborcito_back.models.Pedido;
 import utn.saborcito.El_saborcito_back.services.DetallePedidoService;
 import utn.saborcito.El_saborcito_back.services.PedidoService;
@@ -28,9 +27,8 @@ public class DetallePedidoController {
         return service.findByPedido(pedido);
     }
 
-    @GetMapping("/{pedidoId}/{articuloId}")
-    public DetallePedido getById(@PathVariable Long pedidoId, @PathVariable Long articuloId) {
-        DetallePedidoId id = new DetallePedidoId(pedidoId, articuloId);
+    @GetMapping("/{id}")
+    public DetallePedido getById(@PathVariable Long id) {
         return service.findById(id);
     }
 
@@ -39,16 +37,15 @@ public class DetallePedidoController {
         return service.save(detalle);
     }
 
-    @PutMapping("/{pedidoId}/{articuloId}")
+    @PutMapping("/{id}")
     public DetallePedido update(
-            @PathVariable Long pedidoId,
-            @PathVariable Long articuloId,
+            @PathVariable Long id,
             @RequestBody DetallePedido detalle) {
-        return service.update(pedidoId, articuloId, detalle);
+        return service.update(id, detalle);
     }
 
-    @DeleteMapping("/{pedidoId}/{articuloId}")
-    public void delete(@PathVariable Long pedidoId, @PathVariable Long articuloId) {
-        service.delete(pedidoId, articuloId);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 }

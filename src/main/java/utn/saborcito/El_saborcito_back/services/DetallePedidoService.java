@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.models.DetallePedido;
-import utn.saborcito.El_saborcito_back.models.DetallePedidoId;
 import utn.saborcito.El_saborcito_back.models.Pedido;
 import utn.saborcito.El_saborcito_back.repositories.DetallePedidoRepository;
 
@@ -24,7 +23,7 @@ public class DetallePedidoService {
         return repo.findByPedido(pedido);
     }
 
-    public DetallePedido findById(DetallePedidoId id) {
+    public DetallePedido findById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "DetallePedido no encontrado con ID: " + id));
@@ -32,28 +31,44 @@ public class DetallePedidoService {
 
     public DetallePedido save(DetallePedido detalle) {
         validarDetalle(detalle);
+
+        // Verificar que no exista otro detalle con el mismo artículo y pedido
+        if (detalle.getPedido() != null && detalle.getArticulo() != null && detalle.getId() == null) {
+            Long count = repo.countByPedidoAndArticulo(detalle.getPedido(), detalle.getArticulo());
+            if (count > 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Ya existe un detalle para este artículo en este pedido");
+            }
+        }
+
         return repo.save(detalle);
     }
 
     /**
      * Actualiza un detalle de pedido
      * 
-     * @param pedidoId   ID del pedido
-     * @param articuloId ID del artículo
-     * @param detalle    Datos actualizados
+     * @param id      ID del detalle de pedido
+     * @param detalle Datos actualizados
      * @return El detalle actualizado
      */
-    public DetallePedido update(Long pedidoId, Long articuloId, DetallePedido detalle) {
-        DetallePedidoId id = new DetallePedidoId(pedidoId, articuloId);
-
+    public DetallePedido update(Long id, DetallePedido detalle) {
         if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "No se puede actualizar: DetallePedido no encontrado");
         }
 
-        detalle.setPedidoId(pedidoId);
-        detalle.setArticuloId(articuloId);
+        detalle.setId(id);
         validarDetalle(detalle);
+
+        // Verificar que no exista otro detalle con el mismo artículo y pedido
+        if (detalle.getPedido() != null && detalle.getArticulo() != null) {
+            Long count = repo.countByPedidoAndArticuloAndIdNot(
+                    detalle.getPedido(), detalle.getArticulo(), id);
+            if (count > 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Ya existe otro detalle para este artículo en este pedido");
+            }
+        }
 
         return repo.save(detalle);
     }
@@ -64,8 +79,8 @@ public class DetallePedidoService {
      * @param detalle El detalle a validar
      */
     private void validarDetalle(DetallePedido detalle) {
-        if (detalle.getArticulo() == null || detalle.getCantidad() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe especificar artículo y cantidad");
+        if (detalle.getArticulo() == null || detalle.getCantidad() == null || detalle.getPedido() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe especificar artículo, pedido y cantidad");
         }
 
         if (detalle.getArticulo().getPrecioVenta() == null) {
@@ -81,12 +96,9 @@ public class DetallePedidoService {
     /**
      * Elimina un detalle de pedido
      * 
-     * @param pedidoId   ID del pedido
-     * @param articuloId ID del artículo
+     * @param id ID del detalle de pedido
      */
-    public void delete(Long pedidoId, Long articuloId) {
-        DetallePedidoId id = new DetallePedidoId(pedidoId, articuloId);
-
+    public void delete(Long id) {
         if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "No se puede eliminar: DetallePedido no encontrado");
@@ -98,7 +110,7 @@ public class DetallePedidoService {
     /**
      * Elimina todos los detalles de un pedido
      * 
-     * @param pedido El pedido
+     * @param pedido El pedido del cual se eliminarán todos los detalles
      */
     public void deleteByPedido(Pedido pedido) {
         repo.deleteByPedido(pedido);
