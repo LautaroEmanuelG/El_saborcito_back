@@ -10,6 +10,4 @@ import lombok.AllArgsConstructor;
 public class ImagenDTO {
     private Long id;
     private String url;
-    // No incluimos UsuarioDTO aquí para evitar ciclos y mantenerlo simple,
-    // a menos que sea estrictamente necesario para el contexto de PromocionDTO
 }

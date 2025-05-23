@@ -12,7 +12,6 @@ public interface UsuarioMapper {
 
     UsuarioDTO toDTO(Usuario usuario);
 
-    @Mapping(target = "password", ignore = true) // Ignorar password en la conversión a entidad
-    // El campo imagen se mapea automáticamente
+    @Mapping(target = "password", ignore = true)
     Usuario toEntity(UsuarioDTO usuarioDTO);
 }

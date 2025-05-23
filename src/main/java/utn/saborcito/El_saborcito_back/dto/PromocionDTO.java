@@ -19,6 +19,6 @@ public class PromocionDTO {
     private LocalTime horaHasta;
     private Double descuento;
     private Double precioPromocional;
-    private SucursalDTO sucursal; // Se asume que SucursalDTO ya existe en este paquete
-    private ArticuloDTO articulo; // Se asume que ArticuloDTO ya existe en este paquete o se importará correctamente
+    private SucursalDTO sucursal;
+    private ArticuloDTO articulo;
 }

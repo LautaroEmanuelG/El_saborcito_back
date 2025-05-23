@@ -14,17 +14,26 @@ import java.util.List;
 public class DatosMercadoPagoService {
     private final DatosMercadoPagoRepository repo;
 
-    public List<DatosMercadoPago> findAll() { return repo.findAll(); }
+    public List<DatosMercadoPago> findAll() {
+        return repo.findAll();
+    }
+
     public DatosMercadoPago findById(Long id) {
         return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
-    public DatosMercadoPago save(DatosMercadoPago dmp) { return repo.save(dmp); }
+
+    public DatosMercadoPago save(DatosMercadoPago dmp) {
+        return repo.save(dmp);
+    }
+
     public DatosMercadoPago update(Long id, DatosMercadoPago dmp) {
         dmp.setId(id);
         return repo.save(dmp);
     }
+
     public void delete(Long id) {
-        if (!repo.existsById(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!repo.existsById(id))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         repo.deleteById(id);
     }
 }

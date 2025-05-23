@@ -3,7 +3,7 @@ package utn.saborcito.El_saborcito_back.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utn.saborcito.El_saborcito_back.models.Usuario;
+import utn.saborcito.El_saborcito_back.dto.UsuarioDTO;
 import utn.saborcito.El_saborcito_back.services.UsuarioService;
 
 import java.util.List;
@@ -15,15 +15,28 @@ public class UsuarioController {
     private final UsuarioService service;
 
     @GetMapping
-    public List<Usuario> getAll() { return service.findAll(); }
-    @GetMapping("/{id}") public Usuario getById(@PathVariable Long id) { return service.findById(id); }
+    public List<UsuarioDTO> getAll() {
+        return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public UsuarioDTO getById(@PathVariable Long id) {
+        return service.findById(id);
+    }
+
     @PostMapping
-    public Usuario create(@RequestBody Usuario usuario) { return service.save(usuario); }
-    @PutMapping("/{id}") public Usuario update(@PathVariable Long id, @RequestBody Usuario usuario) { return service.update(id, usuario); }
+    public UsuarioDTO create(@RequestBody UsuarioDTO usuarioDTO) {
+        return service.save(usuarioDTO);
+    }
+
+    @PutMapping("/{id}")
+    public UsuarioDTO update(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
+        return service.update(id, usuarioDTO);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.ok("Usuario eliminado correctamente");
     }
-
 }

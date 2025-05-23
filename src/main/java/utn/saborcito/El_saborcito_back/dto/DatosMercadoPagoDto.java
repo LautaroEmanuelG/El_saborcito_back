@@ -16,9 +16,9 @@ public class DatosMercadoPagoDto {
     private LocalDate dateCreate;
     private LocalDate dateApproved;
     private LocalDate dateLastUpdate;
-    private String paymentType;
-    private String paymentMethod;
+    // private String paymentType;
+    // private String paymentMethod;
     private String status;
     private String statusDetail;
-    private Long facturaId;
+    private Long factura;
 }
