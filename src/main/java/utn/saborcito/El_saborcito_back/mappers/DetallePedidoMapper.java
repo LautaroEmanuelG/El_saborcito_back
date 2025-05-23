@@ -7,21 +7,17 @@ import utn.saborcito.El_saborcito_back.dto.DetallePedidoDTO;
 import utn.saborcito.El_saborcito_back.models.DetallePedido;
 
 @Mapper(componentModel = "spring", uses = { ArticuloMapper.class })
-public interface DetallePedidoMapper {
+public interface DetallePedidoMapper extends BaseMapper<DetallePedido, DetallePedidoDTO> {
     DetallePedidoMapper INSTANCE = Mappers.getMapper(DetallePedidoMapper.class);
 
-    @Mapping(source = "articulo", target = "articulo")
-    @Mapping(target = "subtotal", expression = "java(detallePedido.calcularSubtotal())") // Usar el método para calcular
-                                                                                         // el subtotal
-    DetallePedidoDTO toDTO(DetallePedido detallePedido);
+    @Override
+    @Mapping(source = "articulo.id", target = "articulo.id")
+    // Asegúrate de que ArticuloMapper pueda manejar la conversión de Articulo a ArticuloDTO
+    // Si ArticuloDTO solo necesita el ID, este mapeo es suficiente.
+    // Si ArticuloDTO necesita más campos de Articulo, ArticuloMapper debe configurarse para ello.
+    DetallePedidoDTO toDTO(DetallePedido entity);
 
-    /*
-     * // Comentado debido a la naturaleza abstracta de Articulo
-     * 
-     * @Mapping(source = "articulo", target = "articulo")
-     * 
-     * @Mapping(target = "pedido", ignore = true) // Ignorar pedido en la conversión
-     * a entidad
-     * DetallePedido toEntity(DetallePedidoDTO detallePedidoDTO);
-     */
+    @Override
+    @Mapping(target = "articulo", ignore = true) // Se manejará en la capa de servicio
+    DetallePedido toEntity(DetallePedidoDTO dto);
 }
