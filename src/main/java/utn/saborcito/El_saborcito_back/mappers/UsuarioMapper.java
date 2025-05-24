@@ -12,6 +12,10 @@ public interface UsuarioMapper {
 
     UsuarioDTO toDTO(Usuario usuario);
 
-    @Mapping(target = "password", ignore = true) // Ignorar password en la conversión a entidad
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "rol", ignore = true)
+    @Mapping(target = "estado", ignore = true)
+    @Mapping(target = "auth0Id", ignore = true)
+    @Mapping(target = "username", ignore = true)
     Usuario toEntity(UsuarioDTO usuarioDTO);
 }

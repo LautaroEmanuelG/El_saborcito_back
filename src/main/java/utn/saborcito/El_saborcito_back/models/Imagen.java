@@ -14,9 +14,4 @@ public class Imagen {
     private Long id;
 
     private String url;
-
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
 }
-

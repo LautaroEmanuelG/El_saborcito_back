@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class CategoriaDTO {
     private Long id;
     private String denominacion;
-    private CategoriaDTO tipoCategoria; // Para la relación recursiva
+    private CategoriaDTO tipoCategoria;
 }

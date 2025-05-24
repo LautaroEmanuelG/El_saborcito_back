@@ -225,24 +225,24 @@
 //             // 5. Imágenes para cada tipo de producto
 //             Imagen imagenHamburguesa = imagenRepo
 //                     .save(Imagen.builder().url("http://ejemplo.com/hamburguesa.png")
-//                             .usuario(usuario).build());
+//                             .build());
 //             Imagen imagenLomo = imagenRepo
-//                     .save(Imagen.builder().url("http://ejemplo.com/lomo.png").usuario(usuario)
+//                     .save(Imagen.builder().url("http://ejemplo.com/lomo.png")
 //                             .build());
 //             Imagen imagenPizza = imagenRepo
-//                     .save(Imagen.builder().url("http://ejemplo.com/pizza.png").usuario(usuario)
+//                     .save(Imagen.builder().url("http://ejemplo.com/pizza.png")
 //                             .build());
 //             Imagen imagenGaseosa = imagenRepo
-//                     .save(Imagen.builder().url("http://ejemplo.com/gaseosa.png").usuario(usuario)
+//                     .save(Imagen.builder().url("http://ejemplo.com/gaseosa.png")
 //                             .build());
 //             Imagen imagenAgua = imagenRepo
-//                     .save(Imagen.builder().url("http://ejemplo.com/agua.png").usuario(usuario)
+//                     .save(Imagen.builder().url("http://ejemplo.com/agua.png")
 //                             .build());
 //             Imagen imagenTrago = imagenRepo
-//                     .save(Imagen.builder().url("http://ejemplo.com/trago.png").usuario(usuario)
+//                     .save(Imagen.builder().url("http://ejemplo.com/trago.png")
 //                             .build());
 //             Imagen imagenDefault = imagenRepo
-//                     .save(Imagen.builder().url("http://ejemplo.com/default.png").usuario(usuario)
+//                     .save(Imagen.builder().url("http://ejemplo.com/default.png")
 //                             .build());
 
 //             // 6. Unidades de medida
@@ -257,7 +257,7 @@
 //             // -- Ingredientes para elaboración (esParaElaborar = true)
 //             ArticuloInsumo insumoHarina = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Harina 000")
-//                     .precioVenta(1000)
+//                     .precioVenta(1000.0)
 //                     .categoria(categoriaPizzas)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(700.0)
@@ -269,7 +269,7 @@
 
 //             ArticuloInsumo insumoQueso = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Mozzarella")
-//                     .precioVenta(2500)
+//                     .precioVenta(2500.0)
 //                     .categoria(categoriaPizzas)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(2000.0)
@@ -281,7 +281,7 @@
 
 //             ArticuloInsumo insumoCarne = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Carne Molida Premium")
-//                     .precioVenta(3500)
+//                     .precioVenta(3500.0)
 //                     .categoria(categoriaHamburguesas)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(3000.0)
@@ -293,7 +293,7 @@
 
 //             ArticuloInsumo insumoPan = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Pan de Hamburguesa")
-//                     .precioVenta(1500)
+//                     .precioVenta(1500.0)
 //                     .categoria(categoriaHamburguesas)
 //                     .unidadMedida(unidadUnidad)
 //                     .precioCompra(1200.0)
@@ -305,7 +305,7 @@
 
 //             ArticuloInsumo insumoLechuga = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Lechuga Fresca")
-//                     .precioVenta(800)
+//                     .precioVenta(800.0)
 //                     .categoria(categoriaHamburguesas)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(600.0)
@@ -317,7 +317,7 @@
 
 //             ArticuloInsumo insumoTomate = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Tomate")
-//                     .precioVenta(900)
+//                     .precioVenta(900.0)
 //                     .categoria(categoriaHamburguesas)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(700.0)
@@ -329,7 +329,7 @@
 
 //             ArticuloInsumo insumoCebolla = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Cebolla")
-//                     .precioVenta(600)
+//                     .precioVenta(600.0)
 //                     .categoria(categoriaHamburguesas)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(400.0)
@@ -341,7 +341,7 @@
 
 //             ArticuloInsumo insumoPanLomo = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Pan de Lomo")
-//                     .precioVenta(1700)
+//                     .precioVenta(1700.0)
 //                     .categoria(categoriaLomos)
 //                     .unidadMedida(unidadUnidad)
 //                     .precioCompra(1400.0)
@@ -353,7 +353,7 @@
 
 //             ArticuloInsumo insumoCarneLomo = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Bife de Lomo")
-//                     .precioVenta(5000)
+//                     .precioVenta(5000.0)
 //                     .categoria(categoriaLomos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(4500.0)
@@ -365,7 +365,7 @@
 
 //             ArticuloInsumo insumoSalsaTomate = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Salsa de Tomate")
-//                     .precioVenta(1200)
+//                     .precioVenta(1200.0)
 //                     .categoria(categoriaPizzas)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(900.0)
@@ -378,7 +378,7 @@
 //             // -- Productos terminados que no se elaboran (esParaElaborar = false)
 //             ArticuloInsumo insumoCocaCola = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Coca Cola 500ml")
-//                     .precioVenta(1800)
+//                     .precioVenta(1800.0)
 //                     .categoria(categoriaGaseosas)
 //                     .unidadMedida(unidadLitros)
 //                     .precioCompra(1300.0)
@@ -390,7 +390,7 @@
 
 //             ArticuloInsumo insumoAguaMineral = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Agua Mineral 500ml")
-//                     .precioVenta(1200)
+//                     .precioVenta(1200.0)
 //                     .categoria(categoriaAguas)
 //                     .unidadMedida(unidadLitros)
 //                     .precioCompra(800.0)
@@ -402,7 +402,7 @@
 
 //             ArticuloInsumo insumoFernet = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Fernet 750ml")
-//                     .precioVenta(6000)
+//                     .precioVenta(6000.0)
 //                     .categoria(categoriaTragos)
 //                     .unidadMedida(unidadLitros)
 //                     .precioCompra(4500.0)
@@ -419,7 +419,7 @@
 //                             .denominacion("Pizza Mozzarella")
 //                             .descripcion("Pizza con queso mozzarella y salsa de tomate")
 //                             .tiempoEstimadoMinutos(20)
-//                             .precioVenta(4500)
+//                             .precioVenta(4500.0)
 //                             .categoria(categoriaPizzas)
 //                             .imagen(imagenPizza)
 //                             .build());
@@ -449,7 +449,7 @@
 //                             .denominacion("Hamburguesa Clásica")
 //                             .descripcion("Hamburguesa con lechuga, tomate y cebolla")
 //                             .tiempoEstimadoMinutos(15)
-//                             .precioVenta(3800)
+//                             .precioVenta(3800.0)
 //                             .categoria(categoriaHamburguesas)
 //                             .imagen(imagenHamburguesa)
 //                             .build());
@@ -491,7 +491,7 @@
 //                             .denominacion("Lomo Completo")
 //                             .descripcion("Lomo con jamón, queso, lechuga y tomate")
 //                             .tiempoEstimadoMinutos(20)
-//                             .precioVenta(5500)
+//                             .precioVenta(5500.0)
 //                             .categoria(categoriaLomos)
 //                             .imagen(imagenLomo)
 //                             .build());
