@@ -1,0 +1,26 @@
+meta {
+  name: POST /api/articulos
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/articulos
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "denominacion": "Pizza Margarita",
+    "precioVenta": 2300,
+    "categoria": { "id": 1 },
+    "detalleProducto": { "id": 1 },
+    "articuloInsumo": null
+  }
+  
+}

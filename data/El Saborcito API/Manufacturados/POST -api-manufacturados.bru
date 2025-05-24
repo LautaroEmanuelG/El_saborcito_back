@@ -1,0 +1,27 @@
+meta {
+  name: POST /api/manufacturados
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/manufacturados
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "denominacion": "Hamburguesa clásica",
+    "descripcion": "Pan, carne y queso",
+    "tiempoEstimadoMinutos": 15,
+    "preparacion": "Asar carne, armar",
+    "precioVenta": 1800.00,
+    "imagen": { "id": 2 }
+  }
+  
+}

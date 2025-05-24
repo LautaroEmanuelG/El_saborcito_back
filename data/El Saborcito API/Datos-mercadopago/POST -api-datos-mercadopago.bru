@@ -1,0 +1,29 @@
+meta {
+  name: POST /api/datos-mercadopago
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/datos-mercadopago
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "dateCreate": "2025-05-10",
+    "dateApproved": "2025-05-10",
+    "dateLastUpdate": "2025-05-10",
+    "paymentType": "credit_card",
+    "paymentMethod": "visa",
+    "status": "approved",
+    "statusDetail": "accredited",
+    "factura": { "id": 2 }
+  }
+  
+}

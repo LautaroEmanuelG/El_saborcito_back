@@ -1,0 +1,25 @@
+meta {
+  name: PUT /api/promociones/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/promociones/4
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "denominacion": "Promo Jueves",
+    "fechaDesde": "2025-05-13",
+    "fechaHasta": "2025-05-13",
+    "horaDesde": "20:00:00",
+    "horaHasta": "23:59:00",
+    "descuento": null,
+    "precioPromocional": 2599,
+    "articulo": { "id": 1 },
+    "sucursal": { "id": 1 }
+  }
+}

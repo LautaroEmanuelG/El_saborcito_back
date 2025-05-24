@@ -1,0 +1,19 @@
+meta {
+  name: PUT /api/notas-credito/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/notas-credito/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "fechaEmision": "2025-04-17",
+    "motivo": "Devolución porque llegó frío",
+    "factura": { "id": 2 }
+  }
+}

@@ -1,0 +1,28 @@
+meta {
+  name: POST /api/categorias
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/categorias
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "denominacion": "Postres",
+    "tipoCategoria": {
+      "id": 2  // MANUFACTURADOS
+    },
+    "sucursal": {
+      "id": 1
+    }
+  }
+  
+}

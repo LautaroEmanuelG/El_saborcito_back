@@ -1,0 +1,29 @@
+meta {
+  name: POST /api/facturas
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/facturas
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "fechaFacturacion": "2025-05-10",
+    "formaPago": "MERCADO_PAGO",
+    "mpPaymentId": 99887766,
+    "mpMerchantOrderId": 55443322,
+    "mpPreferenceId": "pref-abc-123",
+    "mpPaymentType": "credit_card",
+    "totalVenta": 2500.0,
+    "pedido": { "id": 2 }
+  }
+  
+}

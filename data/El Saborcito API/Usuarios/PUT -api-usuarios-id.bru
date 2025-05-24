@@ -1,0 +1,29 @@
+meta {
+  name: PUT /api/usuarios/id
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{BASE_URL_DEV}}/usuarios/3
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "id": 3,
+      "auth0Id": "auth0|jefe456",
+      "username": "jefe456",
+      "email": "jefe@correo.com",
+      "password": "hashedpassword34",
+      "nombre": "Chistopher",
+      "apellido": "Park",
+      "telefono": "26112347890",
+      "fechaNacimiento": "1991-11-15",
+      "rol": "ADMIN",
+      "estado": true,
+      "fechaRegistro": "2025-05-10T18:12:39",
+      "fechaUltimaModificacion": "2025-05-10T18:12:39"
+  }
+}

@@ -1,0 +1,25 @@
+meta {
+  name: POST /api/detalles-pedido
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/detalles-pedido
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "cantidad": 1,
+    "subTotal": 2500.00,
+    "articulo": { "id": 1 },
+    "pedido": { "id": 1 }
+  }
+  
+}

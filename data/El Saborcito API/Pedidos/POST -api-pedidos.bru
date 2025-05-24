@@ -1,0 +1,30 @@
+meta {
+  name: POST /api/pedidos
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/pedidos
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "horasEstimadaFinalizacion": "00:45:00",
+    "total": 2500.0,
+    "totalCosto": 1700.0,
+    "fechaPedido": "2025-05-10",
+    "estado": "PENDIENTE",
+    "tipoEnvio": "TAKE_AWAY",
+    "formaPago": "MERCADO_PAGO",
+    "cliente": { "id": 1 },
+    "sucursal": { "id": 1 }
+  }
+  
+}

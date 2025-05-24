@@ -1,0 +1,20 @@
+meta {
+  name: PUT /api/detalles-manufacturados/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/detalles-manufacturados/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "cantidad": 250,
+    "articuloManufacturado": { "id": 1 },
+    "articuloInsumo": { "id": 5 }
+  }
+  
+}

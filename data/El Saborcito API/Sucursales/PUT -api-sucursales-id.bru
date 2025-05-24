@@ -1,0 +1,31 @@
+meta {
+  name: PUT /api/sucursales/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/sucursales/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Sucursal GodoyCruz",
+    "horarioApertura": "10:00:00",
+    "horarioCierre": "22:00:00",
+    "domicilio": {
+      "id": 4,
+      "calle": "San Martín",
+      "numero": 1234,
+      "cp": "5500",
+      "localidad": { "id": 1 },
+      "usuario": { "id": 1 }
+    },
+    "empresa": {
+      "id": 2
+    }
+  }
+  
+}

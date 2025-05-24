@@ -1,0 +1,30 @@
+meta {
+  name: POST /api/empleados
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/empleados
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "fechaIngreso": "2022-03-01",
+    "legajo": "EMP002",
+    "sucursalAsignada": 1,
+    "sucursal": {
+      "id": 1
+    },
+    "usuario": {
+      "id": 1
+    }
+  }
+  
+}

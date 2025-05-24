@@ -1,0 +1,24 @@
+meta {
+  name: PUT /api/manufacturados/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/manufacturados/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "denominacion": "Pizza Margherita Especial",
+    "descripcion": "Pizza con salsa de tomate, mozzarella y albahaca fresca",
+    "tiempoEstimadoMinutos": 18,
+    "preparacion": "Armar la base, agregar ingredientes y hornear 15 minutos",
+    "precioVenta": 2800.00,
+    "imagen": {
+      "id": 1
+    }
+  }
+}

@@ -1,0 +1,30 @@
+meta {
+  name: POST /api/sucursales
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/sucursales
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "Sucursal Godoy Cruz",
+    "horarioApertura": "09:00:00",
+    "horarioCierre": "23:00:00",
+    "domicilio": {
+      "id": 4
+    },
+    "empresa": {
+      "id": 2
+    }
+  }
+  
+}
