@@ -1,0 +1,33 @@
+meta {
+  name: POST /api/usuarios
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BASE_URL_DEV}}/usuarios
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+          "id": 3,
+          "auth0Id": "auth0|cliente456",
+          "username": "cliente456",
+          "email": "jefe@correo.com",
+          "password": "hashedpassword34",
+          "nombre": "Chistopher",
+          "apellido": "Jones",
+          "telefono": "26112347890",
+          "fechaNacimiento": "1991-11-15",
+          "rol": "ADMIN",
+          "estado": true,
+          "fechaRegistro": "2025-05-10T18:12:39",
+          "fechaUltimaModificacion": "2025-05-10T18:12:39"
+  }
+}

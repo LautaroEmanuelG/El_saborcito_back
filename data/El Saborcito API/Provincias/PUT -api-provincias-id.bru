@@ -1,0 +1,20 @@
+meta {
+  name: PUT /api/provincias/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/provincias/4
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Santa Fe",
+    "pais": {
+      "id": 1
+    }
+  }
+}

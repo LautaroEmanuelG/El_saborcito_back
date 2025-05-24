@@ -1,0 +1,25 @@
+meta {
+  name: PUT /api/empleados/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/empleados/4
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "fechaIngreso": "2020-03-01",
+    "legajo": "EMP004",
+    "sucursalAsignada": 1,
+    "sucursal": {
+      "id": 1
+    },
+    "usuario": {
+      "id": 1
+    }
+  }
+}

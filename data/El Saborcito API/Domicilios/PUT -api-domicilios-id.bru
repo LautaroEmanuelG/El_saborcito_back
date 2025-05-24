@@ -1,0 +1,25 @@
+meta {
+  name: PUT /api/domicilios/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/domicilios/4
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "calle": "Sarmiento",
+    "numero": 1234,
+    "cp": "5501",
+    "localidad": {
+      "id": 3
+    },
+    "usuario": {
+      "id": 2
+    }
+  }
+}

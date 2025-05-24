@@ -1,0 +1,30 @@
+meta {
+  name: POST /api/domicilios
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/domicilios
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "calle": "San Juan",
+    "numero": 1234,
+    "cp": "5501",
+    "localidad": {
+      "id": 3
+    },
+    "usuario": {
+      "id": 2
+    }
+  }
+  
+}

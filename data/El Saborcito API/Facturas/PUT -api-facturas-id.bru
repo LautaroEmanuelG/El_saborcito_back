@@ -1,0 +1,24 @@
+meta {
+  name: PUT /api/facturas/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/facturas/3
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "fechaFacturacion": "2025-05-10",
+    "formaPago": "EFECTIVO",
+    "mpPaymentId": 99887766,
+    "mpMerchantOrderId": 55443322,
+    "mpPreferenceId": "pref-abc-123",
+    "mpPaymentType": "credit_card",
+    "totalVenta": 2500.0,
+    "pedido": { "id": 2 }
+  }
+}

@@ -1,0 +1,24 @@
+meta {
+  name: POST /api/detalles-manufacturados
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/detalles-manufacturados
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "cantidad": 300,
+    "articuloManufacturado": { "id": 1 },
+    "articuloInsumo": { "id": 5 }
+  }
+  
+}

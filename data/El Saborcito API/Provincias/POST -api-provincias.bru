@@ -1,0 +1,25 @@
+meta {
+  name: POST /api/provincias
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/provincias
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "La Rioja",
+    "pais": {
+      "id": 1
+    }
+  }
+  
+}

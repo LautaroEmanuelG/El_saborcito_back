@@ -1,0 +1,25 @@
+meta {
+  name: POST /api/imagenes
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/imagenes
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "url": "https://ejemplo.com/imagenes/mozzarella.jpg",
+    "articuloInsumo": {
+      "id": 5
+    }
+  }
+  
+}

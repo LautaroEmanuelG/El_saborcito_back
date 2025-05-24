@@ -1,0 +1,21 @@
+meta {
+  name: PUT /api/clientes/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/clientes/5
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "usuario": {
+      "id": 4
+    },
+    "historialPedidos": "[{\"pedidoId\": 1, \"monto\": 2500.00, \"fecha\": \"2025-05-10\"}]"
+  }
+  
+}

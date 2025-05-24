@@ -1,0 +1,27 @@
+meta {
+  name: POST /api/insumos
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/insumos
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "denominacion": "Queso rallado",
+    "precioCompra": 450.0,
+    "stockActual": 15,
+    "stockMaximo": 50,
+    "esParaElaborar": true,
+    "imagen": { "id": 1 }
+  }
+  
+}

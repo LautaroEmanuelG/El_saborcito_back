@@ -1,0 +1,37 @@
+meta {
+  name: PUT /api/pedidos/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/pedidos/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 2,
+    "horasEstimadaFinalizacion": "00:45:00",
+    "total": 2500.0,
+    "totalCosto": 1700.0,
+    "fechaPedido": "2025-05-10",
+    "estado": "ENTREGADO",
+    "tipoEnvio": "DELIVERY",
+    "formaPago": "EFECTIVO",
+    "cliente": { "id": 1 },
+    "sucursal": { "id": 1 },
+    "detalles": [
+      {
+        "id": 1,
+        "cantidad": 1,
+        "subTotal": 2500.0,
+        "articulo": { "id": 1 },
+        "pedido": { "id": 2 }
+      }
+    ]
+  }
+  
+  
+}

@@ -1,0 +1,25 @@
+meta {
+  name: POST /api/clientes
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL_DEV}}/clientes
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "usuario": {
+      "id":4
+    },
+    "historialPedidos": "[]"
+  }
+  
+}

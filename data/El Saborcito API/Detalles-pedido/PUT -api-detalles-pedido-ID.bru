@@ -1,0 +1,25 @@
+meta {
+  name: PUT /api/detalles-pedido/ID
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/detalles-pedido/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "cantidad": 2,
+    "subTotal": 5000.0,
+    "articulo": {
+      "id": 1
+    },
+    "pedido": {
+      "id": 1
+    }
+  }
+  
+}

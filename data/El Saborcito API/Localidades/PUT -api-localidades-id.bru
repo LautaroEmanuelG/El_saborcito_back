@@ -1,0 +1,21 @@
+meta {
+  name: PUT /api/localidades/id
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{BASE_URL_DEV}}/localidades/8
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "San Rafael",
+    "provincia": {
+      "id": 1
+    }
+  }
+  
+}
