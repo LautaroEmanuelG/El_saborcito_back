@@ -5,15 +5,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import utn.saborcito.El_saborcito_back.dto.ClienteRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.mappers.SucursalMapper;
 import utn.saborcito.El_saborcito_back.models.Articulo;
+import utn.saborcito.El_saborcito_back.models.Cliente;
 import utn.saborcito.El_saborcito_back.models.DetallePedido;
 import utn.saborcito.El_saborcito_back.models.Domicilio;
+import utn.saborcito.El_saborcito_back.models.Pedido;
 import utn.saborcito.El_saborcito_back.models.Sucursal;
 import utn.saborcito.El_saborcito_back.repositories.DetallePedidoRepository;
 import utn.saborcito.El_saborcito_back.repositories.DomicilioRepository;
+import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
 import utn.saborcito.El_saborcito_back.repositories.SucursalRepository;
 import java.util.Map;
 import java.util.Comparator;
@@ -31,6 +35,40 @@ public class SucursalService {
     private final DomicilioRepository domicilioRepository;
     private final SucursalMapper sucursalMapper;
     private final DetallePedidoRepository detallePedidoRepo;
+    private final PedidoRepository pedidoRepository;
+
+
+    public List<ClienteRankingDTO> getRankingClientes(LocalDate desde, LocalDate hasta, String ordenarPor) {
+    List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
+
+    Map<Cliente, List<Pedido>> pedidosPorCliente = pedidos.stream()
+        .collect(Collectors.groupingBy(Pedido::getCliente));
+
+        List<ClienteRankingDTO> ranking = pedidosPorCliente.entrySet().stream()
+        .map(entry -> {
+            Cliente cliente = entry.getKey();
+            List<Pedido> pedidosCliente = entry.getValue();
+            long cantidad = pedidosCliente.size();
+            double total = pedidosCliente.stream().mapToDouble(Pedido::getTotal).sum();
+            return new ClienteRankingDTO(
+                cliente.getId(),
+                cliente.getUsuario().getNombre() + " " + cliente.getUsuario().getApellido(),
+                cantidad,
+                total
+            );
+        })
+        .sorted((a, b) -> {
+            if ("importe".equalsIgnoreCase(ordenarPor)) {
+                return Double.compare(b.getTotalImporte(), a.getTotalImporte());
+            } else {
+                return Long.compare(b.getCantidadPedidos(), a.getCantidadPedidos());
+            }
+        })
+        .collect(Collectors.toList());
+
+        return ranking;
+    }
+
 
     public List<ProductoRankingDTO> getRankingProductos(LocalDate desde, LocalDate hasta) {
         List<DetallePedido> detalles = detallePedidoRepo.findAllByPedido_FechaPedidoBetween(desde, hasta);
