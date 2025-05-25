@@ -1,9 +1,12 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.services.SucursalService;
-
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -13,6 +16,14 @@ public class SucursalController {
 
     public SucursalController(SucursalService service) {
         this.service = service;
+    }
+
+    @GetMapping("/ranking-productos")
+    public List<ProductoRankingDTO> getRankingProductos(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+    ) {
+        return service.getRankingProductos(desde, hasta);
     }
 
     @GetMapping

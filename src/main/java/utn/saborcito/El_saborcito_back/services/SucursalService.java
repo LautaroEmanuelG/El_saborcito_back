@@ -4,13 +4,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.mappers.SucursalMapper;
+import utn.saborcito.El_saborcito_back.models.Articulo;
+import utn.saborcito.El_saborcito_back.models.DetallePedido;
 import utn.saborcito.El_saborcito_back.models.Domicilio;
 import utn.saborcito.El_saborcito_back.models.Sucursal;
+import utn.saborcito.El_saborcito_back.repositories.DetallePedidoRepository;
 import utn.saborcito.El_saborcito_back.repositories.DomicilioRepository;
 import utn.saborcito.El_saborcito_back.repositories.SucursalRepository;
+import java.util.Map;
+import java.util.Comparator;
 
+
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +30,30 @@ public class SucursalService {
     private final SucursalRepository repo;
     private final DomicilioRepository domicilioRepository;
     private final SucursalMapper sucursalMapper;
+    private final DetallePedidoRepository detallePedidoRepo;
+
+    public List<ProductoRankingDTO> getRankingProductos(LocalDate desde, LocalDate hasta) {
+        List<DetallePedido> detalles = detallePedidoRepo.findAllByPedido_FechaPedidoBetween(desde, hasta);
+
+        Map<Articulo, Long> conteo = new HashMap<>();
+        for (DetallePedido detalle : detalles) {
+            conteo.merge(detalle.getArticulo(), detalle.getCantidad().longValue(), Long::sum);
+        }
+
+        return conteo.entrySet().stream()
+                .map(entry -> {
+                    Articulo articulo = entry.getKey();
+                    String tipo = articulo.getClass().getSimpleName().equals("ArticuloManufacturado") ? "MANUFACTURADO" : "INSUMO";
+                    return new ProductoRankingDTO(
+                            articulo.getId(),
+                            articulo.getDenominacion(),
+                            entry.getValue(),
+                            tipo
+                    );
+                })
+                .sorted(Comparator.comparingLong(ProductoRankingDTO::getCantidadVendida).reversed())
+                .collect(Collectors.toList());
+    }
 
     public List<SucursalDTO> findAll() {
         return repo.findAll().stream()
