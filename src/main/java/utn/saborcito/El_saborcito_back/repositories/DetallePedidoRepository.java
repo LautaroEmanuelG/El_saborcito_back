@@ -6,6 +6,7 @@ import utn.saborcito.El_saborcito_back.models.Articulo;
 import utn.saborcito.El_saborcito_back.models.DetallePedido;
 import utn.saborcito.El_saborcito_back.models.Pedido;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -19,4 +20,7 @@ public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Lo
     Long countByPedidoAndArticulo(Pedido pedido, Articulo articulo);
 
     Long countByPedidoAndArticuloAndIdNot(Pedido pedido, Articulo articulo, Long id);
+
+    List<DetallePedido> findAllByPedido_FechaPedidoBetween(LocalDate desde, LocalDate hasta);
+
 }
