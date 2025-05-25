@@ -44,4 +44,16 @@ public class Pedido {
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<DetallePedido> detalles;
+
+     /**
+     * Calcula el costo total del pedido (sumando el costo de cada detalle)
+     * @return el costo total calculado
+     */
+    @Transient
+    public Double calcularCostoTotal() {
+        if (detalles == null || detalles.isEmpty()) return 0.0;
+        return detalles.stream()
+                .mapToDouble(DetallePedido::calcularCosto)
+                .sum();
+    }
 }

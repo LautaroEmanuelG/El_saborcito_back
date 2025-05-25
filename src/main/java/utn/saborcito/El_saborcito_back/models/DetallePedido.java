@@ -36,4 +36,31 @@ public class DetallePedido {
         }
         return cantidad * articulo.getPrecioVenta().doubleValue();
     }
+
+    @Transient
+    public Double calcularCosto() {
+        if (articulo == null || cantidad == null) {
+            return 0.0;
+        }
+
+        // Si es un artículo insumo, se toma el precio de compra directamente
+        if (articulo instanceof ArticuloInsumo insumo && insumo.getPrecioCompra() != null) {
+            return cantidad * insumo.getPrecioCompra();
+        }
+
+        // Si es un artículo manufacturado, calcular el costo en base a sus detalles
+        if (articulo instanceof ArticuloManufacturado manufacturado && manufacturado.getDetalles() != null) {
+            double costoUnitario = manufacturado.getDetalles().stream()
+                    .mapToDouble(det -> {
+                        double precioInsumo = det.getArticuloInsumo().getPrecioCompra() != null
+                                ? det.getArticuloInsumo().getPrecioCompra()
+                                : 0.0;
+                        return det.getCantidad() * precioInsumo;
+                    }).sum();
+
+            return cantidad * costoUnitario;
+        }
+
+        return 0.0;
+    }
 }

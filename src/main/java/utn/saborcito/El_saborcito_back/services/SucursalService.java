@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import utn.saborcito.El_saborcito_back.dto.ClienteRankingDTO;
+import utn.saborcito.El_saborcito_back.dto.MovimientoMonetarioDTO;
 import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.mappers.SucursalMapper;
@@ -36,6 +37,24 @@ public class SucursalService {
     private final SucursalMapper sucursalMapper;
     private final DetallePedidoRepository detallePedidoRepo;
     private final PedidoRepository pedidoRepository;
+
+
+    public MovimientoMonetarioDTO getMovimientos(LocalDate desde, LocalDate hasta) {
+        List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
+
+        double ingresos = pedidos.stream()
+                .mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0)
+                .sum();
+
+        double costos = pedidos.stream()
+                .mapToDouble(p -> p.calcularCostoTotal())
+                .sum();
+
+        double ganancias = ingresos - costos;
+
+        return new MovimientoMonetarioDTO(ingresos, costos, ganancias);
+    }
+
 
 
     public List<ClienteRankingDTO> getRankingClientes(LocalDate desde, LocalDate hasta, String ordenarPor) {
