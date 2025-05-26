@@ -49,8 +49,8 @@ public class DetallePedido {
         }
 
         // Si es un artículo manufacturado, calcular el costo en base a sus detalles
-        if (articulo instanceof ArticuloManufacturado manufacturado && manufacturado.getDetalles() != null) {
-            double costoUnitario = manufacturado.getDetalles().stream()
+        if (articulo instanceof ArticuloManufacturado manufacturado && manufacturado.getArticuloManufacturadoDetalles() != null) {
+            double costoUnitario = manufacturado.getArticuloManufacturadoDetalles().stream()
                     .mapToDouble(det -> {
                         double precioInsumo = det.getArticuloInsumo().getPrecioCompra() != null
                                 ? det.getArticuloInsumo().getPrecioCompra()
