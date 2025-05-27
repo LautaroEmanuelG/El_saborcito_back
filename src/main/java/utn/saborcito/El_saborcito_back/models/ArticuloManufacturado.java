@@ -6,7 +6,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.List;
 
 @Entity
 @Data
@@ -20,10 +19,6 @@ public class ArticuloManufacturado extends Articulo {
     private String descripcion;
     private Integer tiempoEstimadoMinutos;
     private String preparacion;
-
-    @ManyToOne
-    @JoinColumn(name = "imagen_id")
-    private Imagen imagen;
 
     @OneToMany(mappedBy = "articuloManufacturado", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default

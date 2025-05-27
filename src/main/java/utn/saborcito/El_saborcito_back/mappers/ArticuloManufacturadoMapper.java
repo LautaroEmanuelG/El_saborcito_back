@@ -10,13 +10,14 @@ import utn.saborcito.El_saborcito_back.models.ArticuloManufacturado;
 public interface ArticuloManufacturadoMapper extends BaseMapper<ArticuloManufacturado, ArticuloManufacturadoDTO> {
 
     @Override
-    @Mapping(source = "imagen", target = "imagen")
+    @Mapping(source = "imagen", target = "imagen") // Corregido: mapear a imagen (ImagenDTO)
     @Mapping(source = "categoria.id", target = "categoriaId")
     @Mapping(source = "unidadMedida.id", target = "unidadMedidaId")
     @Mapping(source = "articuloManufacturadoDetalles", target = "articuloManufacturadoDetalles")
     ArticuloManufacturadoDTO toDTO(ArticuloManufacturado source);
 
     @Override
+    @Mapping(target = "imagen", ignore = true) // Se manejará en el servicio
     @Mapping(target = "categoria", ignore = true) // Ignorar para manejo manual/en servicio
     @Mapping(target = "unidadMedida", ignore = true) // Ignorar para manejo manual/en servicio
     ArticuloManufacturado toEntity(ArticuloManufacturadoDTO source);

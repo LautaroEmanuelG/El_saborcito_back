@@ -13,4 +13,5 @@ public class ArticuloDTO {
     private Double precioVenta;
     private Long categoriaId;
     private Long unidadMedidaId;
+    private ImagenDTO imagen;
 }

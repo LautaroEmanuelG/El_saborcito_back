@@ -19,6 +19,10 @@ public abstract class Articulo {
     private Double precioVenta; // Corregido de Integer a Double
 
     @ManyToOne
+    @JoinColumn(name = "imagen_id") // Añadido para la imagen
+    private Imagen imagen; // Añadido para la imagen
+
+    @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
