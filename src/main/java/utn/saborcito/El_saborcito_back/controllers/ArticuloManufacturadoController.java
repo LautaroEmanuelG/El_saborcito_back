@@ -38,4 +38,9 @@ public class ArticuloManufacturadoController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+    @GetMapping("/categoria/{categoriaId}")
+    public List<ArticuloManufacturadoDTO> getAllByCategoria(@PathVariable Long categoriaId) {
+        return service.findAllByCategoriaId(categoriaId);
+    }
 }

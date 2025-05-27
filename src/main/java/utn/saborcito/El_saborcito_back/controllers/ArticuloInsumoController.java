@@ -40,4 +40,19 @@ public class ArticuloInsumoController {
         articuloInsumoService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/es-para-elaborar")
+    public ResponseEntity<List<ArticuloInsumoDTO>> getAllEsParaElaborar() {
+        return ResponseEntity.ok(articuloInsumoService.findAllByEsParaElaborarTrue());
+    }
+
+    @GetMapping("/no-es-para-elaborar")
+    public ResponseEntity<List<ArticuloInsumoDTO>> getAllNoEsParaElaborar() {
+        return ResponseEntity.ok(articuloInsumoService.findAllByEsParaElaborarFalse());
+    }
+
+    @GetMapping("/categoria/{categoriaId}")
+    public ResponseEntity<List<ArticuloInsumoDTO>> getAllByCategoria(@PathVariable Long categoriaId) {
+        return ResponseEntity.ok(articuloInsumoService.findAllByCategoriaId(categoriaId));
+    }
 }

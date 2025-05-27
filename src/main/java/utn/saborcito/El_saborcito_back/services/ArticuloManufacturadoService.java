@@ -62,4 +62,10 @@ public class ArticuloManufacturadoService {
         }
         repo.deleteById(id);
     }
+
+    public List<ArticuloManufacturadoDTO> findAllByCategoriaId(Long categoriaId) {
+        return repo.findAllByCategoria_Id(categoriaId).stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

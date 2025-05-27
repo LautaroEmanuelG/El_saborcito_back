@@ -135,4 +135,25 @@ public class ArticuloInsumoService {
         }
         articuloInsumoRepository.deleteById(id);
     }
+
+    public List<ArticuloInsumoDTO> findAllByEsParaElaborarTrue() {
+        return articuloInsumoRepository.findAllByEsParaElaborarTrue()
+                .stream()
+                .map(articuloInsumoMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ArticuloInsumoDTO> findAllByEsParaElaborarFalse() {
+        return articuloInsumoRepository.findAllByEsParaElaborarFalse()
+                .stream()
+                .map(articuloInsumoMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ArticuloInsumoDTO> findAllByCategoriaId(Long categoriaId) {
+        return articuloInsumoRepository.findAllByCategoria_Id(categoriaId)
+                .stream()
+                .map(articuloInsumoMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

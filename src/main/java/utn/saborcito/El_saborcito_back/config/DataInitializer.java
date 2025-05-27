@@ -260,49 +260,49 @@
 
 //                         // Nuevas imágenes para pizzas
 //                         Imagen imagenPizzaCuatroQuesos = imagenRepo
-//                                         .save(Imagen.builder().url("./public/img/productos/pizza/pizzacuatroquesos.png")
+//                                         .save(Imagen.builder().url("/public/img/productos/pizza/pizzacuatroquesos.png")
 //                                                         .build());
 //                         Imagen imagenPizzaHawaiana = imagenRepo
-//                                         .save(Imagen.builder().url("./public/img/productos/pizza/pizzahawaiana.png")
+//                                         .save(Imagen.builder().url("/public/img/productos/pizza/pizzahawaiana.png")
 //                                                         .build());
 //                         Imagen imagenPizzaMargherita = imagenRepo
-//                                         .save(Imagen.builder().url("./public/img/productos/pizza/pizzamargherita.png")
+//                                         .save(Imagen.builder().url("/public/img/productos/pizza/pizzamargherita.png")
 //                                                         .build());
 //                         Imagen imagenPizzaPepperoni = imagenRepo
-//                                         .save(Imagen.builder().url("./public/img/productos/pizza/pizzapepperoni.png")
+//                                         .save(Imagen.builder().url("/public/img/productos/pizza/pizzapepperoni.png")
 //                                                         .build());
 
 //                         // Nuevas imágenes para hamburguesas
 //                         Imagen imagenHamburguesaBbq = imagenRepo
 //                                         .save(Imagen.builder()
-//                                                         .url("./public/img/productos/hamburguesas/hamburguesabbq.png")
+//                                                         .url("/public/img/productos/hamburguesas/hamburguesabbq.png")
 //                                                         .build());
 //                         Imagen imagenHamburguesaClasicaNueva = imagenRepo
 //                                         .save(Imagen.builder().url(
-//                                                         "./public/img/productos/hamburguesas/hamburguesaclásica.png")
+//                                                         "/public/img/productos/hamburguesas/hamburguesaclásica.png")
 //                                                         .build());
 //                         Imagen imagenHamburguesaConQueso = imagenRepo
 //                                         .save(Imagen.builder().url(
-//                                                         "./public/img/productos/hamburguesas/hamburguesaconqueso.png")
+//                                                         "/public/img/productos/hamburguesas/hamburguesaconqueso.png")
 //                                                         .build());
 //                         Imagen imagenHamburguesaVegetariana = imagenRepo
 //                                         .save(Imagen.builder().url(
-//                                                         "./public/img/productos/hamburguesas/hamburguesavegetariana.png")
+//                                                         "/public/img/productos/hamburguesas/hamburguesavegetariana.png")
 //                                                         .build());
 
 //                         // Nuevas imágenes para bebidas
 //                         Imagen imagenAguaMineralNueva = imagenRepo
-//                                         .save(Imagen.builder().url("./public/img/productos/bebidas/aguamineral.jpg")
+//                                         .save(Imagen.builder().url("/public/img/productos/bebidas/aguamineral.jpg")
 //                                                         .build());
 //                         Imagen imagenCervezaArtesanal = imagenRepo
 //                                         .save(Imagen.builder()
-//                                                         .url("./public/img/productos/bebidas/cervezaartesanal.png")
+//                                                         .url("/public/img/productos/bebidas/cervezaartesanal.png")
 //                                                         .build());
 //                         Imagen imagenCocaColaNueva = imagenRepo
-//                                         .save(Imagen.builder().url("./public/img/productos/bebidas/cocacola.jpg")
+//                                         .save(Imagen.builder().url("/public/img/productos/bebidas/cocacola.jpg")
 //                                                         .build());
 //                         Imagen imagenJugoDeNaranja = imagenRepo
-//                                         .save(Imagen.builder().url("./public/img/productos/bebidas/jugodenaranja.png")
+//                                         .save(Imagen.builder().url("/public/img/productos/bebidas/jugodenaranja.png")
 //                                                         .build());
 
 //                         // 6. Unidades de medida
