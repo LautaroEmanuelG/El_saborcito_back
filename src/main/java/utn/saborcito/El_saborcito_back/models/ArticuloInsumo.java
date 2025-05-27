@@ -17,8 +17,4 @@ public class ArticuloInsumo extends Articulo {
     private Integer stockActual;
     private Integer stockMaximo;
     private Boolean esParaElaborar;
-
-    @ManyToOne
-    @JoinColumn(name = "imagen_id") // La imagen es obligatoria según ArticuloService
-    private Imagen imagen;
 }

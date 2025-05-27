@@ -14,6 +14,7 @@ import utn.saborcito.El_saborcito_back.repositories.ArticuloRepository;
 import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 import utn.saborcito.El_saborcito_back.repositories.UnidadMedidaRepository;
+import utn.saborcito.El_saborcito_back.mappers.ImagenMapper; // Asegúrate de importar ImagenMapper
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class ArticuloService {
     private final CategoriaRepository categoriaRepository; // Inyectar CategoriaRepository
     private final UnidadMedidaRepository unidadMedidaRepository; // Inyectar UnidadMedidaRepository
     private final ImagenRepository imagenRepository; // Inyectar ImagenRepository (si aplica para ArticuloInsumo)
+    private final ImagenMapper imagenMapper; // Inyectar ImagenMapper
 
     public Articulo findById(Long id) {
         if (id == null) {
@@ -44,15 +46,16 @@ public class ArticuloService {
 
     private ArticuloDTO toDto(Articulo articulo) {
         if (articulo == null) {
-            // Considerar si devolver null, un DTO vacío o lanzar excepción
-            // Por ahora, se asume que 'articulo' no será null si viene de repo.findAll()
-            // pero es buena práctica considerarlo.
             return null;
         }
         ArticuloDTO dto = new ArticuloDTO();
-        dto.setId(articulo.getId()); // getId() en Long no debería ser null si la entidad está gestionada
+        dto.setId(articulo.getId());
         dto.setDenominacion(articulo.getDenominacion());
         dto.setPrecioVenta(articulo.getPrecioVenta());
+
+        if (articulo.getImagen() != null) { // No es necesario chequear el ID de la imagen aquí
+            dto.setImagen(imagenMapper.toDTO(articulo.getImagen())); // Mapear Imagen a ImagenDTO
+        }
 
         if (articulo.getCategoria() != null && articulo.getCategoria().getId() != null) {
             dto.setCategoriaId(articulo.getCategoria().getId());
@@ -106,19 +109,27 @@ public class ArticuloService {
                         "Unidad de medida no encontrada con ID: " + articulo.getUnidadMedida().getId()));
         articulo.setUnidadMedida(unidadMedida);
 
-        // Validaciones específicas para ArticuloInsumo (ej. imagen)
-        if (articulo instanceof ArticuloInsumo insumo) {
-            // CORRECCIÓN 24: Si la imagen es obligatoria para ArticuloInsumo
-            if (insumo.getImagen() == null || insumo.getImagen().getId() == null) {
-                // Si es opcional, se puede quitar esta validación o manejarla diferente
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "La imagen es obligatoria para un artículo de tipo insumo.");
-            }
-            Imagen imagen = imagenRepository.findById(insumo.getImagen().getId())
+        // Validar y asegurar la existencia de Imagen si se proporciona
+        if (articulo.getImagen() != null && articulo.getImagen().getId() != null) {
+            Imagen imagen = imagenRepository.findById(articulo.getImagen().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Imagen no encontrada con ID: " + insumo.getImagen().getId()));
-            insumo.setImagen(imagen);
+                            "Imagen no encontrada con ID: " + articulo.getImagen().getId()));
+            articulo.setImagen(imagen);
+        } else if (articulo.getImagen() != null && articulo.getImagen().getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El ID de la imagen es necesario si se proporciona el objeto imagen.");
+        }
 
+        // Validaciones específicas para ArticuloInsumo
+        if (articulo instanceof ArticuloInsumo insumo) {
+            // Si ArticuloInsumo tiene requerimientos *adicionales* para la imagen,
+            // se pondrían aquí. Por ejemplo, si para Insumos la imagen es siempre
+            // obligatoria.
+            // if (insumo.getImagen() == null) {
+            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            // "La imagen es obligatoria para un artículo de tipo insumo.");
+            // }
+            // También se podrían validar otros campos específicos de ArticuloInsumo aquí
             if (insumo.getPrecioCompra() == null || insumo.getPrecioCompra() < 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "El precio de compra del insumo es obligatorio y no puede ser negativo.");
@@ -161,6 +172,27 @@ public class ArticuloService {
             articuloExistente.setPrecioVenta(articuloActualizado.getPrecioVenta());
         }
 
+        // Actualizar Imagen (aplica a cualquier Articulo)
+        if (articuloActualizado.getImagen() != null && articuloActualizado.getImagen().getId() != null) {
+            Imagen imagen = imagenRepository.findById(articuloActualizado.getImagen().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Imagen para actualizar no encontrada con ID: "
+                                    + articuloActualizado.getImagen().getId()));
+            articuloExistente.setImagen(imagen);
+        } else if (articuloActualizado.getImagen() == null && articuloExistente.getImagen() != null) {
+            // Permitir desasociar la imagen estableciéndola a null
+            articuloExistente.setImagen(null);
+        } else if (articuloActualizado.getImagen() != null && articuloActualizado.getImagen().getId() == null
+                && articuloActualizado.getImagen().getUrl() != null) {
+            // Si se envía un objeto imagen con URL pero sin ID en la actualización,
+            // se podría interpretar como un intento de crear y asociar una nueva imagen.
+            // Esta lógica dependerá de si se permite la creación de imágenes "al vuelo"
+            // aquí.
+            // Por ahora, se asume que la imagen debe existir o ser null para desasociar.
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Para asignar una nueva imagen en la actualización, esta debe existir previamente y proveer su ID.");
+        }
+
         // Actualizar Categoria si se proporciona
         if (articuloActualizado.getCategoria() != null && articuloActualizado.getCategoria().getId() != null) {
             Categoria categoria = categoriaRepository.findById(articuloActualizado.getCategoria().getId())
@@ -196,30 +228,8 @@ public class ArticuloService {
             if (insumoActualizado.getEsParaElaborar() != null) {
                 insumoExistente.setEsParaElaborar(insumoActualizado.getEsParaElaborar());
             }
-            // Actualizar Imagen para ArticuloInsumo si se proporciona
-            if (insumoActualizado.getImagen() != null && insumoActualizado.getImagen().getId() != null) {
-                Imagen imagen = imagenRepository.findById(insumoActualizado.getImagen().getId())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "Imagen para actualizar no encontrada con ID: "
-                                        + insumoActualizado.getImagen().getId()));
-                insumoExistente.setImagen(imagen);
-            } else if (insumoActualizado.getImagen() == null && insumoExistente.getImagen() != null) { // Solo si se
-                                                                                                       // intenta poner
-                                                                                                       // a null una
-                                                                                                       // imagen
-                                                                                                       // existente
-                // Si se quiere permitir desasociar la imagen, se podría hacer:
-                // insumoExistente.setImagen(null);
-                // O lanzar error si la imagen es obligatoria y se intenta poner a null.
-                // Actualmente, se considera obligatoria, por lo que no se permite poner a null
-                // si ya tiene una.
-                // Si la intención es cambiar la imagen, se debe proveer una nueva imagen con
-                // ID.
-                // Si la intención es quitarla y la imagen fuera opcional, esta lógica
-                // cambiaría.
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "La imagen es obligatoria para un artículo de tipo insumo y no puede ser nula en la actualización si ya existe una.");
-            }
+            // La lógica de actualización de imagen ya está cubierta arriba de forma
+            // genérica para Articulo.
         }
         // Faltaría el manejo para ArticuloManufacturado si tiene campos específicos
         // actualizables

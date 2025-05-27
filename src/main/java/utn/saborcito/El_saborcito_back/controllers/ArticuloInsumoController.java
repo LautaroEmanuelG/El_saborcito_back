@@ -22,23 +22,39 @@ public class ArticuloInsumoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ArticuloInsumoDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(articuloInsumoService.findById(id));
+        try {
+            return ResponseEntity.ok(articuloInsumoService.findById(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } 
     }
 
     @PostMapping
     public ResponseEntity<ArticuloInsumoDTO> create(@RequestBody ArticuloInsumoDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(articuloInsumoService.save(dto));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(articuloInsumoService.save(dto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ArticuloInsumoDTO> update(@PathVariable Long id, @RequestBody ArticuloInsumoDTO dto) {
-        return ResponseEntity.ok(articuloInsumoService.update(id, dto));
+        try {
+            return ResponseEntity.ok(articuloInsumoService.update(id, dto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        articuloInsumoService.delete(id);
-        return ResponseEntity.noContent().build();
+        try {
+            articuloInsumoService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/es-para-elaborar")

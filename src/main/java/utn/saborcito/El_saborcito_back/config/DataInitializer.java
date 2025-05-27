@@ -237,72 +237,75 @@
 
 //                         // 5. Imágenes para cada tipo de producto
 //                         Imagen imagenHamburguesa = imagenRepo
-//                                         .save(Imagen.builder().url("http://ejemplo.com/hamburguesa.png")
+//                                         .save(Imagen.builder().url("/img/productos/haamburguesas/hamburguesa.png")
 //                                                         .build());
 //                         Imagen imagenLomo = imagenRepo
-//                                         .save(Imagen.builder().url("http://ejemplo.com/lomo.png")
+//                                         .save(Imagen.builder().url("/img/productos/lomos/lomo.png")
 //                                                         .build());
 //                         Imagen imagenPizza = imagenRepo
-//                                         .save(Imagen.builder().url("http://ejemplo.com/pizza.png")
+//                                         .save(Imagen.builder().url("/img/productos/pizza/pizza.png")
 //                                                         .build());
 //                         Imagen imagenGaseosa = imagenRepo
-//                                         .save(Imagen.builder().url("http://ejemplo.com/gaseosa.png")
+//                                         .save(Imagen.builder().url("/img/productos/bebidas/gaseosa.png")
 //                                                         .build());
 //                         Imagen imagenAgua = imagenRepo
-//                                         .save(Imagen.builder().url("http://ejemplo.com/agua.png")
+//                                         .save(Imagen.builder().url("/img/productos/bebidas/agua.png")
 //                                                         .build());
 //                         Imagen imagenTrago = imagenRepo
-//                                         .save(Imagen.builder().url("http://ejemplo.com/trago.png")
+//                                         .save(Imagen.builder().url("/img/productos/bebidas/trago.png")
 //                                                         .build());
 //                         Imagen imagenDefault = imagenRepo
-//                                         .save(Imagen.builder().url("http://ejemplo.com/default.png")
+//                                         .save(Imagen.builder().url("/img/default.png")
 //                                                         .build());
 
 //                         // Nuevas imágenes para pizzas
+//                         Imagen imagenPizzaMuzarella = imagenRepo
+//                                         .save(Imagen.builder().url("/img/productos/pizza/pizzamuzarella.png")
+//                                                         .build());
 //                         Imagen imagenPizzaCuatroQuesos = imagenRepo
-//                                         .save(Imagen.builder().url("/public/img/productos/pizza/pizzacuatroquesos.png")
+//                                         .save(Imagen.builder().url("/img/productos/pizza/pizzacuatroquesos.png")
 //                                                         .build());
 //                         Imagen imagenPizzaHawaiana = imagenRepo
-//                                         .save(Imagen.builder().url("/public/img/productos/pizza/pizzahawaiana.png")
+//                                         .save(Imagen.builder().url("/img/productos/pizza/pizzahawaiana.png")
 //                                                         .build());
 //                         Imagen imagenPizzaMargherita = imagenRepo
-//                                         .save(Imagen.builder().url("/public/img/productos/pizza/pizzamargherita.png")
+//                                         .save(Imagen.builder().url("/img/productos/pizza/pizzamargherita.png")
 //                                                         .build());
 //                         Imagen imagenPizzaPepperoni = imagenRepo
-//                                         .save(Imagen.builder().url("/public/img/productos/pizza/pizzapepperoni.png")
+//                                         .save(Imagen.builder().url("/img/productos/pizza/pizzapepperoni.png")
 //                                                         .build());
 
 //                         // Nuevas imágenes para hamburguesas
 //                         Imagen imagenHamburguesaBbq = imagenRepo
 //                                         .save(Imagen.builder()
-//                                                         .url("/public/img/productos/hamburguesas/hamburguesabbq.png")
+//                                                         .url("/img/productos/hamburguesas/hamburguesabbq.png")
 //                                                         .build());
 //                         Imagen imagenHamburguesaClasicaNueva = imagenRepo
 //                                         .save(Imagen.builder().url(
-//                                                         "/public/img/productos/hamburguesas/hamburguesaclásica.png")
+//                                                         "/img/productos/hamburguesas/hamburguesaclásica.png")
 //                                                         .build());
 //                         Imagen imagenHamburguesaConQueso = imagenRepo
 //                                         .save(Imagen.builder().url(
-//                                                         "/public/img/productos/hamburguesas/hamburguesaconqueso.png")
+//                                                         "/img/productos/hamburguesas/hamburguesaconqueso.png")
 //                                                         .build());
 //                         Imagen imagenHamburguesaVegetariana = imagenRepo
 //                                         .save(Imagen.builder().url(
-//                                                         "/public/img/productos/hamburguesas/hamburguesavegetariana.png")
+//                                                         "/img/productos/hamburguesas/hamburguesavegetariana.png")
 //                                                         .build());
 
 //                         // Nuevas imágenes para bebidas
 //                         Imagen imagenAguaMineralNueva = imagenRepo
-//                                         .save(Imagen.builder().url("/public/img/productos/bebidas/aguamineral.jpg")
+//                                         .save(Imagen.builder().url("/img/productos/bebidas/aguamineral.jpg")
 //                                                         .build());
 //                         Imagen imagenCervezaArtesanal = imagenRepo
 //                                         .save(Imagen.builder()
-//                                                         .url("/public/img/productos/bebidas/cervezaartesanal.png")
+//                                                         .url("/img/productos/bebidas/cervezaartesanal.png")
 //                                                         .build());
 //                         Imagen imagenCocaColaNueva = imagenRepo
-//                                         .save(Imagen.builder().url("/public/img/productos/bebidas/cocacola.jpg")
+//                                         .save(Imagen.builder().url("/img/productos/bebidas/cocacola.jpg")
 //                                                         .build());
 //                         Imagen imagenJugoDeNaranja = imagenRepo
-//                                         .save(Imagen.builder().url("/public/img/productos/bebidas/jugodenaranja.png")
+//                                         .save(Imagen.builder().url("/img/productos/bebidas/jugodenaranja.png")
 //                                                         .build());
 
 //                         // 6. Unidades de medida
@@ -642,8 +645,7 @@
 //                                                         .tiempoEstimadoMinutos(20)
 //                                                         .precioVenta(4500.0)
 //                                                         .categoria(categoriaPizzas)
-//                                                         .imagen(imagenPizza) // Se mantiene la imagen genérica de pizza
-//                                                                              // o se puede cambiar
+//                                                         .imagen(imagenPizzaMuzarella)
 //                                                         .build());
 
 //                         // Detalles de Pizza Mozzarella

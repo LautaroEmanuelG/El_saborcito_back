@@ -8,14 +8,14 @@ import utn.saborcito.El_saborcito_back.models.ArticuloInsumo;
 @Mapper(componentModel = "spring", uses = { ImagenMapper.class, CategoriaMapper.class, UnidadMedidaMapper.class })
 public interface ArticuloInsumoMapper extends BaseMapper<ArticuloInsumo, ArticuloInsumoDTO> {
     @Override
-    @Mapping(source = "imagen", target = "imagen")
+    @Mapping(source = "imagen", target = "imagen") // Corregido: mapear a imagen (ImagenDTO)
     @Mapping(source = "categoria", target = "categoria")
     @Mapping(source = "unidadMedida", target = "unidadMedida")
     ArticuloInsumoDTO toDTO(ArticuloInsumo source);
 
     @Override
     @Mapping(target = "id", ignore = true) // El ID se genera automáticamente
-    @Mapping(source = "imagen", target = "imagen")
+    @Mapping(target = "imagen", ignore = true) // Se manejará en el servicio
     @Mapping(source = "categoria", target = "categoria")
     @Mapping(source = "unidadMedida", target = "unidadMedida")
     ArticuloInsumo toEntity(ArticuloInsumoDTO source);

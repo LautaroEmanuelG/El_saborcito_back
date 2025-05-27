@@ -1,6 +1,7 @@
 package utn.saborcito.El_saborcito_back.services;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,140 +20,180 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class ArticuloInsumoService {
-    private final ArticuloInsumoRepository articuloInsumoRepository;
-    private final ArticuloInsumoMapper articuloInsumoMapper;
-    private final ImagenRepository imagenRepository;
-    private final CategoriaRepository categoriaRepository;
-    private final UnidadMedidaRepository unidadMedidaRepository;
+public class ArticuloInsumoService { // No extiende BaseServiceImpl
 
+    @Autowired
+    private ArticuloInsumoRepository articuloInsumoRepository; // Repositorio específico
+
+    @Autowired
+    private ArticuloInsumoMapper articuloInsumoMapper;
+
+    @Autowired
+    private ImagenRepository imagenRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    private UnidadMedidaRepository unidadMedidaRepository;
+
+    @Transactional
     public List<ArticuloInsumoDTO> findAll() {
-        return articuloInsumoRepository.findAll()
-                .stream()
+        return articuloInsumoRepository.findAll().stream()
                 .map(articuloInsumoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public ArticuloInsumoDTO findById(Long id) {
+    @Transactional
+    public ArticuloInsumoDTO findById(Long id) throws Exception {
         ArticuloInsumo articuloInsumo = articuloInsumoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "ArticuloInsumo no encontrado con id: " + id));
+                        "No se encontró el artículo insumo con el ID: " + id));
         return articuloInsumoMapper.toDTO(articuloInsumo);
     }
 
-    public ArticuloInsumo findEntityById(Long id) { // Método para obtener la entidad
+    @Transactional
+    public ArticuloInsumo findEntityById(Long id) throws Exception {
         return articuloInsumoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "ArticuloInsumo no encontrado con id: " + id));
+                        "No se encontró el artículo insumo con el ID: " + id));
     }
 
-    public ArticuloInsumoDTO save(ArticuloInsumoDTO dto) {
-        ArticuloInsumo articuloInsumo = articuloInsumoMapper.toEntity(dto);
+    @Transactional
+    public ArticuloInsumoDTO save(ArticuloInsumoDTO dto) throws Exception {
+        try {
+            ArticuloInsumo insumo = articuloInsumoMapper.toEntity(dto);
 
-        // Manejar relaciones
-        if (dto.getImagen() != null && dto.getImagen().getId() != null) {
-            Imagen imagen = imagenRepository.findById(dto.getImagen().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Imagen no encontrada con id: " + dto.getImagen().getId()));
-            articuloInsumo.setImagen(imagen);
-        } else {
-            // Considerar lanzar error si la imagen es obligatoria o manejar la creación de
-            // una nueva imagen
-            articuloInsumo.setImagen(null); // O manejar de otra forma
-        }
+            if (dto.getPrecioCompra() == null || dto.getPrecioCompra() <= 0) {
+                throw new Exception("El precio de compra debe ser mayor que cero.");
+            }
+            if (dto.getStockActual() == null || dto.getStockActual() < 0) {
+                throw new Exception("El stock actual no puede ser negativo.");
+            }
+            if (dto.getStockMaximo() == null || dto.getStockMaximo() <= 0) {
+                throw new Exception("El stock máximo debe ser mayor que cero.");
+            }
+            if (dto.getEsParaElaborar() == null) {
+                throw new Exception("Debe indicar si el insumo es para elaborar.");
+            }
 
-        if (dto.getCategoria() != null && dto.getCategoria().getId() != null) {
+            if (dto.getImagen() != null) {
+                Imagen imagen = imagenRepository.findById(dto.getImagen().getId())
+                        .orElseThrow(() -> new Exception("No se encontró la imagen con el ID: " + dto.getImagen().getId()));
+                insumo.setImagen(imagen);
+            } else {
+                insumo.setImagen(null);
+            }
+
+            if (dto.getCategoria() == null || dto.getCategoria().getId() == null) {
+                throw new Exception("Debe proporcionar una categoría para el artículo insumo.");
+            }
             Categoria categoria = categoriaRepository.findById(dto.getCategoria().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Categoría no encontrada con id: " + dto.getCategoria().getId()));
-            articuloInsumo.setCategoria(categoria);
-        } else {
-            articuloInsumo.setCategoria(null); // O manejar según la lógica de negocio
-        }
+                    .orElseThrow(() -> new Exception(
+                            "No se encontró la categoría con el ID: " + dto.getCategoria().getId()));
+            insumo.setCategoria(categoria);
 
-        if (dto.getUnidadMedida() != null && dto.getUnidadMedida().getId() != null) {
+            if (dto.getUnidadMedida() == null || dto.getUnidadMedida().getId() == null) {
+                throw new Exception("Debe proporcionar una unidad de medida para el artículo insumo.");
+            }
             UnidadMedida unidadMedida = unidadMedidaRepository.findById(dto.getUnidadMedida().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Unidad de Medida no encontrada con id: " + dto.getUnidadMedida().getId()));
-            articuloInsumo.setUnidadMedida(unidadMedida);
-        } else {
-            articuloInsumo.setUnidadMedida(null); // O manejar según la lógica de negocio
-        }
+                    .orElseThrow(() -> new Exception(
+                            "No se encontró la unidad de medida con el ID: " + dto.getUnidadMedida().getId()));
+            insumo.setUnidadMedida(unidadMedida);
 
-        ArticuloInsumo savedArticuloInsumo = articuloInsumoRepository.save(articuloInsumo);
-        return articuloInsumoMapper.toDTO(savedArticuloInsumo);
+            return articuloInsumoMapper.toDTO(articuloInsumoRepository.save(insumo));
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
-    public ArticuloInsumoDTO update(Long id, ArticuloInsumoDTO dto) {
-        ArticuloInsumo existingArticuloInsumo = articuloInsumoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "ArticuloInsumo no encontrado con id: " + id));
+    @Transactional
+    public ArticuloInsumoDTO update(Long id, ArticuloInsumoDTO dto) throws Exception {
+        try {
+            ArticuloInsumo insumoExistente = articuloInsumoRepository.findById(id)
+                    .orElseThrow(() -> new Exception("No se encontró el artículo insumo con el ID: " + id));
 
-        // Actualizar campos simples
-        existingArticuloInsumo.setDenominacion(dto.getDenominacion());
-        existingArticuloInsumo.setPrecioVenta(dto.getPrecioVenta());
-        existingArticuloInsumo.setPrecioCompra(dto.getPrecioCompra());
-        existingArticuloInsumo.setStockActual(dto.getStockActual());
-        existingArticuloInsumo.setStockMaximo(dto.getStockMaximo());
-        existingArticuloInsumo.setEsParaElaborar(dto.getEsParaElaborar());
+            insumoExistente.setDenominacion(dto.getDenominacion());
+            insumoExistente.setPrecioVenta(dto.getPrecioVenta());
 
-        // Manejar relaciones (similar a save, pero actualizando existingArticuloInsumo)
-        if (dto.getImagen() != null && dto.getImagen().getId() != null) {
-            Imagen imagen = imagenRepository.findById(dto.getImagen().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Imagen no encontrada con id: " + dto.getImagen().getId()));
-            existingArticuloInsumo.setImagen(imagen);
-        } else {
-            existingArticuloInsumo.setImagen(null);
+            if (dto.getPrecioCompra() == null || dto.getPrecioCompra() <= 0) {
+                throw new Exception("El precio de compra debe ser mayor que cero.");
+            }
+            insumoExistente.setPrecioCompra(dto.getPrecioCompra());
+
+            if (dto.getStockActual() == null || dto.getStockActual() < 0) {
+                throw new Exception("El stock actual no puede ser negativo.");
+            }
+            insumoExistente.setStockActual(dto.getStockActual());
+
+            if (dto.getStockMaximo() == null || dto.getStockMaximo() <= 0) {
+                throw new Exception("El stock máximo debe ser mayor que cero.");
+            }
+            insumoExistente.setStockMaximo(dto.getStockMaximo());
+
+            if (dto.getEsParaElaborar() == null) {
+                throw new Exception("Debe indicar si el insumo es para elaborar.");
+            }
+            insumoExistente.setEsParaElaborar(dto.getEsParaElaborar());
+
+            if (dto.getImagen() != null) {
+                Imagen imagen = imagenRepository.findById(dto.getImagen().getId())
+                        .orElseThrow(() -> new Exception("No se encontró la imagen con el ID: " + dto.getImagen().getId()));
+                insumoExistente.setImagen(imagen);
+            } else {
+                insumoExistente.setImagen(null);
+            }
+
+            if (dto.getCategoria() != null && dto.getCategoria().getId() != null) {
+                Categoria categoria = categoriaRepository.findById(dto.getCategoria().getId())
+                        .orElseThrow(() -> new Exception(
+                                "No se encontró la categoría con el ID: " + dto.getCategoria().getId()));
+                insumoExistente.setCategoria(categoria);
+            } else {
+                throw new Exception("Debe proporcionar una categoría para el artículo insumo.");
+            }
+
+            if (dto.getUnidadMedida() != null && dto.getUnidadMedida().getId() != null) {
+                UnidadMedida unidadMedida = unidadMedidaRepository.findById(dto.getUnidadMedida().getId())
+                        .orElseThrow(() -> new Exception(
+                                "No se encontró la unidad de medida con el ID: " + dto.getUnidadMedida().getId()));
+                insumoExistente.setUnidadMedida(unidadMedida);
+            } else {
+                throw new Exception("Debe proporcionar una unidad de medida para el artículo insumo.");
+            }
+
+            return articuloInsumoMapper.toDTO(articuloInsumoRepository.save(insumoExistente));
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
-
-        if (dto.getCategoria() != null && dto.getCategoria().getId() != null) {
-            Categoria categoria = categoriaRepository.findById(dto.getCategoria().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Categoría no encontrada con id: " + dto.getCategoria().getId()));
-            existingArticuloInsumo.setCategoria(categoria);
-        } else {
-            existingArticuloInsumo.setCategoria(null);
-        }
-
-        if (dto.getUnidadMedida() != null && dto.getUnidadMedida().getId() != null) {
-            UnidadMedida unidadMedida = unidadMedidaRepository.findById(dto.getUnidadMedida().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Unidad de Medida no encontrada con id: " + dto.getUnidadMedida().getId()));
-            existingArticuloInsumo.setUnidadMedida(unidadMedida);
-        } else {
-            existingArticuloInsumo.setUnidadMedida(null);
-        }
-
-        ArticuloInsumo updatedArticuloInsumo = articuloInsumoRepository.save(existingArticuloInsumo);
-        return articuloInsumoMapper.toDTO(updatedArticuloInsumo);
     }
 
-    public void delete(Long id) {
+    @Transactional
+    public void delete(Long id) throws Exception {
         if (!articuloInsumoRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ArticuloInsumo no encontrado con id: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "No se encontró el artículo insumo con el ID: " + id);
         }
         articuloInsumoRepository.deleteById(id);
     }
 
+    @Transactional
     public List<ArticuloInsumoDTO> findAllByEsParaElaborarTrue() {
-        return articuloInsumoRepository.findAllByEsParaElaborarTrue()
-                .stream()
+        return articuloInsumoRepository.findAllByEsParaElaborarTrue().stream()
                 .map(articuloInsumoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<ArticuloInsumoDTO> findAllByEsParaElaborarFalse() {
-        return articuloInsumoRepository.findAllByEsParaElaborarFalse()
-                .stream()
+        return articuloInsumoRepository.findAllByEsParaElaborarFalse().stream()
                 .map(articuloInsumoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<ArticuloInsumoDTO> findAllByCategoriaId(Long categoriaId) {
-        return articuloInsumoRepository.findAllByCategoria_Id(categoriaId)
-                .stream()
+        return articuloInsumoRepository.findAllByCategoria_Id(categoriaId).stream()
                 .map(articuloInsumoMapper::toDTO)
                 .collect(Collectors.toList());
     }
