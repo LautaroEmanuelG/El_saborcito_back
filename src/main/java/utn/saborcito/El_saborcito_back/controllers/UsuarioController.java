@@ -3,6 +3,7 @@ package utn.saborcito.El_saborcito_back.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import utn.saborcito.El_saborcito_back.dto.LoginRequest;
 import utn.saborcito.El_saborcito_back.dto.UsuarioDTO;
 import utn.saborcito.El_saborcito_back.services.UsuarioService;
 
@@ -39,4 +40,10 @@ public class UsuarioController {
         service.delete(id);
         return ResponseEntity.ok("Usuario eliminado correctamente");
     }
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioDTO> login(@RequestBody LoginRequest request) {
+        UsuarioDTO usuario = service.login(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(usuario);
+    }
+
 }

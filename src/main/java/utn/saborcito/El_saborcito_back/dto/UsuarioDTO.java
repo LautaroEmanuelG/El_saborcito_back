@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import utn.saborcito.El_saborcito_back.enums.Rol;
 // import utn.saborcito.El_saborcito_back.enums.Rol;
 
 import java.time.LocalDate;
@@ -23,8 +24,8 @@ public class UsuarioDTO {
     private String apellido;
     private String telefono;
     private LocalDate fechaNacimiento;
-    // private Rol rol;
-    // private Boolean estado;
+     private Rol rol;
+     private Boolean estado;
     private LocalDateTime fechaRegistro;
     private LocalDateTime fechaUltimaModificacion;
     private ImagenDTO imagen;

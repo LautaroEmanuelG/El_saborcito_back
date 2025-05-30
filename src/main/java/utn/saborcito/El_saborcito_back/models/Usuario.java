@@ -35,6 +35,11 @@ public class Usuario {
     private LocalDateTime fechaRegistro;
     private LocalDateTime fechaUltimaModificacion;
 
+    // Relación uno a uno: un usuario puede tener un domicilio
+    @OneToOne
+    @JoinColumn(name = "domicilio_id")
+    private Domicilio domicilio;
+
     // Relación uno a uno: un usuario puede tener una imagen de perfil
     @OneToOne
     @JoinColumn(name = "imagen_id")
