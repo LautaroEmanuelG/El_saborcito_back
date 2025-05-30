@@ -3,6 +3,7 @@ package utn.saborcito.El_saborcito_back.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -12,6 +13,9 @@ public class ArticuloDTO {
     private String denominacion;
     private Double precioVenta;
     private Long categoriaId;
-    private Long unidadMedidaId;
     private ImagenDTO imagen;
+
+    // Campos para delete lógico
+    private Boolean eliminado;
+    private LocalDateTime fechaEliminacion;
 }

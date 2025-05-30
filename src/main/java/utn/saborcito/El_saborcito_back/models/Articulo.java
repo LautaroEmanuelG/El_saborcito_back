@@ -3,6 +3,7 @@ package utn.saborcito.El_saborcito_back.models;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import java.time.LocalDateTime;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -29,4 +30,12 @@ public abstract class Articulo {
     @ManyToOne
     @JoinColumn(name = "unidad_medida_id")
     private UnidadMedida unidadMedida;
+
+    // Campos para delete lógico
+    @Column(name = "eliminado", nullable = false)
+    @Builder.Default
+    private Boolean eliminado = false;
+
+    @Column(name = "fecha_eliminacion")
+    private LocalDateTime fechaEliminacion;
 }

@@ -2,20 +2,17 @@ package utn.saborcito.El_saborcito_back.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArticuloInsumoDTO {
-    private Long id;
-    private String denominacion;
-    private Double precioVenta;
+@EqualsAndHashCode(callSuper = true)
+public class ArticuloInsumoDTO extends ArticuloDTO {
     private Double precioCompra;
     private Integer stockActual;
     private Integer stockMaximo;
     private Boolean esParaElaborar;
-    private ImagenDTO imagen;
-    private CategoriaDTO categoria;
-    private UnidadMedidaDTO unidadMedida;
+    private UnidadMedidaDTO unidadMedida; // Para mapear completo
 }

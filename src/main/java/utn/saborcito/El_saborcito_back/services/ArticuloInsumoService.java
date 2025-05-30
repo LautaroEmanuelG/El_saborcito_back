@@ -16,14 +16,15 @@ import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 import utn.saborcito.El_saborcito_back.repositories.UnidadMedidaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ArticuloInsumoService { // No extiende BaseServiceImpl
+public class ArticuloInsumoService {
 
     @Autowired
-    private ArticuloInsumoRepository articuloInsumoRepository; // Repositorio específico
+    private ArticuloInsumoRepository articuloInsumoRepository;
 
     @Autowired
     private ArticuloInsumoMapper articuloInsumoMapper;
@@ -37,16 +38,17 @@ public class ArticuloInsumoService { // No extiende BaseServiceImpl
     @Autowired
     private UnidadMedidaRepository unidadMedidaRepository;
 
+    // Métodos principales con delete lógico
     @Transactional
     public List<ArticuloInsumoDTO> findAll() {
-        return articuloInsumoRepository.findAll().stream()
+        return articuloInsumoRepository.findAllNotDeleted().stream()
                 .map(articuloInsumoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public ArticuloInsumoDTO findById(Long id) throws Exception {
-        ArticuloInsumo articuloInsumo = articuloInsumoRepository.findById(id)
+        ArticuloInsumo articuloInsumo = articuloInsumoRepository.findByIdNotDeleted(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "No se encontró el artículo insumo con el ID: " + id));
         return articuloInsumoMapper.toDTO(articuloInsumo);
@@ -54,7 +56,7 @@ public class ArticuloInsumoService { // No extiende BaseServiceImpl
 
     @Transactional
     public ArticuloInsumo findEntityById(Long id) throws Exception {
-        return articuloInsumoRepository.findById(id)
+        return articuloInsumoRepository.findByIdNotDeleted(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "No se encontró el artículo insumo con el ID: " + id));
     }
@@ -63,6 +65,14 @@ public class ArticuloInsumoService { // No extiende BaseServiceImpl
     public ArticuloInsumoDTO save(ArticuloInsumoDTO dto) throws Exception {
         try {
             ArticuloInsumo insumo = articuloInsumoMapper.toEntity(dto);
+
+            // Inicializar campos de delete lógico si no están establecidos
+            if (insumo.getEliminado() == null) {
+                insumo.setEliminado(false);
+            }
+            if (insumo.getFechaEliminacion() == null && insumo.getEliminado()) {
+                insumo.setFechaEliminacion(LocalDateTime.now());
+            }
 
             if (dto.getPrecioCompra() == null || dto.getPrecioCompra() <= 0) {
                 throw new Exception("El precio de compra debe ser mayor que cero.");
@@ -79,18 +89,18 @@ public class ArticuloInsumoService { // No extiende BaseServiceImpl
 
             if (dto.getImagen() != null) {
                 Imagen imagen = imagenRepository.findById(dto.getImagen().getId())
-                        .orElseThrow(() -> new Exception("No se encontró la imagen con el ID: " + dto.getImagen().getId()));
+                        .orElseThrow(
+                                () -> new Exception("No se encontró la imagen con el ID: " + dto.getImagen().getId()));
                 insumo.setImagen(imagen);
             } else {
                 insumo.setImagen(null);
             }
-
-            if (dto.getCategoria() == null || dto.getCategoria().getId() == null) {
+            if (dto.getCategoriaId() == null) {
                 throw new Exception("Debe proporcionar una categoría para el artículo insumo.");
             }
-            Categoria categoria = categoriaRepository.findById(dto.getCategoria().getId())
+            Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
                     .orElseThrow(() -> new Exception(
-                            "No se encontró la categoría con el ID: " + dto.getCategoria().getId()));
+                            "No se encontró la categoría con el ID: " + dto.getCategoriaId()));
             insumo.setCategoria(categoria);
 
             if (dto.getUnidadMedida() == null || dto.getUnidadMedida().getId() == null) {
@@ -138,16 +148,16 @@ public class ArticuloInsumoService { // No extiende BaseServiceImpl
 
             if (dto.getImagen() != null) {
                 Imagen imagen = imagenRepository.findById(dto.getImagen().getId())
-                        .orElseThrow(() -> new Exception("No se encontró la imagen con el ID: " + dto.getImagen().getId()));
+                        .orElseThrow(
+                                () -> new Exception("No se encontró la imagen con el ID: " + dto.getImagen().getId()));
                 insumoExistente.setImagen(imagen);
             } else {
                 insumoExistente.setImagen(null);
             }
-
-            if (dto.getCategoria() != null && dto.getCategoria().getId() != null) {
-                Categoria categoria = categoriaRepository.findById(dto.getCategoria().getId())
+            if (dto.getCategoriaId() != null) {
+                Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
                         .orElseThrow(() -> new Exception(
-                                "No se encontró la categoría con el ID: " + dto.getCategoria().getId()));
+                                "No se encontró la categoría con el ID: " + dto.getCategoriaId()));
                 insumoExistente.setCategoria(categoria);
             } else {
                 throw new Exception("Debe proporcionar una categoría para el artículo insumo.");
@@ -166,15 +176,53 @@ public class ArticuloInsumoService { // No extiende BaseServiceImpl
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
-    }
+    } // Método de delete lógico
 
     @Transactional
     public void delete(Long id) throws Exception {
-        if (!articuloInsumoRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "No se encontró el artículo insumo con el ID: " + id);
-        }
-        articuloInsumoRepository.deleteById(id);
+        ArticuloInsumo articulo = articuloInsumoRepository.findByIdNotDeleted(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "No se encontró el artículo insumo con el ID: " + id));
+
+        articulo.setEliminado(true);
+        articulo.setFechaEliminacion(LocalDateTime.now());
+        articuloInsumoRepository.save(articulo);
+    }
+
+    // Métodos adicionales para gestión de elementos eliminados
+    @Transactional
+    public List<ArticuloInsumoDTO> findAllDeleted() {
+        return articuloInsumoRepository.findAllDeleted().stream()
+                .map(this::toDtoWithDeletedFields)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ArticuloInsumoDTO findByIdDeleted(Long id) {
+        ArticuloInsumo articulo = articuloInsumoRepository.findByIdDeleted(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Artículo insumo eliminado no encontrado"));
+        return toDtoWithDeletedFields(articulo);
+    }
+
+    @Transactional
+    public ArticuloInsumoDTO restoreDeleted(Long id) {
+        ArticuloInsumo articulo = articuloInsumoRepository.findByIdDeleted(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Artículo insumo eliminado no encontrado"));
+
+        articulo.setEliminado(false);
+        articulo.setFechaEliminacion(null);
+        ArticuloInsumo restored = articuloInsumoRepository.save(articulo);
+        return articuloInsumoMapper.toDTO(restored);
+    }
+
+    @Transactional
+    public void permanentDelete(Long id) {
+        ArticuloInsumo articulo = articuloInsumoRepository.findByIdDeleted(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Artículo insumo eliminado no encontrado"));
+        articuloInsumoRepository.delete(articulo);
     }
 
     @Transactional
@@ -196,5 +244,15 @@ public class ArticuloInsumoService { // No extiende BaseServiceImpl
         return articuloInsumoRepository.findAllByCategoria_Id(categoriaId).stream()
                 .map(articuloInsumoMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Convierte entidad a DTO incluyendo campos de eliminación cuando sea necesario
+     */
+    private ArticuloInsumoDTO toDtoWithDeletedFields(ArticuloInsumo entity) {
+        ArticuloInsumoDTO dto = articuloInsumoMapper.toDTO(entity);
+        // Los campos eliminado y fechaEliminacion se incluirán si el DTO los tiene
+        // definidos
+        return dto;
     }
 }
