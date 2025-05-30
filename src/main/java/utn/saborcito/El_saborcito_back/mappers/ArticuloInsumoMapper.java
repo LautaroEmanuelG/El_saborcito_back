@@ -7,16 +7,21 @@ import utn.saborcito.El_saborcito_back.models.ArticuloInsumo;
 
 @Mapper(componentModel = "spring", uses = { ImagenMapper.class, CategoriaMapper.class, UnidadMedidaMapper.class })
 public interface ArticuloInsumoMapper extends BaseMapper<ArticuloInsumo, ArticuloInsumoDTO> {
+
     @Override
-    @Mapping(source = "imagen", target = "imagen") // Corregido: mapear a imagen (ImagenDTO)
-    @Mapping(source = "categoria", target = "categoria")
-    @Mapping(source = "unidadMedida", target = "unidadMedida")
+    @Mapping(source = "imagen", target = "imagen") // mapear a imagen (ImagenDTO)
+    @Mapping(source = "categoria.id", target = "categoriaId") // Para el campo heredado de ArticuloDTO
+    @Mapping(source = "unidadMedida", target = "unidadMedida") // Campo específico de ArticuloInsumoDTO
+    @Mapping(source = "eliminado", target = "eliminado")
+    @Mapping(source = "fechaEliminacion", target = "fechaEliminacion")
     ArticuloInsumoDTO toDTO(ArticuloInsumo source);
 
     @Override
     @Mapping(target = "id", ignore = true) // El ID se genera automáticamente
     @Mapping(target = "imagen", ignore = true) // Se manejará en el servicio
-    @Mapping(source = "categoria", target = "categoria")
-    @Mapping(source = "unidadMedida", target = "unidadMedida")
+    @Mapping(target = "categoria", ignore = true) // Se manejará en el servicio
+    @Mapping(target = "unidadMedida", ignore = true) // Se manejará en el servicio
+    @Mapping(target = "eliminado", expression = "java(source.getEliminado() != null ? source.getEliminado() : false)")
+    @Mapping(target = "fechaEliminacion", source = "fechaEliminacion")
     ArticuloInsumo toEntity(ArticuloInsumoDTO source);
 }

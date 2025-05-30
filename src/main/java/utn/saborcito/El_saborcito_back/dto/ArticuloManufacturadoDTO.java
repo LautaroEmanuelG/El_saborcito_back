@@ -15,6 +15,5 @@ public class ArticuloManufacturadoDTO extends ArticuloDTO {
     private String descripcion;
     private Integer tiempoEstimadoMinutos;
     private String preparacion;
-    private ImagenDTO imagen;
     private Set<ArticuloManufacturadoDetalleDTO> articuloManufacturadoDetalles;
 }
