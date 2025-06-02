@@ -2,14 +2,15 @@ package utn.saborcito.El_saborcito_back.services;
 
 import lombok.RequiredArgsConstructor;
 
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import utn.saborcito.El_saborcito_back.dto.ArticuloDTO;
 import utn.saborcito.El_saborcito_back.dto.ClienteRankingDTO;
+import utn.saborcito.El_saborcito_back.dto.DetallePedidoDTO;
 import utn.saborcito.El_saborcito_back.dto.MovimientoMonetarioDTO;
 import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
@@ -27,8 +28,6 @@ import utn.saborcito.El_saborcito_back.repositories.SucursalRepository;
 import java.util.Map;
 import java.util.Comparator;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.http.ResponseEntity;
 import java.io.ByteArrayOutputStream;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -38,6 +37,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @Service
@@ -47,44 +48,100 @@ public class SucursalService {
     private final SucursalMapper sucursalMapper;
     private final DetallePedidoRepository detallePedidoRepo;
     private final PedidoRepository pedidoRepository;
+
+    public List<DetallePedidoDTO> getPedidosPorCliente(Long clienteId, LocalDate desde, LocalDate hasta) {
+        List<Pedido> pedidos = pedidoRepository.findAllByCliente_IdAndFechaPedidoBetween(clienteId, desde, hasta);
+
+        return pedidos.stream()
+        .flatMap(p -> p.getDetalles().stream())
+        .map(dp -> new DetallePedidoDTO(
+                dp.getId(),
+                dp.getCantidad(),
+                new ArticuloDTO(
+                    dp.getArticulo().getId(),
+                    dp.getArticulo().getDenominacion(),
+                    dp.getArticulo().getPrecioVenta(),
+                    null,       // categoriaId (podés ajustarlo si querés enviarlo)
+                    null,       // imagen (si no se necesita en este contexto)
+                    false,      // eliminado
+                    null        // fechaEliminacion
+                )
+        ))
+        .collect(Collectors.toList());
+    }
+
+
+    public void exportarRankingClientesExcel(LocalDate desde, LocalDate hasta, String ordenarPor, HttpServletResponse response) {
+        List<ClienteRankingDTO> ranking = getRankingClientes(desde, hasta, ordenarPor);
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Ranking Clientes");
+
+            // Cabecera
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("ID Cliente");
+            headerRow.createCell(1).setCellValue("Nombre");
+            headerRow.createCell(2).setCellValue("Cantidad Pedidos");
+            headerRow.createCell(3).setCellValue("Total Gastado");
+
+            // Datos
+            int rowNum = 1;
+            for (ClienteRankingDTO cliente : ranking) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(cliente.getIdCliente());
+                row.createCell(1).setCellValue(cliente.getNombreCompleto());
+                row.createCell(2).setCellValue(cliente.getCantidadPedidos());
+                row.createCell(3).setCellValue(cliente.getTotalImporte());
+            }
+
+            // Configurar respuesta
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=ranking-clientes.xlsx");
+            workbook.write(response.getOutputStream());
+            workbook.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Error al generar el archivo Excel de clientes", e);
+        }
+    }
+
     
     public ResponseEntity<byte[]> exportarRankingProductosExcel(LocalDate desde, LocalDate hasta) {
-    List<ProductoRankingDTO> ranking = getRankingProductos(desde, hasta);
+        List<ProductoRankingDTO> ranking = getRankingProductos(desde, hasta);
 
-    try (Workbook workbook = new XSSFWorkbook()) {
-        Sheet sheet = workbook.createSheet("Ranking Productos");
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Ranking Productos");
 
-        // Cabecera
-        Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("ID");
-        headerRow.createCell(1).setCellValue("Denominación");
-        headerRow.createCell(2).setCellValue("Cantidad Vendida");
-        headerRow.createCell(3).setCellValue("Tipo");
+            // Cabecera
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("ID");
+            headerRow.createCell(1).setCellValue("Denominación");
+            headerRow.createCell(2).setCellValue("Cantidad Vendida");
+            headerRow.createCell(3).setCellValue("Tipo");
 
-        // Cuerpo
-        int rowNum = 1;
-        for (ProductoRankingDTO dto : ranking) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(dto.getId());
-            row.createCell(1).setCellValue(dto.getDenominacion());
-            row.createCell(2).setCellValue(dto.getCantidadVendida());
-            row.createCell(3).setCellValue(dto.getTipoProducto());
+            // Cuerpo
+            int rowNum = 1;
+            for (ProductoRankingDTO dto : ranking) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(dto.getId());
+                row.createCell(1).setCellValue(dto.getDenominacion());
+                row.createCell(2).setCellValue(dto.getCantidadVendida());
+                row.createCell(3).setCellValue(dto.getTipoProducto());
+            }
+
+            // Salida
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            byte[] excelBytes = out.toByteArray();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ranking-productos.xlsx");
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+            return ResponseEntity.ok().headers(headers).body(excelBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al generar Excel", e);
         }
-
-        // Salida
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        workbook.write(out);
-        byte[] excelBytes = out.toByteArray();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ranking-productos.xlsx");
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-        return ResponseEntity.ok().headers(headers).body(excelBytes);
-    } catch (Exception e) {
-        throw new RuntimeException("Error al generar Excel", e);
     }
-}
 
 
     public MovimientoMonetarioDTO getMovimientos(LocalDate desde, LocalDate hasta) {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletResponse;
 import utn.saborcito.El_saborcito_back.dto.ClienteRankingDTO;
+import utn.saborcito.El_saborcito_back.dto.DetallePedidoDTO;
 import utn.saborcito.El_saborcito_back.dto.MovimientoMonetarioDTO;
 import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
@@ -27,6 +28,27 @@ public class SucursalController {
     public SucursalController(SucursalService service) {
         this.service = service;
     }
+
+    @GetMapping("/pedidos-cliente")
+    public List<DetallePedidoDTO> getPedidosPorCliente(
+        @RequestParam Long clienteId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+    ) {
+        return service.getPedidosPorCliente(clienteId, desde, hasta);
+    }
+
+
+    @GetMapping("/exportar-ranking-clientes-excel")
+    public void exportarRankingClientesExcel(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(defaultValue = "cantidad") String ordenarPor,
+            HttpServletResponse response
+    ) throws IOException {
+        service.exportarRankingClientesExcel(desde, hasta, ordenarPor, response);
+    }
+
 
     @GetMapping("/exportar-excel")
     public ResponseEntity<byte[]> exportarRankingProductosExcel(
