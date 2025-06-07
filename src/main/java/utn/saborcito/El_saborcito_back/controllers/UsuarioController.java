@@ -35,10 +35,5 @@ public class UsuarioController {
         service.bajaLogicaUsuario(id);
         return ResponseEntity.noContent().build();
     }
-    @PostMapping("/login")
-    public ResponseEntity<UsuarioDTO> login(@RequestBody LoginRequest request) {
-        UsuarioDTO usuario = service.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(usuario);
-    }
 
 }

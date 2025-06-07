@@ -2,10 +2,8 @@ package utn.saborcito.El_saborcito_back.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import utn.saborcito.El_saborcito_back.enums.Rol;
 
 import java.util.List;
@@ -13,7 +11,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
 public class RegistroEmpleadoDTO extends RegistroClienteDTO {
     // Rol seleccionable tengo dudas que se maneje aca
     private Rol rol; //  Correcto según HU4
