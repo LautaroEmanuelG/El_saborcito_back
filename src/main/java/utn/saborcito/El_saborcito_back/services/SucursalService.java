@@ -2,7 +2,6 @@ package utn.saborcito.El_saborcito_back.services;
 
 import lombok.RequiredArgsConstructor;
 
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,7 @@ import utn.saborcito.El_saborcito_back.dto.ArticuloDTO;
 import utn.saborcito.El_saborcito_back.dto.ClienteRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.DetallePedidoDTO;
 import utn.saborcito.El_saborcito_back.dto.MovimientoMonetarioDTO;
+import utn.saborcito.El_saborcito_back.dto.ProductoRankingConResumenDTO;
 import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.mappers.SucursalMapper;
@@ -27,6 +27,7 @@ import utn.saborcito.El_saborcito_back.repositories.DomicilioRepository;
 import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
 import utn.saborcito.El_saborcito_back.repositories.SucursalRepository;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.Comparator;
 import org.apache.poi.ss.usermodel.*;
 
@@ -54,42 +55,73 @@ public class SucursalService {
     private final PedidoRepository pedidoRepository;
     
     public ResponseEntity<byte[]> exportarRankingProductosExcel(LocalDate desde, LocalDate hasta) {
-    List<ProductoRankingDTO> ranking = getRankingProductos(desde, hasta);
+        List<ProductoRankingDTO> ranking = getRankingProductos(desde, hasta).getProductos();
 
-    try (Workbook workbook = new XSSFWorkbook()) {
-        Sheet sheet = workbook.createSheet("Ranking Productos");
+        long totalManu = ranking.stream()
+            .filter(p -> "MANUFACTURADO".equals(p.getTipoProducto()))
+            .mapToLong(ProductoRankingDTO::getCantidadVendida)
+            .sum();
 
-        // Cabecera
-        Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("ID");
-        headerRow.createCell(1).setCellValue("Denominación");
-        headerRow.createCell(2).setCellValue("Cantidad Vendida");
-        headerRow.createCell(3).setCellValue("Tipo");
+        long totalInsumo = ranking.stream()
+            .filter(p -> "INSUMO".equals(p.getTipoProducto()))
+            .mapToLong(ProductoRankingDTO::getCantidadVendida)
+            .sum();
 
-        // Cuerpo
-        int rowNum = 1;
-        for (ProductoRankingDTO dto : ranking) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(dto.getId());
-            row.createCell(1).setCellValue(dto.getDenominacion());
-            row.createCell(2).setCellValue(dto.getCantidadVendida());
-            row.createCell(3).setCellValue(dto.getTipoProducto());
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Ranking Productos");
+
+            // Cabecera de tabla
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("ID");
+            headerRow.createCell(1).setCellValue("Denominación");
+            headerRow.createCell(2).setCellValue("Cantidad Vendida");
+            headerRow.createCell(3).setCellValue("Tipo");
+
+            // Cuerpo
+            int rowNum = 1;
+            for (ProductoRankingDTO dto : ranking) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(dto.getId());
+                row.createCell(1).setCellValue(dto.getDenominacion());
+                row.createCell(2).setCellValue(dto.getCantidadVendida());
+                row.createCell(3).setCellValue(dto.getTipoProducto());
+            }
+
+            // Espacio
+            rowNum += 2;
+
+            // Título resumen
+            Row resumenTitulo = sheet.createRow(rowNum++);
+            resumenTitulo.createCell(0).setCellValue("Resumen de Ventas por Tipo");
+
+            // Encabezado resumen
+            Row resumenHeader = sheet.createRow(rowNum++);
+            resumenHeader.createCell(0).setCellValue("Tipo");
+            resumenHeader.createCell(1).setCellValue("Cantidad Vendida");
+
+            // Valores resumen
+            Row manuRow = sheet.createRow(rowNum++);
+            manuRow.createCell(0).setCellValue("MANUFACTURADO");
+            manuRow.createCell(1).setCellValue(totalManu);
+
+            Row insumoRow = sheet.createRow(rowNum++);
+            insumoRow.createCell(0).setCellValue("INSUMO");
+            insumoRow.createCell(1).setCellValue(totalInsumo);
+
+            // Exportar
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            byte[] excelBytes = out.toByteArray();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ranking-productos.xlsx");
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+            return ResponseEntity.ok().headers(headers).body(excelBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al generar Excel", e);
         }
-
-        // Salida
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        workbook.write(out);
-        byte[] excelBytes = out.toByteArray();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ranking-productos.xlsx");
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-        return ResponseEntity.ok().headers(headers).body(excelBytes);
-    } catch (Exception e) {
-        throw new RuntimeException("Error al generar Excel", e);
     }
-}
 
     public List<DetallePedidoDTO> getPedidosPorCliente(Long clienteId, LocalDate desde, LocalDate hasta) {
         List<Pedido> pedidos = pedidoRepository.findAllByCliente_IdAndFechaPedidoBetween(clienteId, desde, hasta);
@@ -147,44 +179,7 @@ public class SucursalService {
     }
 
     
-    public ResponseEntity<byte[]> exportarRankingProductosExcel(LocalDate desde, LocalDate hasta) {
-        List<ProductoRankingDTO> ranking = getRankingProductos(desde, hasta);
-
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Ranking Productos");
-
-            // Cabecera
-            Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("ID");
-            headerRow.createCell(1).setCellValue("Denominación");
-            headerRow.createCell(2).setCellValue("Cantidad Vendida");
-            headerRow.createCell(3).setCellValue("Tipo");
-
-            // Cuerpo
-            int rowNum = 1;
-            for (ProductoRankingDTO dto : ranking) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(dto.getId());
-                row.createCell(1).setCellValue(dto.getDenominacion());
-                row.createCell(2).setCellValue(dto.getCantidadVendida());
-                row.createCell(3).setCellValue(dto.getTipoProducto());
-            }
-
-            // Salida
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            workbook.write(out);
-            byte[] excelBytes = out.toByteArray();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ranking-productos.xlsx");
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-            return ResponseEntity.ok().headers(headers).body(excelBytes);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al generar Excel", e);
-        }
-    }
-
+   
 
     public MovimientoMonetarioDTO getMovimientos(LocalDate desde, LocalDate hasta) {
         List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
@@ -236,7 +231,7 @@ public class SucursalService {
     }
 
 
-    public List<ProductoRankingDTO> getRankingProductos(LocalDate desde, LocalDate hasta) {
+    public ProductoRankingConResumenDTO getRankingProductos(LocalDate desde, LocalDate hasta) {
         List<DetallePedido> detalles = detallePedidoRepo.findAllByPedido_FechaPedidoBetween(desde, hasta);
 
         Map<Articulo, Long> conteo = new HashMap<>();
@@ -244,20 +239,34 @@ public class SucursalService {
             conteo.merge(detalle.getArticulo(), detalle.getCantidad().longValue(), Long::sum);
         }
 
-        return conteo.entrySet().stream()
-                .map(entry -> {
-                    Articulo articulo = entry.getKey();
-                    String tipo = articulo.getClass().getSimpleName().equals("ArticuloManufacturado") ? "MANUFACTURADO" : "INSUMO";
-                    return new ProductoRankingDTO(
-                            articulo.getId(),
-                            articulo.getDenominacion(),
-                            entry.getValue(),
-                            tipo
-                    );
-                })
-                .sorted(Comparator.comparingLong(ProductoRankingDTO::getCantidadVendida).reversed())
-                .collect(Collectors.toList());
+        List<ProductoRankingDTO> ranking = new ArrayList<>();
+        long totalManu = 0;
+        long totalInsumo = 0;
+
+        for (Map.Entry<Articulo, Long> entry : conteo.entrySet()) {
+            Articulo articulo = entry.getKey();
+            String tipo = articulo.getClass().getSimpleName().equals("ArticuloManufacturado") ? "MANUFACTURADO" : "INSUMO";
+            ProductoRankingDTO dto = new ProductoRankingDTO(
+                    articulo.getId(),
+                    articulo.getDenominacion(),
+                    entry.getValue(),
+                    tipo
+            );
+            ranking.add(dto);
+
+            // Sumar al resumen
+            if (tipo.equals("MANUFACTURADO")) {
+                totalManu += entry.getValue();
+            } else {
+                totalInsumo += entry.getValue();
+            }
+        }
+
+        ranking.sort(Comparator.comparingLong(ProductoRankingDTO::getCantidadVendida).reversed());
+
+        return new ProductoRankingConResumenDTO(ranking, totalManu, totalInsumo);
     }
+
 
     public List<SucursalDTO> findAll() {
         return repo.findAll().stream()
