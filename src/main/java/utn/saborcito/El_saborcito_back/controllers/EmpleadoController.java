@@ -23,7 +23,10 @@ public class EmpleadoController {
     // --- HU8: Listado completo de empleados ---
     @GetMapping
     public ResponseEntity<List<EmpleadoDTO>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+         if (empleadoDTO != null) {
+            return ResponseEntity.ok(empleadoDTO);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     // --- HU8: Obtener empleado por ID ---
