@@ -26,7 +26,7 @@ public class ArticuloInsumoController {
             return ResponseEntity.ok(articuloInsumoService.findById(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        } 
+        }
     }
 
     @PostMapping
@@ -70,5 +70,39 @@ public class ArticuloInsumoController {
     @GetMapping("/categoria/{categoriaId}")
     public ResponseEntity<List<ArticuloInsumoDTO>> getAllByCategoria(@PathVariable Long categoriaId) {
         return ResponseEntity.ok(articuloInsumoService.findAllByCategoriaId(categoriaId));
+    }
+
+    // Endpoints para manejar elementos eliminados
+    @GetMapping("/deleted")
+    public ResponseEntity<List<ArticuloInsumoDTO>> getAllDeleted() {
+        return ResponseEntity.ok(articuloInsumoService.findAllDeleted());
+    }
+
+    @GetMapping("/deleted/{id}")
+    public ResponseEntity<ArticuloInsumoDTO> getOneDeleted(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(articuloInsumoService.findByIdDeleted(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/deleted/{id}/restore")
+    public ResponseEntity<ArticuloInsumoDTO> restore(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(articuloInsumoService.restoreDeleted(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/deleted/{id}")
+    public ResponseEntity<Void> permanentDelete(@PathVariable Long id) {
+        try {
+            articuloInsumoService.permanentDelete(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

@@ -56,6 +56,9 @@ dependencies {
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	// Necesario si también usas Lombok y MapStruct juntos
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	implementation 'org.apache.poi:poi-ooxml:5.2.3'
+	implementation 'org.apache.poi:poi:5.2.3'
+
 }
 
 tasks.named('test') {
