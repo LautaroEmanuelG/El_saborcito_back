@@ -29,6 +29,7 @@ public class SucursalController {
         this.service = service;
     }
 
+
     @GetMapping("/pedidos-cliente")
     public List<DetallePedidoDTO> getPedidosPorCliente(
         @RequestParam Long clienteId,
