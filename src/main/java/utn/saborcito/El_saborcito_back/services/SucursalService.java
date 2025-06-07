@@ -71,7 +71,7 @@ public class SucursalService {
             double total = pedidosCliente.stream().mapToDouble(Pedido::getTotal).sum();
             return new ClienteRankingDTO(
                 cliente.getId(),
-                cliente.getUsuario().getNombre() + " " + cliente.getUsuario().getApellido(),
+                cliente.getNombre() + " " + cliente.getApellido(), // lo cambie porque cliente ya no tiene un usuario
                 cantidad,
                 total
             );

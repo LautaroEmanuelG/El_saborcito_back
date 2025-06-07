@@ -1,6 +1,7 @@
 package utn.saborcito.El_saborcito_back.models;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
@@ -8,11 +9,10 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Empleado {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@SuperBuilder
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = true)
+public class Empleado extends Usuario {
 
     private String legajo;
     private LocalDate fechaIngreso;
@@ -21,8 +21,7 @@ public class Empleado {
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    // Campos específicos del empleado
+    private Boolean primerLogin; // Para controlar cambio de contraseña obligatorio HU4
 }
 

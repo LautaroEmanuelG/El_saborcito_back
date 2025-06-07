@@ -190,14 +190,14 @@ public class PedidoService {
      * @param motivo La razón de la cancelación
      */
     private void notificarClienteSobreCancelacion(Pedido pedido, String motivo) {
-        if (pedido.getCliente() != null && pedido.getCliente().getUsuario() != null) {
+        if (pedido.getCliente() != null && pedido.getCliente() != null) {  //lo cambie porque cliente ya no tiene un usuario
             // Aquí se implementaría el código para enviar una notificación al cliente
             // Por ejemplo, usando un servicio de email, SMS, o notificaciones push
 
             // Para propósitos de desarrollo, sólo imprimimos un mensaje
             System.out.println("NOTIFICACIÓN: Se ha cancelado el pedido #" + pedido.getId() +
-                    " para el cliente " + pedido.getCliente().getUsuario().getNombre() + " " +
-                    pedido.getCliente().getUsuario().getApellido() + ". Motivo: " +
+                    " para el cliente " + pedido.getCliente().getNombre() + " " +
+                    pedido.getCliente().getApellido() + ". Motivo: " +
                     (motivo != null ? motivo : "No especificado"));
         }
     }
