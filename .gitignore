@@ -43,3 +43,4 @@ target/
 
 # Bruno
 environments/
+environments/*.bru
