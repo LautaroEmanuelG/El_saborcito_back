@@ -1,0 +1,19 @@
+meta {
+  name: Login/Empleado De Baja
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:5252/api/auth/empleados/login
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "email": "empleado.baja@example.com",
+    "password": "Empleado@2024"
+  }
+  
+}

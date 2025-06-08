@@ -7,15 +7,17 @@ import utn.saborcito.El_saborcito_back.dto.UsuarioDTO;
 import utn.saborcito.El_saborcito_back.models.Usuario;
 
 @Mapper(componentModel = "spring")
-public interface UsuarioMapper {
+public interface UsuarioMapper extends BaseMapper<Usuario, UsuarioDTO>{
     UsuarioMapper INSTANCE = Mappers.getMapper(UsuarioMapper.class);
-
+    @Override
+    @Mapping(target = "imagen", source = "imagen")
+    @Mapping(target = "domicilios", source = "domicilios")
     UsuarioDTO toDTO(Usuario usuario);
 
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "rol", ignore = true)
-    @Mapping(target = "estado", ignore = true)
-    @Mapping(target = "auth0Id", ignore = true)
-    @Mapping(target = "username", ignore = true)
+    @Override
+    @Mapping(target = "password", ignore = true) // ✅ Auth0 maneja esto
+    @Mapping(target = "username", ignore = true) // ✅ Usar email como username
+    @Mapping(target = "fechaRegistro", ignore = true) // ✅ Se setea automáticamente
+    @Mapping(target = "fechaUltimaModificacion", ignore = true)
     Usuario toEntity(UsuarioDTO usuarioDTO);
 }

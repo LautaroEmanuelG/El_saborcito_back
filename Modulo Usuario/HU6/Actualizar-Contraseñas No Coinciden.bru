@@ -1,0 +1,28 @@
+meta {
+  name: Actualizar/Contraseñas No Coinciden
+  type: http
+  seq: 3
+}
+
+put {
+  url: http://localhost:5252/api/empleados/{id}
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "telefono": "1133557799",
+    "email": "ana.gomez.fail1@example.com",
+    "domicilios": [
+      {
+        "calle": "San Martín",
+        "numero": "987",
+        "departamento": "2B"
+      }
+    ],
+    "nuevaPassword": "ClaveSegura@2024",
+    "confirmarPassword": "OtraClave@2024"
+  }
+  
+}

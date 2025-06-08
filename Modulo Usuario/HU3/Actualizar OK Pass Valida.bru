@@ -1,0 +1,28 @@
+meta {
+  name: Actualizar OK Pass Valida
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:5252/api/clientes/{id}/actualizar-datos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "telefono": "3512345678",
+    "email": "juan.actualizado@example.com",
+    "domicilios": [
+      {
+        "calle": "Mitre",
+        "numero": "456",
+        "departamento": "B"
+      }
+    ],
+    "nuevaPassword": "NuevaClave@2024",
+    "confirmarPassword": "NuevaClave@2024"
+  }
+  
+}

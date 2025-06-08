@@ -1,0 +1,34 @@
+meta {
+  name: Email Duplicado
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:5252/api/clientes/registro
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "email": "juan.perez@example.com",
+    "password": "Password@123",
+    "confirmarPassword": "Password@123",
+    "telefono": "123456789",
+    "domicilios": [
+      {
+        "calle": "Belgrano",
+        "numero": "123",
+        "departamento": "A"
+      }
+    ]
+  }
+  
+}

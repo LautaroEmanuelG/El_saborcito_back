@@ -1,0 +1,29 @@
+meta {
+  name: Admin/Modificar Empleado Con Rol
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:5252/api/empleados/admin/{id}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Ana",
+    "apellido": "Gómez Actualizada",
+    "email": "ana.actualizada@example.com",
+    "telefono": "1155667788",
+    "rol": "COCINERO",
+    "domicilios": [
+      {
+        "calle": "Alsina",
+        "numero": "123",
+        "departamento": "PB"
+      }
+    ]
+  }
+  
+}

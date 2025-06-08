@@ -1,0 +1,28 @@
+meta {
+  name: Actualizar/Contraseñas No Coinciden
+  type: http
+  seq: 3
+}
+
+put {
+  url: http://localhost:5252/api/clientes/{id}/actualizar-datos
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "telefono": "3512345678",
+    "email": "juan.actualizado@example.com",
+    "domicilios": [
+      {
+        "calle": "Mitre",
+        "numero": "456",
+        "departamento": "B"
+      }
+    ],
+    "nuevaPassword": "NuevaClave@2024",
+    "confirmarPassword": "OtraClave@2024"
+  }
+  
+}

@@ -1,0 +1,39 @@
+meta {
+  name: Contraseñas No Coinciden
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:5252/api/clientes/registro
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "email": "juan.pere@exampl.com",
+    "password": "Password@123",
+    "confirmarPassword": "otraContraseña@2",
+    "telefono": "+541111111111",
+    "fechaNacimiento": "1990-01-01",
+    "esRegistroAuth0": false,
+    "domicilios": [
+      {
+        "calle": "Belgrano",
+        "numero": "123",
+        "cp": "5500",
+        "localidad": {
+          "id": 1
+        },
+        "principal": true
+      }
+    ]
+  }
+}

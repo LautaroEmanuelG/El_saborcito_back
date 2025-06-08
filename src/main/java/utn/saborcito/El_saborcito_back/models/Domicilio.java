@@ -16,16 +16,15 @@ public class Domicilio implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String calle;
     private Integer numero;
     private String cp;
-
+    @Column(name = "es_principal")
+    private Boolean principal; // Nuevo campo para marcar el domicilio principal
     // Muchos domicilios para un usuario
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-
     // Muchos domicilios para una localidad
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "localidad_id", nullable = false)
