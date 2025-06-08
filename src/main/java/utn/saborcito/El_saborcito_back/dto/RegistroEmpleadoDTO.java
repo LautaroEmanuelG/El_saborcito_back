@@ -16,5 +16,5 @@ import java.util.List;
 public class RegistroEmpleadoDTO extends RegistroClienteDTO {
     // Rol seleccionable tengo dudas que se maneje aca
     private Rol rol; //  Correcto según HU4
-    private Long sucursalId;
+    private SucursalDTO sucursal;
 }

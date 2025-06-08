@@ -100,8 +100,9 @@ public class EmpleadoService {
         empleado.setId(usuario.getId());
         empleado.setLegajo(generarLegajo(dto.getNombre(), dto.getApellido()));
         empleado.setFechaIngreso(LocalDate.now());
-        if (dto.getSucursalId() != null) {
-            Sucursal sucursal = sucursalRepository.findById(dto.getSucursalId())
+        // Asignar sucursal
+        if (dto.getSucursal() != null && dto.getSucursal().getId() != null) {
+            Sucursal sucursal = sucursalRepository.findById(dto.getSucursal().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sucursal no encontrada"));
             empleado.setSucursal(sucursal);
         }

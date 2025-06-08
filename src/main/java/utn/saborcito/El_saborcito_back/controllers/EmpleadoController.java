@@ -23,17 +23,22 @@ public class EmpleadoController {
     // --- HU8: Listado completo de empleados ---
     @GetMapping
     public ResponseEntity<List<EmpleadoDTO>> getAll() {
-         if (empleadoDTO != null) {
-            return ResponseEntity.ok(empleadoDTO);
+        EmpleadoDTO empleadoDTO = service.findAll().get(0);
+        if (empleadoDTO != null) {
+            return ResponseEntity.ok(service.findAll());
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
-
     // --- HU8: Obtener empleado por ID ---
     @GetMapping("/{id}")
     public ResponseEntity<EmpleadoDTO> getById(@PathVariable Long id) {
         EmpleadoDTO empleadoDTO = service.findById(id);
+        if (empleadoDTO != null) {
         return ResponseEntity.ok(empleadoDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 
@@ -43,7 +48,11 @@ public class EmpleadoController {
             @PathVariable Long id,
             @RequestBody ActualizarDatosEmpleadoDTO dto) {
         EmpleadoDTO updated = service.updateEmpleado(id, dto);
+        if (updated != null) {
         return ResponseEntity.ok(updated);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // --- HU06: Cambio de contraseña desde el empleado ---
