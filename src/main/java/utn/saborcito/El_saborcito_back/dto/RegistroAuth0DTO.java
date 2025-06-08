@@ -4,14 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Auth0UserDTO {
+@SuperBuilder(toBuilder = true) // Cambiar a SuperBuilder para herencia
+public class RegistroAuth0DTO {
     private String sub; // ID único de Auth0
     private String email;
     private String givenName; // Nombre
     private String familyName; // Apellido
+    private List<DomicilioDTO> domicilios; // Lista de domicilios>
 }

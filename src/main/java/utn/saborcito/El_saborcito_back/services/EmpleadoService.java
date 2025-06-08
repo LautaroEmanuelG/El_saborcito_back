@@ -48,66 +48,79 @@ public class EmpleadoService {
 
     // --- Registro manual ---
     public EmpleadoDTO registrarEmpleado(RegistroEmpleadoDTO dto) {
-        // Validaciones unificadas
+        // HU4 - Registro manual de empleado
         usuarioService.validarEmailUnico(dto.getEmail());
+
         if (!dto.getPassword().equals(dto.getConfirmarPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden");
         }
-        if (!isValidPassword(dto.getPassword())) {
+
+        if (!usuarioService.isValidPassword(dto.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La contraseña debe tener al menos 8 caracteres, una mayúscula, minúscula y símbolo.");
         }
-        if (!isValidEmail(dto.getEmail())) {
+
+        if (!usuarioService.isValidEmail(dto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de email inválido");
         }
-        // Crear Usuario
+
+        return crearEmpleado(dto, false);
+    }
+
+    // --- HU01/HU02: Registro desde Auth0 ---
+    public EmpleadoDTO registrarEmpleadoAuth0(RegistroEmpleadoAuth0DTO dto) {
+        // HU4 - Registro empleado por Auth0
+        if (dto.getGivenName() == null || dto.getFamilyName() == null || dto.getEmail() == null || dto.getRol() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Campos obligatorios faltantes para registro Auth0 (nombre, apellido, email, rol)");
+        }
+
+        RegistroEmpleadoDTO empleadoDTO = new RegistroEmpleadoDTO();
+        empleadoDTO.setNombre(dto.getGivenName());
+        empleadoDTO.setApellido(dto.getFamilyName());
+        empleadoDTO.setEmail(dto.getEmail());
+        empleadoDTO.setRol(dto.getRol()); // ✅ HU4: asignación de rol
+        empleadoDTO.setAuth0Id(dto.getSub());
+        empleadoDTO.setEsAuth0(true);
+        empleadoDTO.setDomicilios(dto.getDomicilios());
+
+        return crearEmpleado(empleadoDTO, true);
+    }
+
+    private EmpleadoDTO crearEmpleado(RegistroEmpleadoDTO dto, boolean esAuth0) {
+        if (!usuarioService.isValidEmail(dto.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de email inválido");
+        }
+
         Usuario usuario = new Usuario();
         usuario.setNombre(dto.getNombre());
         usuario.setApellido(dto.getApellido());
         usuario.setEmail(dto.getEmail());
-        usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
         usuario.setTelefono(dto.getTelefono());
-        usuario.setRol(dto.getRol());//tengo dudas con este
+        usuario.setFechaNacimiento(dto.getFechaNacimiento());
+        usuario.setRol(dto.getRol()); // ✅ HU4: El administrador asigna el rol
         usuario.setEstado(true);
         usuario.setFechaRegistro(LocalDateTime.now());
+
+        if (esAuth0) {
+            usuario.setAuth0Id(dto.getAuth0Id());
+        } else {
+            usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
+            usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
+        }
+
+        usuario.setFechaUltimaModificacion(LocalDateTime.now());
         usuario = usuarioRepository.save(usuario);
 
-        // Procesar domicilios
-        List<Domicilio> domicilios = new ArrayList<>();
-        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            for (DomicilioDTO domicilioDTO : dto.getDomicilios()) {
-                if (domicilioDTO.getCalle() != null && domicilioDTO.getLocalidad() != null &&
-                        domicilioDTO.getLocalidad().getId() != null) {
-                    Localidad localidad = localidadRepository.findById(domicilioDTO.getLocalidad().getId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Localidad no encontrada"));
-                    Domicilio domicilio = new Domicilio();
-                    domicilio.setCalle(domicilioDTO.getCalle());
-                    domicilio.setNumero(domicilioDTO.getNumero());
-                    domicilio.setCp(domicilioDTO.getCp());
-                    domicilio.setLocalidad(localidad);
-                    domicilio.setUsuario(usuario);
-                    domicilio.setPrincipal(domicilioDTO.getPrincipal() != null && domicilioDTO.getPrincipal());
-                    domicilios.add(domicilio);
-                }
-            }
-            usuarioService.validarUnSoloDomicilioPrincipal(domicilios);
-            usuarioService.validarAlMenosUnPrincipal(domicilios);
-        }
-        usuario.setDomicilios(domicilios);
-        usuario = usuarioRepository.save(usuario);
-        // Crear Empleado
         Empleado empleado = new Empleado();
         empleado.setId(usuario.getId());
         empleado.setLegajo(generarLegajo(dto.getNombre(), dto.getApellido()));
         empleado.setFechaIngreso(LocalDate.now());
-        // Asignar sucursal
-        if (dto.getSucursal() != null && dto.getSucursal().getId() != null) {
-            Sucursal sucursal = sucursalRepository.findById(dto.getSucursal().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sucursal no encontrada"));
-            empleado.setSucursal(sucursal);
-        }
-        empleado = empleadoRepository.save(empleado);
-        return empleadoMapper.toDTO(empleado);
+
+        return empleadoMapper.toDTO(empleadoRepository.save(empleado));
     }
 
     // --- Actualizar datos del empleado (autogestión) ---
@@ -118,7 +131,7 @@ public class EmpleadoService {
         // Validar y actualizar email
         if (dto.getEmail() != null && !dto.getEmail().equals(usuario.getEmail())) {
             usuarioService.validarEmailUnico(dto.getEmail());
-            if (!isValidEmail(dto.getEmail())) {
+            if (!usuarioService.isValidEmail(dto.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de email inválido");
             }
             usuario.setEmail(dto.getEmail());
@@ -129,42 +142,7 @@ public class EmpleadoService {
         if (dto.getTelefono() != null) usuario.setTelefono(dto.getTelefono());
         // Actualizar o crear nuevos domicilios
         if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            List<Domicilio> domiciliosExistentes = usuario.getDomicilios();
-
-            for (DomicilioDTO domicilioDTO : dto.getDomicilios()) {
-                if (domicilioDTO.getCalle() == null || domicilioDTO.getLocalidad() == null ||
-                        domicilioDTO.getLocalidad().getId() == null) {
-                    continue; // Saltar si faltan datos necesarios
-                }
-
-                Optional<Domicilio> domicilioExistenteOpt = domiciliosExistentes.stream()
-                        .filter(d -> d.getId() != null && d.getId().equals(domicilioDTO.getId()))
-                        .findFirst();
-
-                if (domicilioExistenteOpt.isPresent()) {
-                    Domicilio domicilio = domicilioExistenteOpt.get();
-                    domicilio.setCalle(domicilioDTO.getCalle());
-                    domicilio.setNumero(domicilioDTO.getNumero());
-                    domicilio.setCp(domicilioDTO.getCp());
-                    Localidad localidad = localidadRepository.findById(domicilioDTO.getLocalidad().getId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Localidad no encontrada"));
-                    domicilio.setLocalidad(localidad);
-                    domicilio.setPrincipal(domicilioDTO.getPrincipal() != null && domicilioDTO.getPrincipal());
-                    domicilioRepository.save(domicilio);
-                } else {
-                    Localidad localidad = localidadRepository.findById(domicilioDTO.getLocalidad().getId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Localidad no encontrada"));
-                    Domicilio nuevoDomicilio = new Domicilio();
-                    nuevoDomicilio.setCalle(domicilioDTO.getCalle());
-                    nuevoDomicilio.setNumero(domicilioDTO.getNumero());
-                    nuevoDomicilio.setCp(domicilioDTO.getCp());
-                    nuevoDomicilio.setLocalidad(localidad);
-                    nuevoDomicilio.setUsuario(usuario);
-                    nuevoDomicilio.setPrincipal(domicilioDTO.getPrincipal() != null && domicilioDTO.getPrincipal());
-                    domiciliosExistentes.add(nuevoDomicilio);
-                }
-            }
-            usuario.setDomicilios(domiciliosExistentes);
+            usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
         }
         usuario.setFechaUltimaModificacion(LocalDateTime.now());
         usuarioRepository.save(usuario);
@@ -181,7 +159,7 @@ public class EmpleadoService {
         // Validar y actualizar email
         if (dto.getEmail() != null && !dto.getEmail().equals(usuario.getEmail())) {
             usuarioService.validarEmailUnico(dto.getEmail());
-            if (!isValidEmail(dto.getEmail())) {
+            if (!usuarioService.isValidEmail(dto.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de email inválido");
             }
             usuario.setEmail(dto.getEmail());
@@ -250,8 +228,13 @@ public class EmpleadoService {
     // --- Login (manual o Auth0) ---
     public AuthEmpleadoResponseDTO loginEmpleado(LoginRequest dto) {
         UsuarioDTO usuario = usuarioService.login(dto);
+
         Empleado empleado = empleadoRepository.findById(usuario.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Este usuario no es un empleado válido"));
+
+        // HU5 - Validar horario laboral e inactividad
+        validarHorarioLaboral(empleado);
+
         boolean esPrimeraVez = usuario.getFechaUltimaModificacion() == null;
         return AuthEmpleadoResponseDTO.builder()
                 .mensaje(esPrimeraVez ? "Debe cambiar su contraseña" : "Inicio de sesión exitoso")
@@ -259,7 +242,6 @@ public class EmpleadoService {
                 .empleado(empleadoMapper.toDTO(empleado))
                 .build();
     }
-
     // --- Activar/desactivar empleado (HU8) ---
     public void toggleEstado(Long empleadoId) {
         Empleado empleado = empleadoRepository.findById(empleadoId)
@@ -273,7 +255,7 @@ public class EmpleadoService {
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden");
         }
-        if (!isValidPassword(dto.getNewPassword())) {
+        if (!usuarioService.isValidPassword(dto.getNewPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La contraseña debe tener al menos 8 caracteres, una mayúscula, minúscula y símbolo.");
         }
@@ -292,18 +274,6 @@ public class EmpleadoService {
         }
     }
 
-    // --- Métodos privados de validación ---
-    private boolean isValidEmail(String email) {
-        return email != null && email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
-    }
-
-    private boolean isValidPassword(String password) {
-        return password != null &&
-                password.length() >= 8 &&
-                password.matches(".*[A-Z].*") &&
-                password.matches(".*[a-z].*") &&
-                password.matches(".*[!@#$%^&*(),.?\":{}|<>].*");
-    }
 
     private String generarLegajo(String nombre, String apellido) {
         return nombre.substring(0, 2).toUpperCase() +
@@ -321,7 +291,7 @@ public class EmpleadoService {
     }
 
     // ✅ Crear o actualizar empleado desde Auth0
-    public EmpleadoDTO sincronizarAuth0Usuario(Auth0UserDTO dto) {
+    public EmpleadoDTO sincronizarAuth0Usuario(RegistroEmpleadoAuth0DTO dto) {
         Optional<EmpleadoDTO> existente = findByAuth0Id(dto.getSub());
         if (existente.isPresent()) {
             return actualizarDatosAuth0(existente.get(), dto);
@@ -330,7 +300,11 @@ public class EmpleadoService {
         }
     }
 
-    private EmpleadoDTO crearDesdeAuth0(Auth0UserDTO dto) {
+    private EmpleadoDTO crearDesdeAuth0(RegistroEmpleadoAuth0DTO dto) {
+        if (dto.getGivenName() == null || dto.getFamilyName() == null || dto.getEmail() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Los campos 'givenName', 'familyName' y 'email' son obligatorios para registro Auth0");
+        }
         RegistroEmpleadoDTO nuevo = new RegistroEmpleadoDTO();
         nuevo.setEmail(dto.getEmail());
         nuevo.setNombre(dto.getGivenName());
@@ -341,10 +315,10 @@ public class EmpleadoService {
         nuevo.setPassword(null);
         nuevo.setConfirmarPassword(null);
         // Guardado como si fuera manual pero sin pass
-        return crearEmpleadoDesdeDTOAuth0(nuevo);
+        return crearEmpleado(nuevo, true);
     }
 
-    private EmpleadoDTO actualizarDatosAuth0(EmpleadoDTO dtoLocal, Auth0UserDTO dto) {
+    private EmpleadoDTO actualizarDatosAuth0(EmpleadoDTO dtoLocal, RegistroEmpleadoAuth0DTO dto) {
         boolean actualizado = false;
         if (!dtoLocal.getEmail().equals(dto.getEmail())) {
             dtoLocal.setEmail(dto.getEmail());
@@ -365,21 +339,4 @@ public class EmpleadoService {
         return dtoLocal;
     }
 
-    // Método auxiliar adaptado para Auth0 sin password
-    private EmpleadoDTO crearEmpleadoDesdeDTOAuth0(RegistroEmpleadoDTO dto) {
-        Usuario usuario = new Usuario();
-        usuario.setNombre(dto.getNombre());
-        usuario.setApellido(dto.getApellido());
-        usuario.setEmail(dto.getEmail());
-        usuario.setRol(dto.getRol());
-        usuario.setEstado(true);
-        usuario.setFechaRegistro(LocalDateTime.now());
-        usuario.setAuth0Id(dto.getAuth0Id());
-        usuario = usuarioRepository.save(usuario);
-        Empleado empleado = new Empleado();
-        empleado.setId(usuario.getId());
-        empleado.setLegajo(generarLegajo(dto.getNombre(), dto.getApellido()));
-        empleado.setFechaIngreso(LocalDate.now());
-        return empleadoMapper.toDTO(empleadoRepository.save(empleado));
-    }
 }

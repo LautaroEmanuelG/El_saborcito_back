@@ -5,14 +5,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.DomicilioDTO;
 import utn.saborcito.El_saborcito_back.dto.LoginRequest;
 import utn.saborcito.El_saborcito_back.dto.UsuarioDTO;
 import utn.saborcito.El_saborcito_back.mappers.UsuarioMapper;
 import utn.saborcito.El_saborcito_back.models.Domicilio;
+import utn.saborcito.El_saborcito_back.models.Localidad;
 import utn.saborcito.El_saborcito_back.models.Usuario;
+import utn.saborcito.El_saborcito_back.repositories.LocalidadRepository;
 import utn.saborcito.El_saborcito_back.repositories.UsuarioRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +27,7 @@ public class UsuarioService {
     private final UsuarioRepository repo;
     private final UsuarioMapper usuarioMapper;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final LocalidadRepository localidadRepository;
 
     public List<UsuarioDTO> findAll() {
         return repo.findAll().stream()
@@ -159,5 +164,49 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Debe haber al menos un domicilio marcado como principal.");
         }
+    }
+
+    public void procesarYValidarDomicilios(Usuario usuario, List<DomicilioDTO> domiciliosDTOs) {
+        if (usuario.getDomicilios() == null) {
+            usuario.setDomicilios(new ArrayList<>());
+        }
+
+        // Limpiar la lista existente y agregar nuevos datos
+        usuario.getDomicilios().clear();
+
+        for (DomicilioDTO domicilioDTO : domiciliosDTOs) {
+            if (domicilioDTO.getCalle() != null && domicilioDTO.getLocalidad() != null &&
+                    domicilioDTO.getLocalidad().getId() != null) {
+
+                Localidad localidad = localidadRepository.findById(domicilioDTO.getLocalidad().getId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Localidad no encontrada"));
+
+                Domicilio nuevoDomicilio = new Domicilio();
+                nuevoDomicilio.setId(domicilioDTO.getId());
+                nuevoDomicilio.setCalle(domicilioDTO.getCalle());
+                nuevoDomicilio.setNumero(domicilioDTO.getNumero());
+                nuevoDomicilio.setCp(domicilioDTO.getCp());
+                nuevoDomicilio.setLocalidad(localidad);
+                nuevoDomicilio.setPrincipal(Boolean.TRUE.equals(domicilioDTO.getPrincipal()));
+                nuevoDomicilio.setUsuario(usuario);
+
+                usuario.getDomicilios().add(nuevoDomicilio);
+            }
+        }
+
+        validarUnSoloDomicilioPrincipal(usuario.getDomicilios());
+        validarAlMenosUnPrincipal(usuario.getDomicilios());
+    }
+    // --- Métodos privados de validación (sin cambios) ---
+    public boolean isValidEmail(String email) {
+        return email != null && email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
+    }
+
+    public boolean isValidPassword(String password) {
+        return password != null &&
+                password.length() >= 8 &&
+                password.matches(".*[A-Z].*") &&
+                password.matches(".*[a-z].*") &&
+                password.matches(".*[!@#$%^&*(),.?\":{}|<>].*");
     }
 }
