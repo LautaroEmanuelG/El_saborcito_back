@@ -1,0 +1,20 @@
+meta {
+  name: Registro Empleado Auth0
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:5252/api/auth/empleados/auth0
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Rosa",
+    "apellido": "Torres",
+    "email": "rosa.torres@gmail.com"
+  }
+  
+}

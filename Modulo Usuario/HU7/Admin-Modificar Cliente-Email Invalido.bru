@@ -1,0 +1,28 @@
+meta {
+  name: Admin/Modificar Cliente/Email Invalido
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:5252/api/clientes/admin/{id}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "email": "correo-mal",
+    "telefono": "1122334455",
+    "domicilios": [
+      {
+        "calle": "Lavalle",
+        "numero": "321",
+        "departamento": "PB"
+      }
+    ]
+  }
+  
+}

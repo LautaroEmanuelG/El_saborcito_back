@@ -1,0 +1,26 @@
+meta {
+  name: Actualizar/Sin Cambiar Contraseña
+  type: http
+  seq: 5
+}
+
+put {
+  url: http://localhost:5252/api/clientes/{id}/actualizar-datos
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "telefono": "3512345678",
+    "email": "juan.actualizado2@example.com",
+    "domicilios": [
+      {
+        "calle": "Mitre",
+        "numero": "456",
+        "departamento": "B"
+      }
+    ]
+  }
+  
+}

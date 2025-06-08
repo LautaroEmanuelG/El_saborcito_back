@@ -1,0 +1,18 @@
+meta {
+  name: Contraseña Incorrecta
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:5252/api/auth/clientes/login
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+      "email": "juan.perez@example.com", 
+      "password": "PasswordIncorrecta1!"
+      }
+}

@@ -1,0 +1,40 @@
+meta {
+  name: Contraseña Debil
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:5252/api/clientes/registro
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "Ana",
+    "apellido": "Pérez",
+    "email": "cliente3@example.com",
+    "password": "12345678",
+    "confirmarPassword": "12345678",
+    "telefono": "+541111111111",
+    "fechaNacimiento": "1990-01-01",
+    "esRegistroAuth0": false,
+    "domicilios": [
+      {
+        "calle": "Belgrano",
+        "numero": "123",
+        "cp": "5500",
+        "localidad": {
+          "id": 1
+        },
+        "principal": true
+      }
+    ]
+  }
+  
+}

@@ -1,0 +1,41 @@
+meta {
+  name: https://dev-hedh862x53dvjz66.us.auth0.com/oauth/token
+  type: http
+  seq: 9
+}
+
+post {
+  url: https://dev-hedh862x53dvjz66.us.auth0.com/oauth/token
+  body: formUrlEncoded
+  auth: oauth2
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+auth:oauth2 {
+  grant_type: authorization_code
+  callback_url: https://oauth.pstmn.io/v1/browser-callback
+  authorization_url: https://dev-hedh862x53dvjz66.us.auth0.com/authorize
+  access_token_url: https://dev-hedh862x53dvjz66.us.auth0.com/oauth/token
+  refresh_token_url: 
+  client_id: yp7XW2BgUPuTebvUsZPwXyAYPBUpQGW8
+  client_secret: 
+  scope: openid profile email
+  state: 
+  pkce: false
+  credentials_placement: body
+  credentials_id: 
+  token_placement: header
+  token_header_prefix: 
+  auto_fetch_token: true
+  auto_refresh_token: false
+}
+
+body:form-urlencoded {
+  ~client_id: yp7XW2BgUPuTebvUsZPwXyAYPBUpQGW8
+  ~client_secret: zvtPhm7rvw2OGCBkWP4GZ5yBTcNKA6T-XIQTwqMsRkPWTz_2zGu-Xdt_lYSJXGAX
+  ~audience: https://saborcito/api/
+  ~grant_type: client_credentials
+}

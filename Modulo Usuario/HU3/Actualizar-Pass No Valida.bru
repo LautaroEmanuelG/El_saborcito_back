@@ -1,0 +1,28 @@
+meta {
+  name: Actualizar/Pass No Valida
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:5252/api/clientes/{id}/actualizar-datos
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "telefono": "3512345678",
+    "email": "juan.actualizado@example.com",
+    "domicilios": [
+      {
+        "calle": "Mitre",
+        "numero": "456",
+        "departamento": "B"
+      }
+    ],
+    "nuevaPassword": "12345678",
+    "confirmarPassword": "12345678"
+  }
+  
+}

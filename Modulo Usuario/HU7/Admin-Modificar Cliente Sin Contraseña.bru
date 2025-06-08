@@ -1,0 +1,28 @@
+meta {
+  name: Admin/Modificar Cliente Sin Contraseña
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:5252/api/clientes/admin/{id}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Juan",
+    "apellido": "Pérez Modificado",
+    "email": "juan.modificado@example.com",
+    "telefono": "1122334455",
+    "domicilios": [
+      {
+        "calle": "Lavalle",
+        "numero": "321",
+        "departamento": "PB"
+      }
+    ]
+  }
+  
+}
