@@ -40,3 +40,6 @@ target/
 *.env
 *.env.local
 .env
+
+# Bruno
+environments/

@@ -64,4 +64,14 @@ public class ArticuloManufacturadoController {
     public void permanentDelete(@PathVariable Long id) {
         service.permanentDelete(id);
     }
+
+    /**
+     * Endpoint para consultar si un artículo manufacturado puede fabricarse (tiene
+     * insumos suficientes).
+     * Ejemplo: GET /api/manufacturados/{id}/can-be-manufactured
+     */
+    @GetMapping("/{id}/can-be-manufactured")
+    public boolean canBeManufactured(@PathVariable Long id) {
+        return service.canBeManufactured(id);
+    }
 }

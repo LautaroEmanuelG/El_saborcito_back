@@ -328,4 +328,31 @@ public class ArticuloManufacturadoService {
 
         return dto;
     }
+
+    /**
+     * Verifica si el artículo manufacturado puede fabricarse con el stock actual de
+     * insumos.
+     * 
+     * @param id ID del artículo manufacturado
+     * @return true si se puede fabricar, false si falta stock o detalles
+     */
+    @Transactional(readOnly = true)
+    public boolean canBeManufactured(Long id) {
+        ArticuloManufacturado manufacturado = repo.findByIdNotDeleted(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Artículo manufacturado no encontrado"));
+
+        if (manufacturado.getArticuloManufacturadoDetalles() == null
+                || manufacturado.getArticuloManufacturadoDetalles().isEmpty()) {
+            return false; // No tiene detalles, no se puede fabricar
+        }
+
+        // Verificar stock de cada insumo
+        return manufacturado.getArticuloManufacturadoDetalles().stream().allMatch(detalle -> {
+            if (detalle.getArticuloInsumo() == null || detalle.getCantidad() == null)
+                return false;
+            Integer stockActual = detalle.getArticuloInsumo().getStockActual();
+            return stockActual != null && stockActual >= detalle.getCantidad();
+        });
+    }
 }
