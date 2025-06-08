@@ -1,0 +1,35 @@
+meta {
+  name: Registro/
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:5252/api/clientes/registro
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "email": "juan.perez@example.com",
+    "password": "Password@123",
+    "confirmarPassword": "Password@123",
+    "telefono": "+541111111111",
+    "fechaNacimiento": "1990-01-01",
+    "esRegistroAuth0": false,
+    "domicilios": [
+      {
+        "calle": "Belgrano",
+        "numero": "123",
+        "cp": "5500",
+        "localidad": {
+          "id": 1
+        },
+        "principal": true
+      }
+    ]
+  }
+}

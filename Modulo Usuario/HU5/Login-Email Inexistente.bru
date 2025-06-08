@@ -1,0 +1,19 @@
+meta {
+  name: Login/Email Inexistente
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:5252/api/auth/empleados/login
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "email": "noexiste@example.com",
+    "password": "Empleado@2024"
+  }
+  
+}

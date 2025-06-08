@@ -1,0 +1,19 @@
+meta {
+  name: Login/PrimerLogin
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:5252/api/auth/empleados/login
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "email": "nuevo.empleado@example.com",
+    "password": "Empleado@2024"
+  }
+  
+}

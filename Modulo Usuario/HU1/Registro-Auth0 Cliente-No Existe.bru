@@ -1,0 +1,24 @@
+meta {
+  name: Registro/Auth0 Cliente/No Existe
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:5252/api/clientes/auth0
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "sub": "auth0|1234567890",
+    "email": "lucia.fernandez@gmail.com",
+    "givenName": "Lucía",
+    "familyName": "Fernández"
+  }
+}

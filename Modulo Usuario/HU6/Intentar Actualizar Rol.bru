@@ -1,0 +1,18 @@
+meta {
+  name: Intentar Actualizar Rol
+  type: http
+  seq: 6
+}
+
+put {
+  url: http://localhost:5252/api/empleados/{id}
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "rol": "ADMIN"
+  }
+  
+}

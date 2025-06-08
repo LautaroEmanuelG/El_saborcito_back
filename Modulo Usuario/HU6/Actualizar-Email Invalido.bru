@@ -1,0 +1,26 @@
+meta {
+  name: Actualizar/Email Invalido
+  type: http
+  seq: 5
+}
+
+put {
+  url: http://localhost:5252/api/empleados/{id}
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "telefono": "1133557799",
+    "email": "correo-mal-formado",
+    "domicilios": [
+      {
+        "calle": "San Martín",
+        "numero": "987",
+        "departamento": "2B"
+      }
+    ]
+  }
+  
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Actualizar/Cambio Contraseña
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:5252/api/empleados/{id}
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "telefono": "1133557799",
+    "email": "ana.gomez.cambioclave@example.com",
+    "domicilios": [
+      {
+        "calle": "San Martín",
+        "numero": "987",
+        "departamento": "2B"
+      }
+    ],
+    "nuevaPassword": "ClaveSegura@2024",
+    "confirmarPassword": "ClaveSegura@2024"
+  }
+  
+}
