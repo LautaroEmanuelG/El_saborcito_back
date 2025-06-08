@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{API_BASE_URL}}/clientes/registro
+  url: http://localhost:5252/api/clientes/registro
   body: json
   auth: none
 }
@@ -13,8 +13,8 @@ post {
 body:json {
   {
     "nombre": "Juan",
-    "apellido": "sosa",
-    "email": "juan.sosa@example.com",
+    "apellido": "Pérez",
+    "email": "juan.perez@example.com",
     "password": "Password@123",
     "confirmarPassword": "Password@123",
     "telefono": "+541111111111",
