@@ -17,6 +17,7 @@ import java.util.List;
 @SuperBuilder(toBuilder = true) // Cambiar a SuperBuilder para herencia
 //Se maneja para HU1
 public class RegistroClienteDTO {
+    private String auth0Id;
     private String nombre;
     private String apellido;
     private String telefono;
@@ -24,15 +25,12 @@ public class RegistroClienteDTO {
     @Email(message = "El email no es válido")
     @NotBlank
     private String email;
-    // ⚠️ PROBLEMA: Con Auth0, estos campos no deberían estar aquí
-    // private String password;
-    // private String confirmPassword;
+
     // ✅ MEJOR: Solo para registro manual (sin Auth0)
-    private String password; // Solo si permites registro manual
-    private String confirmarPassword; // Solo si permites registro manual
+    private String password; // Solo para registro manual
+    private String confirmarPassword; // Solo para registro manual
     private LocalDate fechaNacimiento;
     private List<DomicilioDTO> domicilios;
-    // ✅ AGREGAR: Para manejar Auth0
-    private String auth0Id; // Cuando viene de Auth0
-    private Boolean esRegistroAuth0; // Flag para distinguir tipo de registro
+    @Builder.Default
+    private Boolean esAuth0 = false;
 }
