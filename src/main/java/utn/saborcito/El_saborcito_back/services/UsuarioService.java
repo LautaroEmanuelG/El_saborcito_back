@@ -90,35 +90,34 @@ public class UsuarioService {
         repo.save(usuario);
     }
 
-    // ✅ MEJORADO: Login que maneja Auth0 y manual
-    public UsuarioDTO login(LoginRequest loginRequest) {
-        if (loginRequest.getEsAuth0Login()) {
-            return loginAuth0(loginRequest.getEmail());
-        } else {
-            return loginManual(loginRequest);
-        }
-    }
+//    // ✅ MEJORADO: Login que maneja Auth0 y manual
+//    public UsuarioDTO login(LoginRequest loginRequest) {
+//        if (loginRequest.getEsAuth0Login()) {
+//            return loginAuth0(loginRequest.getEmail());
+//        } else {
+//            return loginManual(loginRequest);
+//        }
+//    }
 
-    // ✅ NUEVO: Login manual (HU2 y HU5)
-    private UsuarioDTO loginManual(LoginRequest loginRequest) {
-        Usuario usuario = repo.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                        "Email o contraseña inválidos"));
-        // ✅ HU2: Validar estado
-        if (!usuario.getEstado()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario dado de baja");
-        }
-        if (!passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email o contraseña inválidos");
-        }
-        return usuarioMapper.toDTO(usuario);
-    }
+//    // ✅ NUEVO: Login manual (HU2 y HU5)
+//    private UsuarioDTO loginManual(LoginRequest loginRequest) {
+//        Usuario usuario = repo.findByEmail(loginRequest.getEmail())
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+//                        "Email o contraseña inválidos"));
+//        // ✅ HU2: Validar estado
+//        if (!usuario.getEstado()) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario dado de baja");
+//        }
+//        if (!passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword())) {
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email o contraseña inválidos");
+//        }
+//        return usuarioMapper.toDTO(usuario);
+//    }
 
     // ✅ NUEVO: Login Auth0 (HU1 y HU2)
-    private UsuarioDTO loginAuth0(String email) {
+    public UsuarioDTO loginAuth0(String email) {
         Usuario usuario = repo.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                        "Usuario no registrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no registrado"));
         if (!usuario.getEstado()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario dado de baja");
         }

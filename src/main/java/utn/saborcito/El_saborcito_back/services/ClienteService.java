@@ -49,96 +49,71 @@ public class ClienteService {
         return usuarioService.findByAuth0Id(auth0Id)
                 .map(usuarioDTO -> {
                     Cliente cliente = repo.findById(usuarioDTO.getId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                    "Cliente no encontrado"));
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
                     return clienteMapper.toDTO(cliente);
                 });
     }
 
-    // --- HU01: Registro manual de cliente ---
-    public ClienteDTO registrarClienteManual(RegistroClienteDTO dto) {
+    // --- HU01: Registro flexible de cliente --
+    // --- Registro fusionado (manual o Auth0) ---
+    public ClienteDTO registrarClienteFlexible(RegistroClienteDTO dto) {
         usuarioService.validarEmailUnico(dto.getEmail());
 
-        if (!dto.getPassword().equals(dto.getConfirmarPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden");
-        }
-
-        if (!usuarioService.isValidPassword(dto.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "La contraseña debe tener al menos 8 caracteres, una mayúscula, minúscula y símbolo.");
-        }
-
-        return crearCliente(dto, false);
-    }
-
-    // --- HU01/HU02: Registro desde Auth0 ---
-    public ClienteDTO registrarClienteAuth0(RegistroAuth0DTO dto) {
-        // Validaciones básicas
-        if (dto.getGivenName() == null || dto.getFamilyName() == null || dto.getEmail() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Los campos 'givenName', 'familyName' y 'email' son obligatorios para registro Auth0");
-        }
-
-        // Crear un RegistroClienteDTO desde el Auth0DTO
-        RegistroClienteDTO clienteDTO = new RegistroClienteDTO();
-        clienteDTO.setNombre(dto.getGivenName());
-        clienteDTO.setApellido(dto.getFamilyName());
-        clienteDTO.setEmail(dto.getEmail());
-        clienteDTO.setTelefono(null); // opcional
-        clienteDTO.setFechaNacimiento(null); // opcional
-        clienteDTO.setDomicilios(dto.getDomicilios()); // pueden ser null también
-        clienteDTO.setEsAuth0(true);
-
-        return crearCliente(clienteDTO, true);
-    }
-
-    // ✅ REFACTORIZADO: Método común para crear cliente manual o auth0
-    private ClienteDTO crearCliente(RegistroClienteDTO dto, boolean esAuth0) {
         if (!usuarioService.isValidEmail(dto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de email inválido");
         }
-        // Crear usuario
+
+        if (!dto.getEsAuth0()) {
+            if (dto.getPassword() == null || dto.getConfirmarPassword() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contraseña obligatoria para registro manual");
+            }
+
+            if (!dto.getPassword().equals(dto.getConfirmarPassword())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden");
+            }
+
+            if (!usuarioService.isValidPassword(dto.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "La contraseña debe tener al menos 8 caracteres, una mayúscula, minúscula y símbolo.");
+            }
+        }
+
+        return crearCliente(dto);
+    }
+
+    private ClienteDTO crearCliente(RegistroClienteDTO dto) {
         Usuario usuario = new Usuario();
         usuario.setNombre(dto.getNombre());
         usuario.setApellido(dto.getApellido());
         usuario.setEmail(dto.getEmail());
         usuario.setTelefono(dto.getTelefono());
         usuario.setFechaNacimiento(dto.getFechaNacimiento());
-        // Asignar rol y no modificable HU1
         usuario.setRol(Rol.CLIENTE);
         usuario.setEstado(true);
         usuario.setFechaRegistro(LocalDateTime.now());
 
-        if (esAuth0) {
+        if (dto.getEsAuth0()) {
             usuario.setAuth0Id(dto.getAuth0Id());
         } else {
-            if (dto.getPassword() == null || !dto.getPassword().equals(dto.getConfirmarPassword())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden");
-            }
-            // Encriptar contraseña HU1
             usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
-// Guardar usuario primero
         usuario = usuarioRepository.save(usuario);
 
-        // Procesar domicilios
         if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
             usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
         }
+
         usuario.setFechaUltimaModificacion(LocalDateTime.now());
         usuarioRepository.save(usuario);
 
-        Cliente cliente = new Cliente(); //devolver DTO
+        Cliente cliente = new Cliente();
         cliente.setId(usuario.getId());
         cliente.setDomicilios(usuario.getDomicilios());
         cliente.setHistorialPedidos(new ArrayList<>());
-        if (cliente.getHistorialPedidos() != null && !cliente.getHistorialPedidos().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "El historial de pedidos no se puede asignar manualmente al crear un cliente.");
-        }
-        return clienteMapper.toDTO(repo.save(cliente)); //devoler DTO cliente + token
+        return clienteMapper.toDTO(repo.save(cliente));
     }
+
 
     // --- HU03: Actualización de datos del cliente ---
     public ClienteDTO updateCliente(Long id, ActualizarDatosClienteDTO dto) {
@@ -146,12 +121,10 @@ public class ClienteService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
         Usuario usuario = clienteExistente;
 
-        // Validar y actualizar datos básicos del usuario
         if (dto.getNombre() != null) usuario.setNombre(dto.getNombre());
         if (dto.getApellido() != null) usuario.setApellido(dto.getApellido());
         if (dto.getTelefono() != null) usuario.setTelefono(dto.getTelefono());
 
-        // ✅ HU03: Validar y actualizar email si corresponde
         if (dto.getEmail() != null && !dto.getEmail().equals(usuario.getEmail())) {
             if (!usuarioService.isValidEmail(dto.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de email inválido");
@@ -159,11 +132,11 @@ public class ClienteService {
             usuarioService.validarEmailUnico(dto.getEmail());
             usuario.setEmail(dto.getEmail());
         }
-        // ✅ HU3: Actualizar dirección de entrega
+
         if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
             usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
         }
-// ✅ HU3: Cambio de contraseña
+
         if (dto.getNuevaContraseña() != null && !dto.getNuevaContraseña().isBlank()) {
             validarCambioContrasena(usuario.getId(), dto);
             usuarioService.cambiarContrasena(usuario.getId(), dto.getNuevaContraseña());
@@ -186,100 +159,81 @@ public class ClienteService {
                     "La contraseña debe tener al menos 8 caracteres, una mayúscula, minúscula y símbolo.");
         }
 
-        // Usar validación centralizada del UsuarioService
         if (!usuarioService.validarContrasenaActual(usuarioId, dto.getContraseñaActual())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La contraseña actual es incorrecta");
         }
     }
 
     // --- HU02: Login delegado a UsuarioService ---
-    public UsuarioDTO loginCliente(LoginRequest loginRequest) {
-        UsuarioDTO usuario = usuarioService.login(loginRequest);
-
-        // ✅ HU2: Validar que sea cliente
-        if (!usuario.getRol().equals(Rol.CLIENTE)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Solo los clientes pueden iniciar sesión aquí");
-        }
-
-        // ✅ HU2: Verificar estado activo (ya manejado en UsuarioService)
-        return usuario;
+//    public UsuarioDTO loginCliente(LoginRequest loginRequest) {
+//        UsuarioDTO usuario = usuarioService.login(loginRequest);
+//
+//        // ✅ HU2: Validar que sea cliente
+//        if (!usuario.getRol().equals(Rol.CLIENTE)) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+//                    "Solo los clientes pueden iniciar sesión aquí");
+//        }
+//
+//        // ✅ HU2: Verificar estado activo (ya manejado en UsuarioService)
+//        return usuario;
+//    }
+    public UsuarioDTO loginCliente(LoginRequest loginRequest){
+        return usuarioService.loginAuth0(loginRequest.getEmail());
     }
-
     // --- HU07: Baja lógica del cliente ---
     public void bajaLogicaCliente(Long id) {
         Cliente cliente = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Cliente no encontrado con ID: " + id));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado con ID: " + id));
         usuarioService.bajaLogicaUsuario(cliente.getId());
     }
 
     // --- HU07: Alta lógica del cliente ---
     public void altaCliente(Long id) {
         Cliente cliente = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Cliente no encontrado con ID: " + id));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado con ID: " + id));
         usuarioService.altaUsuario(cliente.getId());
     }
 
-    // --- HU01: Sincronización desde Auth0 ---
+    // --- Sincronización desde Auth0 ---
     public ClienteDTO sincronizarAuth0Usuario(RegistroAuth0DTO auth0User) {
         Optional<ClienteDTO> clienteExistente = findByAuth0Id(auth0User.getSub());
 
         if (clienteExistente.isPresent()) {
             return actualizarDatosAuth0(clienteExistente.get(), auth0User);
         } else {
-            return crearClienteDesdeAuth0(auth0User);
+            RegistroClienteDTO dto = new RegistroClienteDTO();
+            dto.setNombre(auth0User.getGivenName());
+            dto.setApellido(auth0User.getFamilyName());
+            dto.setEmail(auth0User.getEmail());
+            dto.setTelefono(null);
+            dto.setFechaNacimiento(null);
+            dto.setDomicilios(auth0User.getDomicilios());
+            dto.setEsAuth0(true);
+            dto.setAuth0Id(auth0User.getSub());
+            return registrarClienteFlexible(dto);
         }
     }
-    // --- HU01: Actualizar datos desde Auth0 ---
+
     private ClienteDTO actualizarDatosAuth0(ClienteDTO clienteDTO, RegistroAuth0DTO auth0User) {
         boolean datosActualizados = false;
 
-        // Validar y actualizar nombre/apellido/email solo si son distintos
         if (!clienteDTO.getNombre().equals(auth0User.getGivenName())) {
             clienteDTO.setNombre(auth0User.getGivenName());
             datosActualizados = true;
         }
-
         if (!clienteDTO.getApellido().equals(auth0User.getFamilyName())) {
             clienteDTO.setApellido(auth0User.getFamilyName());
             datosActualizados = true;
         }
-
         if (!clienteDTO.getEmail().equals(auth0User.getEmail())) {
             usuarioService.validarEmailUnico(auth0User.getEmail());
             clienteDTO.setEmail(auth0User.getEmail());
             datosActualizados = true;
         }
-
         if (datosActualizados) {
             Cliente clienteEntity = clienteMapper.toEntity(clienteDTO);
             repo.save(clienteEntity);
         }
-
         return clienteDTO;
     }
-    // --- HU01: Crear cliente desde Auth0 ---
-    private ClienteDTO crearClienteDesdeAuth0(RegistroAuth0DTO auth0User) {
-        if (auth0User.getGivenName() == null || auth0User.getFamilyName() == null || auth0User.getEmail() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Los campos 'givenName', 'familyName' y 'email' son obligatorios para registro Auth0");
-        }
-
-        RegistroClienteDTO dto = new RegistroClienteDTO();
-        dto.setNombre(auth0User.getGivenName());
-        dto.setApellido(auth0User.getFamilyName());
-        dto.setEmail(auth0User.getEmail());
-        dto.setTelefono(null); // opcional
-        dto.setFechaNacimiento(null); // opcional
-        dto.setDomicilios(auth0User.getDomicilios());
-        dto.setEsAuth0(true);
-
-        return crearCliente(dto, true);
-    }
-
-
 }
