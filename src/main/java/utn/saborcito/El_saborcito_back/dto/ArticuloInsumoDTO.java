@@ -15,4 +15,5 @@ public class ArticuloInsumoDTO extends ArticuloDTO {
     private Integer stockMaximo;
     private Boolean esParaElaborar;
     private UnidadMedidaDTO unidadMedida; // Para mapear completo
+    private CategoriaDTO categoria;
 }
