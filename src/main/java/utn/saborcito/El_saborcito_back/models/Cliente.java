@@ -12,7 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
 public class Cliente extends Usuario {
 

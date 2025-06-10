@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import utn.saborcito.El_saborcito_back.dto.PedidoResumenPorClienteDTO;
 import utn.saborcito.El_saborcito_back.dto.ArticuloDTO;
 import utn.saborcito.El_saborcito_back.dto.ClienteRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.DetallePedidoDTO;
@@ -123,25 +124,32 @@ public class SucursalService {
         }
     }
 
-    public List<DetallePedidoDTO> getPedidosPorCliente(Long clienteId, LocalDate desde, LocalDate hasta) {
+    public List<PedidoResumenPorClienteDTO> getPedidosPorCliente(Long clienteId, LocalDate desde, LocalDate hasta) {
         List<Pedido> pedidos = pedidoRepository.findAllByCliente_IdAndFechaPedidoBetween(clienteId, desde, hasta);
 
         return pedidos.stream()
-        .flatMap(p -> p.getDetalles().stream())
-        .map(dp -> new DetallePedidoDTO(
-                dp.getId(),
-                dp.getCantidad(),
-                new ArticuloDTO(
-                    dp.getArticulo().getId(),
-                    dp.getArticulo().getDenominacion(),
-                    dp.getArticulo().getPrecioVenta(),
-                    null,       // categoriaId (podés ajustarlo si querés enviarlo)
-                    null,       // imagen (si no se necesita en este contexto)
-                    false,      // eliminado
-                    null        // fechaEliminacion
-                )
-        ))
-        .collect(Collectors.toList());
+                .map(pedido -> {
+                    List<DetallePedidoDTO> detallesDTO = pedido.getDetalles().stream().map(dp ->
+                            new DetallePedidoDTO(
+                                    dp.getId(),
+                                    dp.getCantidad(),
+                                    new ArticuloDTO(
+                                            dp.getArticulo().getId(),
+                                            dp.getArticulo().getDenominacion(),
+                                            dp.getArticulo().getPrecioVenta(),
+                                            null, null, false, null
+                                    )
+                            )
+                    ).collect(Collectors.toList());
+
+                    PedidoResumenPorClienteDTO dto = new PedidoResumenPorClienteDTO();
+                    dto.setIdPedido(pedido.getId());
+                    dto.setFechaPedido(pedido.getFechaPedido());
+                    dto.setTotal(pedido.getTotal());
+                    dto.setDetalles(detallesDTO);
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
 
@@ -178,8 +186,6 @@ public class SucursalService {
         }
     }
 
-    
-   
 
     public MovimientoMonetarioDTO getMovimientos(LocalDate desde, LocalDate hasta) {
         List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
@@ -197,37 +203,139 @@ public class SucursalService {
         return new MovimientoMonetarioDTO(ingresos, costos, ganancias);
     }
 
-
-
     public List<ClienteRankingDTO> getRankingClientes(LocalDate desde, LocalDate hasta, String ordenarPor) {
-    List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
+        try {
+            System.out.println("=== DEBUG RANKING CLIENTES ===");
+            System.out.println("Fecha desde: " + desde);
+            System.out.println("Fecha hasta: " + hasta);
+            System.out.println("Ordenar por: " + ordenarPor);
 
-    Map<Cliente, List<Pedido>> pedidosPorCliente = pedidos.stream()
-        .collect(Collectors.groupingBy(Pedido::getCliente));
+            // Buscar pedidos
+            List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
+            System.out.println("Cantidad de pedidos encontrados: " + pedidos.size());
 
-        List<ClienteRankingDTO> ranking = pedidosPorCliente.entrySet().stream()
-        .map(entry -> {
-            Cliente cliente = entry.getKey();
-            List<Pedido> pedidosCliente = entry.getValue();
-            long cantidad = pedidosCliente.size();
-            double total = pedidosCliente.stream().mapToDouble(Pedido::getTotal).sum();
-            return new ClienteRankingDTO(
-                cliente.getId(),
-                cliente.getNombre() + " " + cliente.getApellido(), // lo cambie porque cliente ya no tiene un usuario
-                cantidad,
-                total
-            );
-        })
-        .sorted((a, b) -> {
-            if ("importe".equalsIgnoreCase(ordenarPor)) {
-                return Double.compare(b.getTotalImporte(), a.getTotalImporte());
-            } else {
-                return Long.compare(b.getCantidadPedidos(), a.getCantidadPedidos());
+            if (pedidos.isEmpty()) {
+                System.out.println("No hay pedidos en el período especificado");
+                return new ArrayList<>();
             }
-        })
-        .collect(Collectors.toList());
 
-        return ranking;
+            // Filtrar pedidos con datos válidos
+            List<Pedido> pedidosValidos = pedidos.stream()
+                    .filter(pedido -> pedido != null && pedido.getCliente() != null)
+                    .collect(Collectors.toList());
+
+            System.out.println("Pedidos válidos: " + pedidosValidos.size());
+
+            if (pedidosValidos.isEmpty()) {
+                System.out.println("No hay pedidos válidos en el período");
+                return new ArrayList<>();
+            }
+
+            // Agrupar por ID de cliente (más confiable que por objeto Cliente)
+            Map<Long, List<Pedido>> pedidosPorClienteId = pedidosValidos.stream()
+                    .collect(Collectors.groupingBy(pedido -> pedido.getCliente().getId()));
+
+            System.out.println("Clientes únicos: " + pedidosPorClienteId.size());
+
+            // Crear DTOs agrupados correctamente
+            List<ClienteRankingDTO> ranking = pedidosPorClienteId.entrySet().stream()
+                    .map(entry -> {
+                        try {
+                            Long clienteId = entry.getKey();
+                            List<Pedido> pedidosCliente = entry.getValue();
+
+                            // Tomar el primer pedido para obtener datos del cliente
+                            Cliente cliente = pedidosCliente.get(0).getCliente();
+
+                            // Calcular totales
+                            long cantidadPedidos = pedidosCliente.size();
+
+                            // Sumar total de pedidos, calculando si es necesario
+                            double totalImporte = pedidosCliente.stream()
+                                    .mapToDouble(pedido -> {
+                                        if (pedido.getTotal() != null && pedido.getTotal() > 0) {
+                                            return pedido.getTotal();
+                                        } else {
+                                            // Calcular total desde detalles si el total es null o 0
+                                            return pedido.getDetalles() != null ?
+                                                    pedido.getDetalles().stream()
+                                                            .mapToDouble(detalle ->
+                                                                    (detalle.getArticulo().getPrecioVenta() != null ?
+                                                                            detalle.getArticulo().getPrecioVenta() : 0.0) *
+                                                                            detalle.getCantidad())
+                                                            .sum() : 0.0;
+                                        }
+                                    })
+                                    .sum();
+
+                            String nombreCompleto = construirNombreCompleto(cliente);
+
+                            System.out.println("Cliente: " + nombreCompleto + " - Pedidos: " + cantidadPedidos + " - Total: " + totalImporte);
+
+                            return new ClienteRankingDTO(
+                                    clienteId, // Usar Long directamente
+                                    nombreCompleto,
+                                    cantidadPedidos,
+                                    totalImporte
+                            );
+                        } catch (Exception e) {
+                            System.err.println("Error procesando cliente: " + e.getMessage());
+                            e.printStackTrace();
+                            return null;
+                        }
+                    })
+                    .filter(dto -> dto != null)
+                    .sorted((a, b) -> {
+                        try {
+                            if ("importe".equalsIgnoreCase(ordenarPor)) {
+                                return Double.compare(b.getTotalImporte(), a.getTotalImporte());
+                            } else {
+                                return Long.compare(b.getCantidadPedidos(), a.getCantidadPedidos());
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Error ordenando: " + e.getMessage());
+                            return 0;
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+            System.out.println("Ranking final generado con " + ranking.size() + " clientes únicos");
+            return ranking;
+
+        } catch (Exception e) {
+            System.err.println("ERROR GENERAL en getRankingClientes: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener ranking de clientes: " + e.getMessage(), e);
+        }
+    }
+
+    // Método helper para construir nombre completo de forma segura
+    private String construirNombreCompleto(Cliente cliente) {
+        try {
+            if (cliente == null) {
+                return "Cliente desconocido";
+            }
+
+            String nombre = cliente.getNombre();
+            String apellido = cliente.getApellido();
+
+            // Manejar casos de nombres/apellidos nulos o vacíos
+            if (nombre == null) nombre = "";
+            if (apellido == null) apellido = "";
+
+            String nombreCompleto = (nombre.trim() + " " + apellido.trim()).trim();
+
+            if (nombreCompleto.isEmpty()) {
+                return "Cliente #" + cliente.getId();
+            }
+
+            return nombreCompleto;
+
+        } catch (Exception e) {
+            System.err.println("Error construyendo nombre para cliente " +
+                    (cliente != null ? cliente.getId() : "null") + ": " + e.getMessage());
+            return "Cliente #" + (cliente != null ? cliente.getId() : "unknown");
+        }
     }
 
 

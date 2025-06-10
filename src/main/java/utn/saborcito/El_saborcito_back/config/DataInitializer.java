@@ -1311,7 +1311,7 @@
 //                         .articulo(pizzaCuatroQuesos)
 //                         .build());
 //             }
-
+//
              // Verificación: listar y mostrar entidades para probar interacciones
              // System.out.println("=== Verificación de datos cargados ===");
              // System.out.println("Paises: " + paisRepo.findAll());
