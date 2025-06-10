@@ -12,24 +12,26 @@ post {
 
 body:json {
   {
+    "auth0Id": null,
     "nombre": "Juan",
     "apellido": "Pérez",
-    "email": "juan.perez@example.com",
-    "password": "Password@123",
-    "confirmarPassword": "Password@123",
-    "telefono": "+541111111111",
-    "fechaNacimiento": "1990-01-01",
-    "esRegistroAuth0": false,
+    "telefono": "1122334455",
+    "email": "juan.perez@gmail.com",
+    "password": "Password@2024",
+    "confirmarPassword": "Password@2024",
+    "fechaNacimiento": "1995-06-01",
     "domicilios": [
       {
-        "calle": "Belgrano",
+        "calle": "Lavalle",
         "numero": "123",
-        "cp": "5500",
-        "localidad": {
-          "id": 1
-        },
+        "cp": "1A",
+        "localidad":{
+        "id":1
+      },
         "principal": true
       }
-    ]
+    ],
+    "esAuth0": false
   }
+  
 }

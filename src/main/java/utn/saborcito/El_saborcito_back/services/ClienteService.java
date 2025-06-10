@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.dto.*;
 import utn.saborcito.El_saborcito_back.enums.Rol;
 import utn.saborcito.El_saborcito_back.mappers.ClienteMapper;
+import utn.saborcito.El_saborcito_back.mappers.RegistroClienteMapper;
 import utn.saborcito.El_saborcito_back.models.Cliente;
 import utn.saborcito.El_saborcito_back.models.Domicilio;
 import utn.saborcito.El_saborcito_back.models.Localidad;
@@ -28,6 +29,7 @@ import java.util.Optional;
 public class ClienteService {
     private final ClienteRepository repo;
     private final ClienteMapper clienteMapper;
+    private final RegistroClienteMapper registroClienteMapper;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final UsuarioService usuarioService;
@@ -82,36 +84,26 @@ public class ClienteService {
     }
 
     private ClienteDTO crearCliente(RegistroClienteDTO dto) {
-        Usuario usuario = new Usuario();
-        usuario.setNombre(dto.getNombre());
-        usuario.setApellido(dto.getApellido());
-        usuario.setEmail(dto.getEmail());
-        usuario.setTelefono(dto.getTelefono());
-        usuario.setFechaNacimiento(dto.getFechaNacimiento());
-        usuario.setRol(Rol.CLIENTE);
-        usuario.setEstado(true);
-        usuario.setFechaRegistro(LocalDateTime.now());
+        Cliente cliente = registroClienteMapper.toEntity(dto);
 
         if (dto.getEsAuth0()) {
-            usuario.setAuth0Id(dto.getAuth0Id());
+            cliente.setAuth0Id(dto.getAuth0Id());
         } else {
-            usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
+            cliente.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
-        usuario = usuarioRepository.save(usuario);
+        cliente.setRol(Rol.CLIENTE);
+        cliente.setEstado(true);
+        cliente.setFechaRegistro(LocalDateTime.now());
+        cliente.setFechaUltimaModificacion(LocalDateTime.now());
 
         if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
+            usuarioService.procesarYValidarDomicilios(cliente, dto.getDomicilios());
+            cliente.setFechaUltimaModificacion(LocalDateTime.now());
         }
 
-        usuario.setFechaUltimaModificacion(LocalDateTime.now());
-        usuarioRepository.save(usuario);
-
-        Cliente cliente = new Cliente();
-        cliente.setId(usuario.getId());
-        cliente.setDomicilios(usuario.getDomicilios());
-        cliente.setHistorialPedidos(new ArrayList<>());
-        return clienteMapper.toDTO(repo.save(cliente));
+        cliente = repo.save(cliente);
+        return clienteMapper.toDTO(cliente);
     }
 
 
@@ -227,6 +219,7 @@ public class ClienteService {
         }
         if (!clienteDTO.getEmail().equals(auth0User.getEmail())) {
             usuarioService.validarEmailUnico(auth0User.getEmail());
+            usuarioService.isValidEmail(auth0User.getEmail());
             clienteDTO.setEmail(auth0User.getEmail());
             datosActualizados = true;
         }
