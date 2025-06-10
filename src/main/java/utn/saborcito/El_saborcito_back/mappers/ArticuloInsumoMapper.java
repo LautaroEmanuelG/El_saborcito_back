@@ -11,6 +11,7 @@ public interface ArticuloInsumoMapper extends BaseMapper<ArticuloInsumo, Articul
     @Override
     @Mapping(source = "imagen", target = "imagen") // mapear a imagen (ImagenDTO)
     @Mapping(source = "categoria.id", target = "categoriaId") // Para el campo heredado de ArticuloDTO
+    @Mapping(source = "categoria", target = "categoria") // Mapea el objeto completo
     @Mapping(source = "unidadMedida", target = "unidadMedida") // Campo específico de ArticuloInsumoDTO
     @Mapping(source = "eliminado", target = "eliminado")
     @Mapping(source = "fechaEliminacion", target = "fechaEliminacion")

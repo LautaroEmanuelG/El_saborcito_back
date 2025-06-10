@@ -146,6 +146,14 @@ public class ArticuloInsumoService {
             }
             insumoExistente.setEsParaElaborar(dto.getEsParaElaborar());
 
+            // <--- AQUÍ AGREGA ESTO --->
+            insumoExistente.setEliminado(dto.getEliminado() != null ? dto.getEliminado() : false);
+            if (dto.getEliminado() != null && dto.getEliminado()) {
+                insumoExistente.setFechaEliminacion(LocalDateTime.now());
+            } else {
+                insumoExistente.setFechaEliminacion(null);
+            }
+
             if (dto.getImagen() != null) {
                 Imagen imagen = imagenRepository.findById(dto.getImagen().getId())
                         .orElseThrow(
