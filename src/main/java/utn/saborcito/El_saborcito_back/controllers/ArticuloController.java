@@ -3,10 +3,15 @@ package utn.saborcito.El_saborcito_back.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import utn.saborcito.El_saborcito_back.dto.ArticuloDTO;
+import utn.saborcito.El_saborcito_back.dto.ProduccionAnalisisDTO;
+import utn.saborcito.El_saborcito_back.dto.ProduccionAnalisisRequestDTO;
 import utn.saborcito.El_saborcito_back.models.Articulo;
 import utn.saborcito.El_saborcito_back.services.ArticuloService;
+import utn.saborcito.El_saborcito_back.services.ArticuloManufacturadoService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/articulos")
@@ -14,6 +19,7 @@ import java.util.List;
 public class ArticuloController {
 
     private final ArticuloService service;
+    private final ArticuloManufacturadoService articuloManufacturadoService;
 
     @GetMapping
     public List<ArticuloDTO> getAll() {
@@ -59,5 +65,32 @@ public class ArticuloController {
     @DeleteMapping("/deleted/{id}")
     public void permanentDelete(@PathVariable Long id) {
         service.permanentDelete(id);
+    }
+
+    /**
+     * Endpoint para analizar si un conjunto de artículos manufacturados puede
+     * fabricarse.
+     * Este endpoint recibe un array de IDs de artículos manufacturados con sus
+     * cantidades,
+     * analiza si hay insumos suficientes para producirlos todos.
+     *
+     * Ejemplo: POST /api/articulos/analizar-produccion
+     *
+     * @param requestDTO Objeto con la lista de artículos y cantidades a analizar
+     * @return Objeto con el resultado del análisis de producción
+     */
+    @PostMapping("/analizar-produccion")
+    public ProduccionAnalisisDTO analizarProduccion(@RequestBody ProduccionAnalisisRequestDTO requestDTO) {
+        // Convertir la lista de objetos ArticuloCantidad a un mapa de ID -> cantidad
+        Map<Long, Integer> articulosMap = new HashMap<>();
+
+        for (ProduccionAnalisisRequestDTO.ArticuloCantidad articulo : requestDTO.getArticulos()) {
+            // Si ya existe el ID en el mapa, sumar las cantidades (para artículos
+            // repetidos)
+            articulosMap.merge(articulo.getArticuloId(), articulo.getCantidad(), Integer::sum);
+        }
+
+        // Llamar al servicio que hace el análisis real
+        return articuloManufacturadoService.analizarProduccion(articulosMap);
     }
 }
