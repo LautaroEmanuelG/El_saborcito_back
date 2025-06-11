@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import utn.saborcito.El_saborcito_back.dto.PedidoResumenPorClienteDTO;
 import jakarta.servlet.http.HttpServletResponse;
 import utn.saborcito.El_saborcito_back.dto.ClienteRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.DetallePedidoDTO;
@@ -16,6 +17,7 @@ import utn.saborcito.El_saborcito_back.dto.ProductoRankingConResumenDTO;
 import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.services.SucursalService;
+
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -32,13 +34,14 @@ public class SucursalController {
 
 
     @GetMapping("/pedidos-cliente")
-    public List<DetallePedidoDTO> getPedidosPorCliente(
-        @RequestParam Long clienteId,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+    public List<PedidoResumenPorClienteDTO> getPedidosPorCliente(
+            @RequestParam Long clienteId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
     ) {
         return service.getPedidosPorCliente(clienteId, desde, hasta);
     }
+
 
 
     @GetMapping("/exportar-ranking-clientes-excel")

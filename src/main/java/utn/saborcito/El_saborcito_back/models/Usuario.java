@@ -18,6 +18,7 @@ import java.util.List;
 @SuperBuilder
 @Inheritance(strategy = InheritanceType.JOINED) // O TABLE_PER_CLASS
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@EqualsAndHashCode(of = "id") // Solo usar ID para equals/hashCode
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,4 +42,5 @@ public class Usuario {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "imagen_id")
     private Imagen imagen;
+
 }
