@@ -7,7 +7,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -26,8 +25,15 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKeyString);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        try {
+            // Intentamos decodificar en Base64 primero
+            byte[] keyBytes = Decoders.BASE64.decode(secretKeyString);
+            this.key = Keys.hmacShaKeyFor(keyBytes);
+        } catch (Exception e) {
+            // Si falla la decodificación, usamos la clave directamente codificada en Base64
+            byte[] keyBytes = Base64.getEncoder().encode(secretKeyString.getBytes());
+            this.key = Keys.hmacShaKeyFor(keyBytes);
+        }
     }
 
     // Generar token con email y rol
@@ -48,8 +54,7 @@ public class JwtUtil {
                         .setSigningKey(key)
                         .build()
                         .parseClaimsJws(token)
-                        .getBody()
-        );
+                        .getBody());
     }
 
     // Extraer email
