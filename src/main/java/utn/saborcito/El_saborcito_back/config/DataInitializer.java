@@ -1223,29 +1223,117 @@
 //                     .fechaRegistro(LocalDateTime.now().minusDays(15))
 //                     .observacion("Historial de pedido anterior del cliente")
 //                     .build());
+//             // --- Pedidos de prueba para KANBAN MODULO COCINA ---
+//             for (int i = 1; i <= 4; i++) {
+//                 Pedido pedidoPendiente = pedidoRepo.save(Pedido.builder()
+//                         .estado(estadoPendiente)
+//                         .cliente(i % 2 == 0 ? cliente1 : cliente2)
+//                         .sucursal(sucursal)
+//                         .fechaPedido(LocalDate.now())
+//                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(30 + i * 5))
+//                         .tipoEnvio(i % 2 == 0 ? tipoDelivery : tipoLocal)
+//                         .formaPago(i % 2 == 0 ? formaPagoEfectivo : formaPagoTarjeta)
+//                         .build());
+//                 detallePedidoRepo.save(DetallePedido.builder()
+//                         .pedido(pedidoPendiente)
+//                         .cantidad(1 + i % 2)
+//                         .articulo(pizzaMozzarella)
+//                         .build());
+//             }
 //
-//             // Verificación: listar y mostrar entidades para probar interacciones
-//             // System.out.println("=== Verificación de datos cargados ===");
-//             // System.out.println("Paises: " + paisRepo.findAll());
-//             // System.out.println("Provincias: " + provinciaRepo.findAll());
-//             // System.out.println("Localidades: " + localidadRepo.findAll());
-//             // System.out.println("Usuarios: " + usuarioRepo.findAll());
-//             // System.out.println("Empresas: " + empresaRepo.findAll());
-//             // System.out.println("Domicilios: " + domicilioRepo.findAll());
-//             // System.out.println("Sucursales: " + sucursalRepo.findAll());
-//             // System.out.println("UnidadMedida: " + unidadMedidaRepo.findAll());
-//             // System.out.println("Categorias: " + categoriaRepo.findAll());
-//             // System.out.println("Imagenes: " + imagenRepo.findAll());
-//             // System.out.println("Insumos: " + articuloInsumoRepo.findAll());
-//             // System.out.println("Manufacturados: " + articuloManufacturadoRepo.findAll());
-//             // System.out.println("Detalles Manufacturado: " + amdRepo.findAll());
-//             // System.out.println("Promociones: " + promocionRepo.findAll());
-//             // System.out.println("Clientes: " + clienteRepo.findAll());
-//             // System.out.println("Pedidos: " + pedidoRepo.findAll());
-//             // System.out.println("DetallePedido: " + detallePedidoRepo.findAll());
-//             // System.out.println("Facturas: " + facturaRepo.findAll());
-//             // System.out.println("Datos MercadoPago: " + datosMPRepo.findAll());
-//             // System.out.println("Horarios: " + horarioRepo.findAll());
+//             for (int i = 1; i <= 2; i++) {
+//                 Pedido pedidoEnProceso = pedidoRepo.save(Pedido.builder()
+//                         .estado(estadoEnPreparacion)
+//                         .cliente(i % 2 == 0 ? cliente1 : cliente2)
+//                         .sucursal(sucursal)
+//                         .fechaPedido(LocalDate.now())
+//                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(40 + i * 5))
+//                         .tipoEnvio(tipoTakeAway)
+//                         .formaPago(formaPagoMercadoPago)
+//                         .build());
+//                 detallePedidoRepo.save(DetallePedido.builder()
+//                         .pedido(pedidoEnProceso)
+//                         .cantidad(2)
+//                         .articulo(hamburguesaBbq)
+//                         .build());
+//             }
+//
+//             for (int i = 1; i <= 2; i++) {
+//                 Pedido pedidoDemorado = pedidoRepo.save(Pedido.builder()
+//                         .estado(estadoListo) // Cambia a estadoDemorado si tienes uno, si no usa LISTO para simular
+//                         .cliente(i % 2 == 0 ? cliente1 : cliente2)
+//                         .sucursal(sucursal)
+//                         .fechaPedido(LocalDate.now())
+//                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(60 + i * 5))
+//                         .tipoEnvio(tipoDelivery)
+//                         .formaPago(formaPagoTransferencia)
+//                         .build());
+//                 detallePedidoRepo.save(DetallePedido.builder()
+//                         .pedido(pedidoDemorado)
+//                         .cantidad(1)
+//                         .articulo(pizzaPepperoni)
+//                         .build());
+//             }
+//
+//// Si tienes un estado DEMORADO, usa estadoDemorado, si no, crea uno arriba y úsalo aquí
+//             Estado estadoDemorado = estadoRepo.findByNombre("DEMORADO")
+//                     .orElseGet(() -> estadoRepo.save(Estado.builder().nombre("DEMORADO").build()));
+//             for (int i = 1; i <= 2; i++) {
+//                 Pedido pedidoDemorado = pedidoRepo.save(Pedido.builder()
+//                         .estado(estadoDemorado)
+//                         .cliente(i % 2 == 0 ? cliente1 : cliente2)
+//                         .sucursal(sucursal)
+//                         .fechaPedido(LocalDate.now())
+//                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(70 + i * 5))
+//                         .tipoEnvio(tipoTakeAway)
+//                         .formaPago(formaPagoEfectivo)
+//                         .build());
+//                 detallePedidoRepo.save(DetallePedido.builder()
+//                         .pedido(pedidoDemorado)
+//                         .cantidad(1)
+//                         .articulo(hamburguesaVegetariana)
+//                         .build());
+//             }
+//
+//             for (int i = 1; i <= 3; i++) {
+//                 Pedido pedidoListo = pedidoRepo.save(Pedido.builder()
+//                         .estado(estadoListo)
+//                         .cliente(i % 2 == 0 ? cliente1 : cliente2)
+//                         .sucursal(sucursal)
+//                         .fechaPedido(LocalDate.now())
+//                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(80 + i * 5))
+//                         .tipoEnvio(tipoLocal)
+//                         .formaPago(formaPagoTarjeta)
+//                         .build());
+//                 detallePedidoRepo.save(DetallePedido.builder()
+//                         .pedido(pedidoListo)
+//                         .cantidad(1)
+//                         .articulo(pizzaCuatroQuesos)
+//                         .build());
+//             }
+
+             // Verificación: listar y mostrar entidades para probar interacciones
+             // System.out.println("=== Verificación de datos cargados ===");
+             // System.out.println("Paises: " + paisRepo.findAll());
+             // System.out.println("Provincias: " + provinciaRepo.findAll());
+             // System.out.println("Localidades: " + localidadRepo.findAll());
+             // System.out.println("Usuarios: " + usuarioRepo.findAll());
+             // System.out.println("Empresas: " + empresaRepo.findAll());
+             // System.out.println("Domicilios: " + domicilioRepo.findAll());
+             // System.out.println("Sucursales: " + sucursalRepo.findAll());
+             // System.out.println("UnidadMedida: " + unidadMedidaRepo.findAll());
+             // System.out.println("Categorias: " + categoriaRepo.findAll());
+             // System.out.println("Imagenes: " + imagenRepo.findAll());
+             // System.out.println("Insumos: " + articuloInsumoRepo.findAll());
+             // System.out.println("Manufacturados: " + articuloManufacturadoRepo.findAll());
+             // System.out.println("Detalles Manufacturado: " + amdRepo.findAll());
+             // System.out.println("Promociones: " + promocionRepo.findAll());
+             // System.out.println("Clientes: " + clienteRepo.findAll());
+             // System.out.println("Pedidos: " + pedidoRepo.findAll());
+             // System.out.println("DetallePedido: " + detallePedidoRepo.findAll());
+             // System.out.println("Facturas: " + facturaRepo.findAll());
+             // System.out.println("Datos MercadoPago: " + datosMPRepo.findAll());
+             // System.out.println("Horarios: " + horarioRepo.findAll());
 //         };
 //     }
 // }
