@@ -1,0 +1,16 @@
+meta {
+  name: Login Manual Dado de Baja
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{API_BASE_URL}}/clientes/login/manual
+  body: json
+  auth: none
+}
+
+body:json {
+  { "email": "juan.perez@example.com", 
+   "password": "Password@2024" }
+}

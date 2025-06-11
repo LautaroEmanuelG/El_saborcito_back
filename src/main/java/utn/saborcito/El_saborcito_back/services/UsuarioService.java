@@ -115,12 +115,33 @@ public class UsuarioService {
 //    }
 
     // ✅ NUEVO: Login Auth0 (HU1 y HU2)
-    public UsuarioDTO loginAuth0(String email) {
-        Usuario usuario = repo.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no registrado"));
+    public UsuarioDTO loginClienteManual(LoginRequest dto) {
+        Usuario usuario = repo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos"));
+
         if (!usuario.getEstado()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario dado de baja");
         }
+
+        if (dto.getPassword() == null || !passwordEncoder.matches(dto.getPassword(), usuario.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
+        }
+
+        return usuarioMapper.toDTO(usuario);
+    }
+
+    public UsuarioDTO loginClienteAuth0(String email) {
+        Usuario usuario = repo.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no registrado"));
+
+        if (!usuario.getEstado()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario dado de baja");
+        }
+
+        if (usuario.getAuth0Id() == null || usuario.getAuth0Id().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este usuario no se autentica con Auth0");
+        }
+
         return usuarioMapper.toDTO(usuario);
     }
 
@@ -196,6 +217,7 @@ public class UsuarioService {
         validarUnSoloDomicilioPrincipal(usuario.getDomicilios());
         validarAlMenosUnPrincipal(usuario.getDomicilios());
     }
+
     // --- Métodos privados de validación (sin cambios) ---
     public boolean isValidEmail(String email) {
         return email != null && email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");

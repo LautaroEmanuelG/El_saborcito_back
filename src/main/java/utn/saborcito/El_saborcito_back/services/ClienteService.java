@@ -169,8 +169,12 @@ public class ClienteService {
 //        // ✅ HU2: Verificar estado activo (ya manejado en UsuarioService)
 //        return usuario;
 //    }
-    public UsuarioDTO loginCliente(LoginRequest loginRequest){
-        return usuarioService.loginAuth0(loginRequest.getEmail());
+    public UsuarioDTO loginClienteManual(LoginRequest dto) {
+        return usuarioService.loginClienteManual(dto);
+    }
+
+    public UsuarioDTO loginClienteAuth0(LoginRequest dto) {
+        return usuarioService.loginClienteAuth0(dto.getEmail());
     }
     // --- HU07: Baja lógica del cliente ---
     public void bajaLogicaCliente(Long id) {
