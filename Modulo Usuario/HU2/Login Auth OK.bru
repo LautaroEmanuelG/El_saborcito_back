@@ -1,0 +1,17 @@
+meta {
+  name: Login Auth OK
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{API_BASE_URL}}/clientes/login/auth0
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "email": "lucia.fernandez@gmail.com"
+      }
+}

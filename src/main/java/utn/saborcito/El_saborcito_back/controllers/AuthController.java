@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import utn.saborcito.El_saborcito_back.config.security.JwtUtil;
 import utn.saborcito.El_saborcito_back.dto.*;
 import utn.saborcito.El_saborcito_back.services.ClienteService;
 import utn.saborcito.El_saborcito_back.services.EmpleadoService;
@@ -15,6 +16,7 @@ public class AuthController {
 
     private final ClienteService clienteService;
     private final EmpleadoService empleadoService;
+    private final JwtUtil jwtUtil;
 
     // ✅ HU01 - Registro manual de cliente (o desde Auth0)
     @PostMapping("/clientes/registro")
@@ -24,10 +26,28 @@ public class AuthController {
     }
 
     // ✅ HU02 - Login cliente con Auth0 (solo valida que exista y esté activo)
-    @PostMapping("/clientes/auth0/login")
-    public ResponseEntity<UsuarioDTO> loginClienteAuth0(@RequestBody LoginRequest dto) {
-        UsuarioDTO usuario = clienteService.loginCliente(dto);
-        return ResponseEntity.ok(usuario);
+    @PostMapping("/clientes/login/auth0")
+    public ResponseEntity<AuthResponseDTO> loginClienteAuth0(@RequestBody LoginRequest dto) {
+        UsuarioDTO usuario = clienteService.loginClienteAuth0(dto);
+        String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().name());
+
+        return ResponseEntity.ok(AuthResponseDTO.builder()
+                .message("Login con Auth0 exitoso")
+                .token(token)
+                .usuario(usuario)
+                .build());
+    }
+
+    @PostMapping("/clientes/login/manual")
+    public ResponseEntity<AuthResponseDTO> loginClienteManual(@RequestBody LoginRequest dto) {
+        UsuarioDTO usuario = clienteService.loginClienteManual(dto);
+        String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().name());
+
+        return ResponseEntity.ok(AuthResponseDTO.builder()
+                .message("Login manual exitoso")
+                .token(token)
+                .usuario(usuario)
+                .build());
     }
 
     // ✅ HU01/HU02 - Registro o sincronización desde Auth0

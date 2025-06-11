@@ -1,6 +1,9 @@
 package utn.saborcito.El_saborcito_back.config.security;
 
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +12,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -18,6 +23,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,6 +36,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration {
     @Value("${auth0.audience}")
     private String audience;
@@ -39,19 +46,25 @@ public class SecurityConfiguration {
     private String corsAllowedOrigins;
     @Value("${spring.websecurity.debug:true}")
     boolean webSecurityDebug;
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 //    @Bean
 //    public InactivityTimeoutFilter inactivityTimeoutFilter(UsuarioRepository usuarioRepository) {
 //        return new InactivityTimeoutFilter(usuarioRepository);}
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf((csrf) -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .cors(withDefaults()) //por defecto spring va a buscar un bean con el nombre "corsConfigurationSource".
                 //.addFilterBefore(inactivityTimeoutFilter, BearerTokenAuthenticationFilter.class)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests                 //falta configurar bien los roles
                                 // Auth endpoints (públicos o semi-públicos)
-                                .requestMatchers("/api/**").permitAll()
+                               .requestMatchers("/api/**").permitAll()
+                               // .requestMatchers("/api/clientes/login/manual", "/api/clientes/login/auth0").permitAll()
+                               // .anyRequest().authenticated() //todo lo demás requiere autenticación
                                 .anyRequest().permitAll()
                 );
                 //.oauth2ResourceServer(oauth2 -> oauth2
