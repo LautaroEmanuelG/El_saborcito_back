@@ -5,31 +5,24 @@ meta {
 }
 
 put {
-  url: {{API_BASE_URL}}/clientes/25/actualizar-datos
+  url: {{API_BASE_URL}}/clientes/{id}/actualizar-datos
   body: json
   auth: none
 }
 
 body:json {
   {
+    "telefono": "3512345678",
+    "email": "juan.actualizado@example.com",
     "domicilios": [
       {
-       "id":23,
-        "calle": "Chubut",
-        "numero": "456",
-        "cp": "5500",
-        "localidad": { "id": 1 },
-        "principal": false
-      },
-      {
-        "id":24,
         "calle": "Mitre",
         "numero": "456",
-        "cp": "5500",
-        "localidad": { "id": 1 },
-        "principal": true
+        "departamento": "B"
       }
-    ]
+    ],
+    "nuevaPassword": "NuevaClave@2024",
+    "confirmarPassword": "NuevaClave@2024"
   }
   
 }

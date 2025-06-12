@@ -23,5 +23,4 @@ public class FacturaDTO {
     private FormaPagoDTO formaPago;
     private Double totalVenta;
     private PedidoDTO pedido; // Usamos PedidoDTO para evitar recursividad profunda
-    private String clienteEmail;
 }
