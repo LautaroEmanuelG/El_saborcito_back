@@ -1,0 +1,42 @@
+meta {
+  name: Actualizar Domicilios en Cliente
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{API_BASE_URL}}/clientes/24/actualizar-datos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "domicilios": [
+      {
+        "id": 14,
+        "calle": "Mitre",
+        "numero": "456",
+        "cp": "5500",
+        "localidad": { "id": 1 },
+        "principal": true
+      },
+      {
+        "id": 15,
+        "calle": "San Martín",
+        "numero": "789",
+        "cp": "5501",
+        "localidad": { "id": 1 },
+        "principal": false
+      },
+      {
+        "id": 16,
+        "calle": "Belgrano",
+        "numero": "123",
+        "cp": "5502",
+        "localidad": { "id": 1 },
+        "principal": false
+      }
+    ]
+  }
+}

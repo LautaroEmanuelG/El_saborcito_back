@@ -23,6 +23,7 @@ public class Domicilio implements Serializable {
     private Boolean principal; // Nuevo campo para marcar el domicilio principal
     // Muchos domicilios para un usuario
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("domicilios")
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
     // Muchos domicilios para una localidad

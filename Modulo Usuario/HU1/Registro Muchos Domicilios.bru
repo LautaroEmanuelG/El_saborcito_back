@@ -1,0 +1,44 @@
+meta {
+  name: Registro Muchos Domicilios
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{API_BASE_URL}}/clientes/registro
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "email": "juan.sosa@hotmail.com",
+    "password": "Password@2024",
+    "confirmarPassword": "Password@2024",
+    "telefono": "+5491112345678",
+    "fechaNacimiento": "1990-01-01",
+    "domicilios": [
+      {
+        "calle": "Barcelona",
+        "numero": "456",
+        "cp": "5500",
+        "localidad": { "id": 1 },
+        "principal": true
+      },
+      {
+        "calle": "San Luis",
+        "numero": "789",
+        "cp": "5501",
+        "localidad": { "id": 1 },
+        "principal": false
+      }
+    ],
+    "esAuth0": false
+  }
+}
