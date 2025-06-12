@@ -44,8 +44,13 @@ public class CategoriaService {
     public CategoriaDTO save(CategoriaDTO categoriaDTO) {
         Optional<Categoria> existente = repo.findByDenominacionIgnoreCase(categoriaDTO.getDenominacion());
         if (existente.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Ya existe una categoría con la denominación: " + categoriaDTO.getDenominacion());
+            if (existente.get().isEliminado()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Ya existe una categoría con ese nombre, pero está eliminada. Debe restaurarla o elegir otro nombre.");
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Ya existe una categoría activa con la denominación: " + categoriaDTO.getDenominacion());
+            }
         }
         Categoria categoria = categoriaMapper.toEntity(categoriaDTO);
         return categoriaMapper.toDTO(repo.save(categoria));
@@ -61,14 +66,20 @@ public class CategoriaService {
                     .findByDenominacionIgnoreCase(categoriaDTO.getDenominacion());
             if (otraCategoriaConMismaDenominacion.isPresent()
                     && !otraCategoriaConMismaDenominacion.get().getId().equals(id)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Ya existe otra categoría con la denominación: " + categoriaDTO.getDenominacion());
+                if (otraCategoriaConMismaDenominacion.get().isEliminado()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Ya existe una categoría con ese nombre, pero está eliminada. Debe restaurarla o elegir otro nombre.");
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Ya existe otra categoría activa con la denominación: " + categoriaDTO.getDenominacion());
+                }
             }
             categoriaExistente.setDenominacion(categoriaDTO.getDenominacion());
         }
         // Actualizar otros campos si los hubiera y fueran modificables
         // Ejemplo:
         // categoriaExistente.setDescripcion(categoriaDTO.getDescripcion());
+        // ...otros campos...
         return categoriaMapper.toDTO(repo.save(categoriaExistente));
     }
 

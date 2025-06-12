@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
+
     Optional<Categoria> findByDenominacionIgnoreCase(String denominacion);
 
     // Subcategorías directas de una categoría padre
