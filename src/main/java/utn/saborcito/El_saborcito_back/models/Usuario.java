@@ -37,6 +37,7 @@ public class Usuario {
     private LocalDateTime fechaRegistro;
     private LocalDateTime fechaUltimaModificacion;
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("usuario")
     @Builder.Default
     private List<Domicilio> domicilios = new ArrayList<>();
     @OneToOne(cascade = CascadeType.ALL)

@@ -68,11 +68,11 @@ public class ArticuloController {
     }
 
     /**
-     * Endpoint para analizar si un conjunto de artículos manufacturados puede
-     * fabricarse.
-     * Este endpoint recibe un array de IDs de artículos manufacturados con sus
-     * cantidades,
-     * analiza si hay insumos suficientes para producirlos todos.
+     * Endpoint para analizar si es posible producir un ticket completo.
+     * Este endpoint recibe un array de IDs de artículos con sus cantidades y
+     * analiza:
+     * 1. Para artículos manufacturados: si hay insumos suficientes para producirlos
+     * 2. Para artículos insumo (bebidas, etc.): si hay stock suficiente
      *
      * Ejemplo: POST /api/articulos/analizar-produccion
      *

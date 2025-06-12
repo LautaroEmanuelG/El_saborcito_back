@@ -111,12 +111,15 @@ public class ClienteService {
     public ClienteDTO updateCliente(Long id, ActualizarDatosClienteDTO dto) {
         Cliente clienteExistente = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
+
         Usuario usuario = clienteExistente;
 
+        // 1. Actualizar datos básicos del usuario
         if (dto.getNombre() != null) usuario.setNombre(dto.getNombre());
         if (dto.getApellido() != null) usuario.setApellido(dto.getApellido());
         if (dto.getTelefono() != null) usuario.setTelefono(dto.getTelefono());
 
+        // 2. Validar y actualizar email si cambia
         if (dto.getEmail() != null && !dto.getEmail().equals(usuario.getEmail())) {
             if (!usuarioService.isValidEmail(dto.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de email inválido");
@@ -125,17 +128,20 @@ public class ClienteService {
             usuario.setEmail(dto.getEmail());
         }
 
+        // 3. Procesar domicilios solo si vienen en la solicitud
         if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
             usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
         }
 
+        // 4. Si hay nueva contraseña, validar y cambiarla
         if (dto.getNuevaContraseña() != null && !dto.getNuevaContraseña().isBlank()) {
             validarCambioContrasena(usuario.getId(), dto);
             usuarioService.cambiarContrasena(usuario.getId(), dto.getNuevaContraseña());
-        } else {
-            usuario.setFechaUltimaModificacion(LocalDateTime.now());
-            usuarioRepository.save(usuario);
         }
+
+        // 5. Si no hay cambio de contraseña, actualizamos la fecha de modificación
+        usuario.setFechaUltimaModificacion(LocalDateTime.now());
+        usuarioRepository.save(usuario);
 
         return clienteMapper.toDTO(clienteExistente);
     }
