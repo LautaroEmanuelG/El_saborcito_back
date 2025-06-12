@@ -1,0 +1,26 @@
+meta {
+  name: Actualizar/Email Invalido
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{API_BASE_URL}}/clientes/{id}/actualizar-datos
+  body: text
+  auth: none
+}
+
+body:text {
+  {
+    "telefono": "3512345678",
+    "email": "correo-sin-arroba",
+    "domicilios": [
+      {
+        "calle": "Mitre",
+        "numero": "456",
+        "departamento": "B"
+      }
+    ]
+  }
+  
+}
