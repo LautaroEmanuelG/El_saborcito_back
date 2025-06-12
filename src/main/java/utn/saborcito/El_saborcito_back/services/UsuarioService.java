@@ -16,9 +16,7 @@ import utn.saborcito.El_saborcito_back.repositories.LocalidadRepository;
 import utn.saborcito.El_saborcito_back.repositories.UsuarioRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -187,30 +185,49 @@ public class UsuarioService {
     }
 
     public void procesarYValidarDomicilios(Usuario usuario, List<DomicilioDTO> domiciliosDTOs) {
-        if (usuario.getDomicilios() == null) {
+        if (domiciliosDTOs == null || domiciliosDTOs.isEmpty()) {
+            return; // No hay domicilios en la solicitud → no se hace nada
+        }
+
+        Map<Long, Domicilio> domiciliosExistentesMap = new HashMap<>();
+
+        // Cargar domicilios existentes si ya tiene
+        if (usuario.getDomicilios() != null) {
+            for (Domicilio d : usuario.getDomicilios()) {
+                if (d.getId() != null) {
+                    domiciliosExistentesMap.put(d.getId(), d);
+                }
+            }
+        } else {
             usuario.setDomicilios(new ArrayList<>());
         }
 
-        // Limpiar la lista existente y agregar nuevos datos
-        usuario.getDomicilios().clear();
+        // Procesar cada DTO y actualizar o crear
+        for (DomicilioDTO dto : domiciliosDTOs) {
+            Domicilio domicilio;
 
-        for (DomicilioDTO domicilioDTO : domiciliosDTOs) {
-            if (domicilioDTO.getCalle() != null && domicilioDTO.getLocalidad() != null &&
-                    domicilioDTO.getLocalidad().getId() != null) {
+            if (dto.getId() != null && domiciliosExistentesMap.containsKey(dto.getId())) {
+                // Existe → actualizar
+                domicilio = domiciliosExistentesMap.get(dto.getId());
+            } else {
+                // Nuevo → crear
+                domicilio = new Domicilio();
+                domicilio.setUsuario(usuario);
+            }
 
-                Localidad localidad = localidadRepository.findById(domicilioDTO.getLocalidad().getId())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Localidad no encontrada"));
+            Localidad localidad = localidadRepository.findById(dto.getLocalidad().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Localidad no encontrada"));
 
-                Domicilio nuevoDomicilio = new Domicilio();
-                nuevoDomicilio.setId(domicilioDTO.getId());
-                nuevoDomicilio.setCalle(domicilioDTO.getCalle());
-                nuevoDomicilio.setNumero(domicilioDTO.getNumero());
-                nuevoDomicilio.setCp(domicilioDTO.getCp());
-                nuevoDomicilio.setLocalidad(localidad);
-                nuevoDomicilio.setPrincipal(Boolean.TRUE.equals(domicilioDTO.getPrincipal()));
-                nuevoDomicilio.setUsuario(usuario);
+            // Actualizar campos
+            domicilio.setCalle(dto.getCalle());
+            domicilio.setNumero(dto.getNumero());
+            domicilio.setCp(dto.getCp());
+            domicilio.setLocalidad(localidad);
+            domicilio.setPrincipal(Boolean.TRUE.equals(dto.getPrincipal()));
 
-                usuario.getDomicilios().add(nuevoDomicilio);
+            // Solo agregar si es nuevo
+            if (domicilio.getId() == null) {
+                usuario.getDomicilios().add(domicilio);
             }
         }
 
