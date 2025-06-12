@@ -54,7 +54,9 @@ public class SucursalService {
     private final SucursalMapper sucursalMapper;
     private final DetallePedidoRepository detallePedidoRepo;
     private final PedidoRepository pedidoRepository;
-    
+    private final CalculadoraPedidoService calculadoraPedidoService; // Agregar esta dependencia
+
+
     public ResponseEntity<byte[]> exportarRankingProductosExcel(LocalDate desde, LocalDate hasta) {
         List<ProductoRankingDTO> ranking = getRankingProductos(desde, hasta).getProductos();
 
@@ -186,7 +188,6 @@ public class SucursalService {
         }
     }
 
-
     public MovimientoMonetarioDTO getMovimientos(LocalDate desde, LocalDate hasta) {
         List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
 
@@ -194,8 +195,9 @@ public class SucursalService {
                 .mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0)
                 .sum();
 
+        // Cambiar esta línea para usar directamente el campo total_costo de la BD
         double costos = pedidos.stream()
-                .mapToDouble(p -> p.calcularCostoTotal())
+                .mapToDouble(p -> p.getTotalCosto() != null && p.getTotalCosto() > 0 ? p.getTotalCosto() : 0.0)
                 .sum();
 
         double ganancias = ingresos - costos;
@@ -250,22 +252,10 @@ public class SucursalService {
                             // Calcular totales
                             long cantidadPedidos = pedidosCliente.size();
 
-                            // Sumar total de pedidos, calculando si es necesario
+                            // CAMBIO: Usar la misma lógica que getMovimientos()
+                            // Solo sumar pedidos que tienen total válido (distinto de null y mayor a 0)
                             double totalImporte = pedidosCliente.stream()
-                                    .mapToDouble(pedido -> {
-                                        if (pedido.getTotal() != null && pedido.getTotal() > 0) {
-                                            return pedido.getTotal();
-                                        } else {
-                                            // Calcular total desde detalles si el total es null o 0
-                                            return pedido.getDetalles() != null ?
-                                                    pedido.getDetalles().stream()
-                                                            .mapToDouble(detalle ->
-                                                                    (detalle.getArticulo().getPrecioVenta() != null ?
-                                                                            detalle.getArticulo().getPrecioVenta() : 0.0) *
-                                                                            detalle.getCantidad())
-                                                            .sum() : 0.0;
-                                        }
-                                    })
+                                    .mapToDouble(pedido -> pedido.getTotal() != null && pedido.getTotal() > 0 ? pedido.getTotal() : 0.0)
                                     .sum();
 
                             String nombreCompleto = construirNombreCompleto(cliente);
