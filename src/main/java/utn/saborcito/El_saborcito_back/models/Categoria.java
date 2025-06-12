@@ -25,4 +25,7 @@ public class Categoria {
     @ManyToOne
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;
+
+    // NUEVO: campo para baja lógica
+    private boolean eliminado = false;
 }

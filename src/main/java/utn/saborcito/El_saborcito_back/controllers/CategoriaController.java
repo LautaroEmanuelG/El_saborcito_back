@@ -14,9 +14,16 @@ public class CategoriaController {
 
     private final CategoriaService service;
 
+    // Listar solo categorías activas (no eliminadas)
     @GetMapping
     public List<CategoriaDTO> getAll() {
         return service.findAll();
+    }
+
+    // Listar solo categorías eliminadas
+    @GetMapping("/deleted")
+    public List<CategoriaDTO> getAllDeleted() {
+        return service.findAllDeleted();
     }
 
     @GetMapping("/{id}")
@@ -34,8 +41,15 @@ public class CategoriaController {
         return service.update(id, categoriaDTO);
     }
 
+    // Baja lógica (soft delete)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    // Restaurar categoría eliminada
+    @PostMapping("/deleted/{id}/restore")
+    public void restore(@PathVariable Long id) {
+        service.restore(id);
     }
 }
