@@ -5,9 +5,27 @@ meta {
 }
 
 put {
-  url: {{API_BASE_URL}}/clientes/{id}/actualizar-datos
-  body: text
+  url: {{API_BASE_URL}}/clientes/24/actualizar-datos
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "email": "juan.sosa@example.com",
+    "domicilios": [
+      {
+        "calle": "Mitre",
+        "numero": "456",
+        "cp": "5500",
+        "localidad": { "id": 1 },
+        "principal": true
+      }
+    ],
+    "contraseñaActual": "NuevaPass@2026",
+    "nuevaContraseña": "NuevaPass@2026",
+    "confirmarContraseña": "NuevaPass@2026"
+  }
 }
 
 body:text {
@@ -18,7 +36,7 @@ body:text {
       {
         "calle": "Mitre",
         "numero": "456",
-        "departamento": "B"
+        "cp": "B"
       }
     ],
     "nuevaPassword": "12345678",

@@ -9,6 +9,7 @@ import utn.saborcito.El_saborcito_back.dto.ArticuloManufacturadoDTO;
 import utn.saborcito.El_saborcito_back.dto.ArticuloManufacturadoDetalleDTO;
 import utn.saborcito.El_saborcito_back.dto.ImagenDTO;
 import utn.saborcito.El_saborcito_back.dto.ArticuloInsumoDTO;
+import utn.saborcito.El_saborcito_back.dto.ProduccionAnalisisDTO;
 import utn.saborcito.El_saborcito_back.mappers.ArticuloManufacturadoMapper;
 import utn.saborcito.El_saborcito_back.models.ArticuloInsumo;
 import utn.saborcito.El_saborcito_back.models.ArticuloManufacturado;
@@ -21,15 +22,17 @@ import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ArticuloManufacturadoService {
-
     private final ArticuloManufacturadoRepository repo;
     private final ArticuloManufacturadoMapper mapper;
     private final ImagenRepository imagenRepository;
@@ -354,5 +357,218 @@ public class ArticuloManufacturadoService {
             Integer stockActual = detalle.getArticuloInsumo().getStockActual();
             return stockActual != null && stockActual >= detalle.getCantidad();
         });
+    }
+
+    /**
+     * Analiza si se pueden fabricar varios artículos manufacturados y si hay stock
+     * suficiente para artículos insumo (bebidas, etc.) con las cantidades
+     * especificadas.
+     * 
+     * @param articulosConCantidad Mapa de ID de artículo a cantidad requerida
+     * @return DTO con el análisis completo de la producción
+     */
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public ProduccionAnalisisDTO analizarProduccion(Map<Long, Integer> articulosConCantidad) {
+        // Resultado final a devolver
+        ProduccionAnalisisDTO resultado = new ProduccionAnalisisDTO();
+
+        // Mapa para almacenar el consumo total de cada insumo
+        Map<Long, Integer> consumoTotalPorInsumo = new HashMap<>();
+
+        // Mapa para almacenar la cantidad máxima producible de cada artículo
+        Map<Long, Integer> maximoProducible = new HashMap<>();
+
+        // Lista de productos con problemas
+        List<ProduccionAnalisisDTO.ProductoProblemaDTO> productosConProblemas = new ArrayList<>();
+
+        // Lista de insumos insuficientes general
+        List<ProduccionAnalisisDTO.InsumoInsuficienteDTO> insumosInsuficientes = new ArrayList<>();
+
+        // Variable para controlar si se puede producir todo
+        boolean sePuedeProducirCompleto = true;
+
+        // Para cada artículo solicitado
+        for (Map.Entry<Long, Integer> entrada : articulosConCantidad.entrySet()) {
+            Long articuloId = entrada.getKey();
+            Integer cantidad = entrada.getValue();
+
+            // Primero intentamos buscar si es un artículo insumo (bebidas, condimentos,
+            // etc.)
+            ArticuloInsumo articuloInsumo = null;
+            try {
+                articuloInsumo = articuloInsumoRepository.findByIdNotDeleted(articuloId).orElse(null);
+
+                // Si encontramos el artículo insumo y NO es para elaboración (bebidas, etc.)
+                if (articuloInsumo != null && articuloInsumo.getEsParaElaborar() != null
+                        && !articuloInsumo.getEsParaElaborar()) {
+                    // Verificar si hay stock suficiente
+                    Integer stockActual = articuloInsumo.getStockActual();
+
+                    if (stockActual == null || stockActual < cantidad) {
+                        // No hay suficientes unidades
+                        sePuedeProducirCompleto = false;
+
+                        // Calcular cuántas unidades se pueden obtener con el stock actual
+                        int cantidadDisponible = stockActual != null ? stockActual : 0;
+
+                        // Registrar el producto con problema
+                        ProduccionAnalisisDTO.ProductoProblemaDTO problema = new ProduccionAnalisisDTO.ProductoProblemaDTO();
+                        problema.setId(articuloId);
+                        problema.setDenominacion(articuloInsumo.getDenominacion());
+                        problema.setCantidadSolicitada(cantidad);
+                        problema.setCantidadProducible(cantidadDisponible);
+
+                        // Registrar que el stock es insuficiente
+                        ProduccionAnalisisDTO.InsumoInsuficienteDTO insumoInsuficiente = new ProduccionAnalisisDTO.InsumoInsuficienteDTO();
+                        insumoInsuficiente.setId(articuloId);
+                        insumoInsuficiente.setDenominacion(articuloInsumo.getDenominacion());
+                        insumoInsuficiente.setStockActual(stockActual != null ? stockActual : 0);
+                        insumoInsuficiente.setStockRequerido(cantidad);
+                        insumoInsuficiente.setStockFaltante(cantidad - cantidadDisponible);
+
+                        List<ProduccionAnalisisDTO.InsumoInsuficienteDTO> insuficientesProducto = new ArrayList<>();
+                        insuficientesProducto.add(insumoInsuficiente);
+
+                        problema.setInsumosInsuficientes(insuficientesProducto);
+                        productosConProblemas.add(problema);
+                        insumosInsuficientes.add(insumoInsuficiente);
+
+                        // Registrar cantidad máxima disponible
+                        maximoProducible.put(articuloId, cantidadDisponible);
+                    } else {
+                        // Hay suficientes unidades
+                        maximoProducible.put(articuloId, cantidad);
+                    }
+
+                    // Ya hemos procesado este artículo, continuamos con el siguiente
+                    continue;
+                }
+            } catch (Exception e) {
+                // Si ocurrió una excepción al buscar el artículo insumo, lo registramos pero no
+                // detenemos el proceso
+                articuloInsumo = null;
+            }
+
+            // Si no es un artículo insumo o es un insumo para elaboración, intentamos con
+            // artículo manufacturado
+            ArticuloManufacturado manufacturado = null;
+            try {
+                if (articuloInsumo == null
+                        || (articuloInsumo.getEsParaElaborar() != null && articuloInsumo.getEsParaElaborar())) {
+                    manufacturado = repo.findByIdNotDeleted(articuloId).orElse(null);
+                }
+            } catch (Exception e) {
+                manufacturado = null;
+            }
+
+            // Si no encontramos ni artículo insumo ni manufacturado, o es un insumo para
+            // elaboración sin manufacturado
+            if ((articuloInsumo == null
+                    || (articuloInsumo.getEsParaElaborar() != null && articuloInsumo.getEsParaElaborar()))
+                    && manufacturado == null) {
+                // Si no existe el artículo, añadirlo como problema y continuar
+                ProduccionAnalisisDTO.ProductoProblemaDTO problema = new ProduccionAnalisisDTO.ProductoProblemaDTO();
+                problema.setId(articuloId);
+                problema.setDenominacion("Producto no encontrado");
+                problema.setCantidadSolicitada(cantidad);
+                problema.setCantidadProducible(0);
+                problema.setInsumosInsuficientes(new ArrayList<>());
+
+                productosConProblemas.add(problema);
+                sePuedeProducirCompleto = false;
+                maximoProducible.put(articuloId, 0);
+                continue;
+            }
+
+            // Si no tiene detalles, no se puede fabricar
+            if (manufacturado == null || manufacturado.getArticuloManufacturadoDetalles() == null
+                    || manufacturado.getArticuloManufacturadoDetalles().isEmpty()) {
+
+                String denominacion = manufacturado != null ? manufacturado.getDenominacion()
+                        : "Producto sin información";
+
+                ProduccionAnalisisDTO.ProductoProblemaDTO problema = new ProduccionAnalisisDTO.ProductoProblemaDTO();
+                problema.setId(articuloId);
+                problema.setDenominacion(denominacion);
+                problema.setCantidadSolicitada(cantidad);
+                problema.setCantidadProducible(0);
+                problema.setInsumosInsuficientes(new ArrayList<>());
+
+                productosConProblemas.add(problema);
+                sePuedeProducirCompleto = false;
+
+                // Almacenar que no se puede producir nada
+                maximoProducible.put(articuloId, 0);
+                continue;
+            }
+
+            // Lista de insumos insuficientes para este producto
+            List<ProduccionAnalisisDTO.InsumoInsuficienteDTO> insumosInsuficientesProducto = new ArrayList<>();
+
+            // Calcular la cantidad máxima que se puede producir
+            int cantidadMaxima = Integer.MAX_VALUE;
+
+            for (ArticuloManufacturadoDetalle detalle : manufacturado.getArticuloManufacturadoDetalles()) {
+                if (detalle.getArticuloInsumo() == null || detalle.getCantidad() == null) {
+                    continue;
+                }
+
+                ArticuloInsumo insumo = detalle.getArticuloInsumo();
+                Integer stockActual = insumo.getStockActual();
+                Integer cantidadNecesaria = detalle.getCantidad() * cantidad;
+
+                // Acumular consumo total de este insumo
+                consumoTotalPorInsumo.merge(insumo.getId(), cantidadNecesaria, Integer::sum);
+
+                if (stockActual == null || stockActual < cantidadNecesaria) {
+                    // Este insumo es insuficiente
+                    sePuedeProducirCompleto = false;
+
+                    // Calcular cuántas unidades se pueden producir con este insumo
+                    int cantidadPosible = stockActual != null ? stockActual / detalle.getCantidad() : 0;
+                    cantidadMaxima = Math.min(cantidadMaxima, cantidadPosible);
+
+                    // Registrar el insumo insuficiente
+                    ProduccionAnalisisDTO.InsumoInsuficienteDTO insumoInsuficiente = new ProduccionAnalisisDTO.InsumoInsuficienteDTO();
+                    insumoInsuficiente.setId(insumo.getId());
+                    insumoInsuficiente.setDenominacion(insumo.getDenominacion());
+                    insumoInsuficiente.setStockActual(stockActual != null ? stockActual : 0);
+                    insumoInsuficiente.setStockRequerido(cantidadNecesaria);
+                    insumoInsuficiente.setStockFaltante(cantidadNecesaria - (stockActual != null ? stockActual : 0));
+
+                    insumosInsuficientesProducto.add(insumoInsuficiente);
+                    insumosInsuficientes.add(insumoInsuficiente);
+                }
+            }
+
+            // Si cantidadMaxima sigue siendo Integer.MAX_VALUE, significa que no hay
+            // problemas para producir la cantidad solicitada
+            if (cantidadMaxima == Integer.MAX_VALUE) {
+                cantidadMaxima = cantidad;
+            }
+
+            // Almacenar la cantidad máxima que se puede producir
+            maximoProducible.put(articuloId, cantidadMaxima);
+
+            // Si hay problemas con este producto, registrarlo
+            if (!insumosInsuficientesProducto.isEmpty()) {
+                ProduccionAnalisisDTO.ProductoProblemaDTO problema = new ProduccionAnalisisDTO.ProductoProblemaDTO();
+                problema.setId(articuloId);
+                problema.setDenominacion(manufacturado.getDenominacion());
+                problema.setCantidadSolicitada(cantidad);
+                problema.setCantidadProducible(cantidadMaxima);
+                problema.setInsumosInsuficientes(insumosInsuficientesProducto);
+
+                productosConProblemas.add(problema);
+            }
+        }
+
+        // Completar el resultado
+        resultado.setSePuedeProducirCompleto(sePuedeProducirCompleto);
+        resultado.setProductosConProblemas(productosConProblemas);
+        resultado.setMaximoProducible(maximoProducible);
+        resultado.setInsumosInsuficientes(insumosInsuficientes);
+
+        return resultado;
     }
 }
