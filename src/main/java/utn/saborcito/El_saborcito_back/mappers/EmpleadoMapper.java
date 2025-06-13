@@ -2,14 +2,16 @@ package utn.saborcito.El_saborcito_back.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 import utn.saborcito.El_saborcito_back.dto.ActualizarDatosEmpleadoDTO;
 import utn.saborcito.El_saborcito_back.dto.EmpleadoDTO;
 import utn.saborcito.El_saborcito_back.models.Empleado;
 
 @Mapper(componentModel = "spring", uses = { SucursalMapper.class, DomicilioMapper.class })
 public interface EmpleadoMapper extends BaseMapper<Empleado, EmpleadoDTO> {
+    EmpleadoMapper INSTANCE = Mappers.getMapper(EmpleadoMapper.class);
     @Override
-    @Mapping(target = "sucursal", source = "sucursal")
+    @Mapping(target = "sucursal", source = "sucursal") //no entiendo porque sale dos veces
     EmpleadoDTO toDTO(Empleado empleado);
 
     @Override

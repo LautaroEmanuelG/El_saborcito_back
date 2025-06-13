@@ -70,11 +70,4 @@ public class AuthController {
         AuthEmpleadoResponseDTO response = empleadoService.validarEmpleadoAuth0(dto.getEmail());
         return ResponseEntity.ok(response);
     }
-
-    // ✅ HU01/HU02 - Registro o sincronización desde Auth0
-    @PostMapping("/empleados/auth0")
-    public ResponseEntity<EmpleadoDTO> registrarOActualizarDesdeAuth0Empleado(@RequestBody RegistroEmpleadoAuth0DTO dto) {
-        EmpleadoDTO empleado = empleadoService.sincronizarAuth0Usuario(dto);
-        return ResponseEntity.ok(empleado);
-    }
 }

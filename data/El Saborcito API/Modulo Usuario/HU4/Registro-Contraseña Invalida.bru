@@ -5,27 +5,33 @@ meta {
 }
 
 post {
-  url: {{API_BASE_URL}}/empleados/registrar
+  url: {{API_BASE_URL}}/empleados/registro
   body: json
   auth: none
 }
 
 body:json {
   {
-    "nombre": "Ana",
-    "apellido": "Gómez",
-    "email": "ana3@example.com",
+    "nombre": "Javier",
+    "apellido": "Méndez",
+    "email": "javier@example.com",
     "password": "12345678",
     "confirmarPassword": "12345678",
-    "telefono": "1122334455",
-    "rol": "COCINERO",
+    "telefono": "1133445566",
+    "rol": "DELIVERY",
+    "sucursal": {
+    "id": 1
+  },
     "domicilios": [
       {
-        "calle": "Italia",
+        "calle": "Belgrano",
         "numero": "789",
-        "departamento": "1C"
+        "cp": "3C",
+        "localidad": { "id": 1 },
+        "principal": true
       }
-    ]
+    ],
+    "esAuth0": false
   }
   
 }

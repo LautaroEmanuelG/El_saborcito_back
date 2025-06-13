@@ -18,6 +18,7 @@ public interface RegistroEmpleadoMapper {
     @Mapping(target = "primerLogin", constant = "true") // ✅ Según HU5
     @Mapping(target = "fechaIngreso", expression = "java(LocalDate.now())")
     @Mapping(target = "sucursal", ignore = true) // Se carga en servicio
+    @Mapping(target = "rol", ignore = true)
     @Mapping(target = "auth0Id", ignore = true) // ✅ Se asigna desde el servicio
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "legajo", ignore = true) // Se carga en servicio

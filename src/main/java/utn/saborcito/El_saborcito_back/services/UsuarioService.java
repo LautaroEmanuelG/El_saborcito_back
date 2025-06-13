@@ -184,33 +184,31 @@ public class UsuarioService {
         }
     }
 
+
     public void procesarYValidarDomicilios(Usuario usuario, List<DomicilioDTO> domiciliosDTOs) {
         if (domiciliosDTOs == null || domiciliosDTOs.isEmpty()) {
-            return; // No hay domicilios en la solicitud → no se hace nada
+            return;
         }
 
+        // Cargar domicilios existentes (si hay)
         Map<Long, Domicilio> domiciliosExistentesMap = new HashMap<>();
-
-        // Cargar domicilios existentes si ya tiene
         if (usuario.getDomicilios() != null) {
             for (Domicilio d : usuario.getDomicilios()) {
                 if (d.getId() != null) {
                     domiciliosExistentesMap.put(d.getId(), d);
                 }
             }
-        } else {
-            usuario.setDomicilios(new ArrayList<>());
         }
 
-        // Procesar cada DTO y actualizar o crear
+        // ⚠️ Lista temporal para validar antes de modificar el usuario
+        List<Domicilio> listaProcesada = new ArrayList<>();
+
         for (DomicilioDTO dto : domiciliosDTOs) {
             Domicilio domicilio;
 
             if (dto.getId() != null && domiciliosExistentesMap.containsKey(dto.getId())) {
-                // Existe → actualizar
                 domicilio = domiciliosExistentesMap.get(dto.getId());
             } else {
-                // Nuevo → crear
                 domicilio = new Domicilio();
                 domicilio.setUsuario(usuario);
             }
@@ -218,22 +216,23 @@ public class UsuarioService {
             Localidad localidad = localidadRepository.findById(dto.getLocalidad().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Localidad no encontrada"));
 
-            // Actualizar campos
             domicilio.setCalle(dto.getCalle());
             domicilio.setNumero(dto.getNumero());
             domicilio.setCp(dto.getCp());
             domicilio.setLocalidad(localidad);
-            domicilio.setPrincipal(Boolean.TRUE.equals(dto.getPrincipal()));
+            domicilio.setPrincipal(dto.getPrincipal() != null && dto.getPrincipal());
 
-            // Solo agregar si es nuevo
-            if (domicilio.getId() == null) {
-                usuario.getDomicilios().add(domicilio);
-            }
+            listaProcesada.add(domicilio);
         }
 
-        validarUnSoloDomicilioPrincipal(usuario.getDomicilios());
-        validarAlMenosUnPrincipal(usuario.getDomicilios());
+        // ✅ Validaciones solo una vez sobre la lista final simulada
+        validarUnSoloDomicilioPrincipal(listaProcesada);
+        validarAlMenosUnPrincipal(listaProcesada);
+
+        // 🟢 Todo válido: ahora sí, modificar al usuario
+        usuario.setDomicilios(listaProcesada);
     }
+
 
     // --- Métodos privados de validación (sin cambios) ---
     public boolean isValidEmail(String email) {

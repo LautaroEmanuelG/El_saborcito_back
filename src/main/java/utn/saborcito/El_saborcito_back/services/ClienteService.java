@@ -130,7 +130,7 @@ public class ClienteService {
 
         // 3. Procesar domicilios solo si vienen en la solicitud
         if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
+            usuarioService.procesarYValidarDomicilios(clienteExistente, dto.getDomicilios()); // o usuario
         }
 
         // 4. Si hay nueva contraseña, validar y cambiarla
