@@ -17,6 +17,8 @@ import utn.saborcito.El_saborcito_back.dto.ProductoRankingConResumenDTO;
 import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
 import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
 import utn.saborcito.El_saborcito_back.services.SucursalService;
+import utn.saborcito.El_saborcito_back.dto.PedidoGananciaDetalleDTO;
+import utn.saborcito.El_saborcito_back.dto.PedidoCostoDetalleDTO;
 
 
 import java.io.IOException;
@@ -124,6 +126,40 @@ public class SucursalController {
         return service.getRankingProductos(desde, hasta);
     }
 
+    @GetMapping("/detalle-ganancias")
+    public List<PedidoGananciaDetalleDTO> getDetalleGanancias(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+    ) {
+        return service.getDetalleGanancias(desde, hasta);
+    }
+
+    @GetMapping("/detalle-costos")
+    public List<PedidoCostoDetalleDTO> getDetalleCostos(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+    ) {
+        return service.getDetalleCostos(desde, hasta);
+    }
+
+    @GetMapping("/exportar-detalle-ganancias-excel")
+    public void exportarDetalleGananciasExcel(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            HttpServletResponse response
+    ) throws IOException {
+        service.exportarDetalleGananciasExcel(desde, hasta, response);
+    }
+
+    @GetMapping("/exportar-detalle-costos-excel")
+    public void exportarDetalleCostosExcel(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            HttpServletResponse response
+    ) throws IOException {
+        service.exportarDetalleCostosExcel(desde, hasta, response);
+    }
+
 
     @GetMapping
     public List<SucursalDTO> getAll() {
@@ -149,4 +185,6 @@ public class SucursalController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+
 }
