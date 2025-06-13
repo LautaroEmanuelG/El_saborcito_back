@@ -1312,28 +1312,28 @@
 //                         .build());
 //             }
 //
-             //  Verificación: listar y mostrar entidades para probar interacciones
-//              System.out.println("=== Verificación de datos cargados ===");
-//              System.out.println("Paises: " + paisRepo.findAll());
-//              System.out.println("Provincias: " + provinciaRepo.findAll());
-//              System.out.println("Localidades: " + localidadRepo.findAll());
-//              System.out.println("Usuarios: " + usuarioRepo.findAll());
-//              System.out.println("Empresas: " + empresaRepo.findAll());
-//              System.out.println("Domicilios: " + domicilioRepo.findAll());
-//              System.out.println("Sucursales: " + sucursalRepo.findAll());
-//              System.out.println("UnidadMedida: " + unidadMedidaRepo.findAll());
-//              System.out.println("Categorias: " + categoriaRepo.findAll());
-//              System.out.println("Imagenes: " + imagenRepo.findAll());
-//              System.out.println("Insumos: " + articuloInsumoRepo.findAll());
-//              System.out.println("Manufacturados: " + articuloManufacturadoRepo.findAll());
-//              System.out.println("Detalles Manufacturado: " + amdRepo.findAll());
-//              System.out.println("Promociones: " + promocionRepo.findAll());
-//              System.out.println("Clientes: " + clienteRepo.findAll());
-//              System.out.println("Pedidos: " + pedidoRepo.findAll());
-//              System.out.println("DetallePedido: " + detallePedidoRepo.findAll());
-//              System.out.println("Facturas: " + facturaRepo.findAll());
-//              System.out.println("Datos MercadoPago: " + datosMPRepo.findAll());
-//              System.out.println("Horarios: " + horarioRepo.findAll());
+//             //  Verificación: listar y mostrar entidades para probar interacciones
+////              System.out.println("=== Verificación de datos cargados ===");
+////              System.out.println("Paises: " + paisRepo.findAll());
+////              System.out.println("Provincias: " + provinciaRepo.findAll());
+////              System.out.println("Localidades: " + localidadRepo.findAll());
+////              System.out.println("Usuarios: " + usuarioRepo.findAll());
+////              System.out.println("Empresas: " + empresaRepo.findAll());
+////              System.out.println("Domicilios: " + domicilioRepo.findAll());
+////              System.out.println("Sucursales: " + sucursalRepo.findAll());
+////              System.out.println("UnidadMedida: " + unidadMedidaRepo.findAll());
+////              System.out.println("Categorias: " + categoriaRepo.findAll());
+////              System.out.println("Imagenes: " + imagenRepo.findAll());
+////              System.out.println("Insumos: " + articuloInsumoRepo.findAll());
+////              System.out.println("Manufacturados: " + articuloManufacturadoRepo.findAll());
+////              System.out.println("Detalles Manufacturado: " + amdRepo.findAll());
+////              System.out.println("Promociones: " + promocionRepo.findAll());
+////              System.out.println("Clientes: " + clienteRepo.findAll());
+////              System.out.println("Pedidos: " + pedidoRepo.findAll());
+////              System.out.println("DetallePedido: " + detallePedidoRepo.findAll());
+////              System.out.println("Facturas: " + facturaRepo.findAll());
+////              System.out.println("Datos MercadoPago: " + datosMPRepo.findAll());
+////              System.out.println("Horarios: " + horarioRepo.findAll());
 //         };
 //     }
 // }
