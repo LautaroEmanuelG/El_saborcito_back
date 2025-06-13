@@ -1,7 +1,7 @@
 meta {
-  name: Registro/Email Existente
+  name: Registro Rol Invalido
   type: http
-  seq: 4
+  seq: 8
 }
 
 post {
@@ -12,21 +12,21 @@ post {
 
 body:json {
   {
-    "nombre": "Rosa",
-    "apellido": "Torres",
-    "email": "rosa@example.com",
+    "nombre": "Pedro",
+    "apellido": "Ríos",
+    "email": "pedro@example.com",
     "password": "Empleado@2024",
     "confirmarPassword": "Empleado@2024",
-    "telefono": "1133445566",
-    "rol": "CAJERO",
+    "telefono": "1155667788",
+    "rol": "ADMIN",
     "sucursal": {
     "id": 1
   },
     "domicilios": [
       {
-        "calle": "Italia",
+        "calle": "Mitre",
         "numero": "321",
-        "cp": "4D",
+        "cp": "5E",
         "localidad": { "id": 1 },
         "principal": true
       }
@@ -38,23 +38,20 @@ body:json {
 
 body:text {
   {
-    "nombre": "Rosa",
-    "apellido": "Torres",
-    "email": "rosa@example.com",
+    "nombre": "Ana",
+    "apellido": "Gómez",
+    "email": "correo-sin-arroba",
     "password": "Empleado@2024",
     "confirmarPassword": "Empleado@2024",
-    "telefono": "1133445566",
-    "rol": "CAJERO",
+    "telefono": "1122334455",
+    "rol": "COCINERO",
     "domicilios": [
       {
         "calle": "Italia",
-        "numero": "321",
-        "cp": "4D",
-        "localidad": { "id": 1 },
-        "principal": true
+        "numero": "789",
+        "departamento": "1C"
       }
-    ],
-    "esAuth0": false
+    ]
   }
   
 }
