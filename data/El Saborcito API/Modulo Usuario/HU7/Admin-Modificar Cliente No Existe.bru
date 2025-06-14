@@ -1,11 +1,11 @@
 meta {
-  name: Admin/Modificar Cliente Sin Contraseña
+  name: Admin/Modificar Cliente No Existe
   type: http
-  seq: 1
+  seq: 5
 }
 
 put {
-  url: {{API_BASE_URL}}/clientes/admin/50
+  url: {{API_BASE_URL}}/clientes/admin/500
   body: json
   auth: none
 }
@@ -15,7 +15,7 @@ body:json {
     "nombre": "Juana",
     "apellido": "Pérez",
     "telefono": "2619999999",
-    "email": "pedro.gomeez@example.com",
+    "email": "juana.perez@correo.com",
     "estado": true
   }
   

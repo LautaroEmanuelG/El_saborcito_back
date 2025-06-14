@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,9 @@ import utn.saborcito.El_saborcito_back.mappers.ClienteMapper;
 import utn.saborcito.El_saborcito_back.services.ClienteService;
 import utn.saborcito.El_saborcito_back.services.UsuarioService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -45,18 +48,30 @@ public class ClienteController {
         return ResponseEntity.ok(clienteActualizado);
     }
 
-    // --- HU07: Baja lógica del cliente (desde Admin) ---
+    // --- HU7 Actualizacion de cliente por parte del administrador ---
+    @PutMapping("/admin/{id}")
+    public ResponseEntity<ClienteDTO> updateClienteAdmin(
+            @PathVariable Long id,
+            @RequestBody @Valid ActualizarClienteAdminDTO dto) {
+        ClienteDTO actualizado = service.updateClienteAdmin(id, dto);
+        return ResponseEntity.ok(actualizado);
+    }
 
+    // --- HU07: Baja lógica del cliente (desde Admin) ---
     @PatchMapping("/admin/{id}/baja")
-    public ResponseEntity<Void> bajaLogicaCliente(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> bajaLogicaCliente(@PathVariable Long id) {
         service.bajaLogicaCliente(id);
-        return ResponseEntity.noContent().build();
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", "Cliente dado de baja correctamente");
+        return ResponseEntity.ok(response); // 200 OK con mensaje JSON
     }
 
     // --- HU07: Alta lógica del cliente (desde Admin) ---
     @PatchMapping("/admin/{id}/alta")
-    public ResponseEntity<Void> altaCliente(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> altaCliente(@PathVariable Long id) {
         service.altaCliente(id);
-        return ResponseEntity.noContent().build();
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", "Cliente dado de alta correctamente");
+        return ResponseEntity.ok(response); // 200 OK con mensaje JSON
     }
 }

@@ -5,25 +5,20 @@ meta {
 }
 
 put {
-  url: {{API_BASE_URL}}/empleados/admin/{id}
+  url: {{API_BASE_URL}}/empleados/admin/35
   body: json
   auth: none
 }
 
 body:json {
   {
-    "nombre": "Ana",
-    "apellido": "Gómez Actualizada",
-    "email": "ana.actualizada@example.com",
-    "telefono": "1155667788",
+    "nombre": "Lucas",
+    "apellido": "Pérez",
+    "telefono": "2611234567",
+    "email": "lucas.perez@email.com",
     "rol": "COCINERO",
-    "domicilios": [
-      {
-        "calle": "Alsina",
-        "numero": "123",
-        "departamento": "PB"
-      }
-    ]
+    "estado": true,
+    "sucursalId": 1
   }
   
 }

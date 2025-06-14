@@ -1,11 +1,11 @@
 meta {
-  name: Admin/Modificar Empleado Email Invalido
+  name: Admin/Modificar Empleado Email Existente
   type: http
-  seq: 2
+  seq: 7
 }
 
 put {
-  url: {{API_BASE_URL}}/empleados/admin/41
+  url: {{API_BASE_URL}}/empleados/admin/29
   body: json
   auth: none
 }
@@ -14,7 +14,7 @@ body:json {
   {
     "nombre": "Ana",
     "apellido": "Gómez",
-    "email": "correo-invalido",
+    "email": "juan.juan@mail.com",
     "telefono": "1155667788",
     "rol": "COCINERO"
   }
