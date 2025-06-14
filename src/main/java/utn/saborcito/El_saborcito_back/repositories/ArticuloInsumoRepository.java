@@ -22,6 +22,10 @@ public interface ArticuloInsumoRepository extends JpaRepository<ArticuloInsumo, 
     @Query("SELECT ai FROM ArticuloInsumo ai WHERE ai.categoria.id = :categoriaId AND ai.eliminado = false")
     List<ArticuloInsumo> findAllByCategoria_Id(@Param("categoriaId") Long categoriaId);
 
+    // NUEVO: Traer todos los insumos de una categoría (sin importar si están eliminados)
+    @Query("SELECT ai FROM ArticuloInsumo ai WHERE ai.categoria.id = :categoriaId")
+    List<ArticuloInsumo> findAllByCategoria_IdAll(@Param("categoriaId") Long categoriaId);
+
     // Métodos para elementos no eliminados
     @Query("SELECT ai FROM ArticuloInsumo ai WHERE ai.eliminado = false")
     List<ArticuloInsumo> findAllNotDeleted();

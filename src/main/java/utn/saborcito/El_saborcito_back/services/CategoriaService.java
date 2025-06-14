@@ -8,8 +8,10 @@ import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.dto.CategoriaDTO;
 import utn.saborcito.El_saborcito_back.mappers.CategoriaMapper;
 import utn.saborcito.El_saborcito_back.models.ArticuloManufacturado;
+import utn.saborcito.El_saborcito_back.models.ArticuloInsumo;
 import utn.saborcito.El_saborcito_back.models.Categoria;
 import utn.saborcito.El_saborcito_back.repositories.ArticuloManufacturadoRepository;
+import utn.saborcito.El_saborcito_back.repositories.ArticuloInsumoRepository;
 import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,7 @@ public class CategoriaService {
     private final CategoriaRepository repo;
     private final CategoriaMapper categoriaMapper;
     private final ArticuloManufacturadoRepository articuloManufacturadoRepository;
+    private final ArticuloInsumoRepository articuloInsumoRepository;
 
     // Para GET /api/categorias
     public List<CategoriaDTO> findAll() {
@@ -89,7 +92,7 @@ public class CategoriaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "No se puede eliminar: Categoría no encontrada con ID: " + id));
 
-        // Eliminar artículos manufacturados de esta categoría y subcategorías recursivamente (soft delete)
+        // Eliminar artículos manufacturados e insumos de esta categoría y subcategorías recursivamente (soft delete)
         eliminarArticulosDeCategoriaYSubcategorias(categoria);
 
         // Baja lógica de la categoría
@@ -113,6 +116,13 @@ public class CategoriaService {
             articulo.setEliminado(true);
             articulo.setFechaEliminacion(LocalDateTime.now());
             articuloManufacturadoRepository.save(articulo);
+        }
+        // 1b. Eliminar insumos de esta categoría
+        List<ArticuloInsumo> insumos = articuloInsumoRepository.findAllByCategoria_IdAll(categoria.getId());
+        for (ArticuloInsumo insumo : insumos) {
+            insumo.setEliminado(true);
+            // Si tienes campo fechaEliminacion en insumo, setéalo aquí
+            articuloInsumoRepository.save(insumo);
         }
         // 2. Buscar subcategorías directas usando el método optimizado
         List<Categoria> subcategorias = repo.findAllByTipoCategoria_Id(categoria.getId());
