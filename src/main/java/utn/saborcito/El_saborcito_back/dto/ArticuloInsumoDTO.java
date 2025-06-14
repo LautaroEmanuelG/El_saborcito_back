@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ArticuloInsumoDTO extends ArticuloDTO {
     private Double precioCompra;
     private Integer stockActual;
-    private Integer stockMaximo;
+    private Integer stockMinimo; // Cambiado aquí
     private Boolean esParaElaborar;
     private UnidadMedidaDTO unidadMedida; // Para mapear completo
     private CategoriaDTO categoria;
