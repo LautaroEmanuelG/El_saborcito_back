@@ -55,6 +55,7 @@
 // import utn.saborcito.El_saborcito_back.models.HistorialPedido;
 // import utn.saborcito.El_saborcito_back.enums.Rol;
 // import utn.saborcito.El_saborcito_back.enums.DiaSemana;
+// import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
 //
 // import java.time.LocalDate;
 // import java.time.LocalDateTime;
@@ -203,38 +204,79 @@
 //
 //             // -- Categorías principales
 //             Categoria categoriaSandwiches = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Sandwiches").sucursal(sucursal).build());
+//                     Categoria.builder()
+//                             .denominacion("Sandwiches")
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.MANUFACTURADOS)
+//                             .build()
+//             );
 //             Categoria categoriaPizzas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Pizzas").sucursal(sucursal).build());
+//                     Categoria.builder()
+//                             .denominacion("Pizzas")
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.MANUFACTURADOS)
+//                             .build()
+//             );
 //             Categoria categoriaBebidas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Bebidas").sucursal(sucursal).build());
+//                     Categoria.builder()
+//                             .denominacion("Bebidas")
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
 //             Categoria categoriaInsumos = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Insumos").sucursal(sucursal).build());
+//                     Categoria.builder()
+//                             .denominacion("Insumos")
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
 //
-//             // -- Subcategorías
-//             // Subcategorías de Sandwiches
+//            // -- Subcategorías de Sandwiches
 //             Categoria categoriaHamburguesas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Hamburguesas")
+//                     Categoria.builder()
+//                             .denominacion("Hamburguesas")
 //                             .tipoCategoria(categoriaSandwiches)
-//                             .sucursal(sucursal).build());
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.MANUFACTURADOS)
+//                             .build()
+//             );
 //             Categoria categoriaLomos = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Lomos")
+//                     Categoria.builder()
+//                             .denominacion("Lomos")
 //                             .tipoCategoria(categoriaSandwiches)
-//                             .sucursal(sucursal).build());
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.MANUFACTURADOS)
+//                             .build()
+//             );
 //
-//             // Subcategorías de Bebidas
+//            // -- Subcategorías de Bebidas
 //             Categoria categoriaGaseosas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Gaseosas")
+//                     Categoria.builder()
+//                             .denominacion("Gaseosas")
 //                             .tipoCategoria(categoriaBebidas)
-//                             .sucursal(sucursal).build());
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
 //             Categoria categoriaAguas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Aguas")
+//                     Categoria.builder()
+//                             .denominacion("Aguas")
 //                             .tipoCategoria(categoriaBebidas)
-//                             .sucursal(sucursal).build());
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
 //             Categoria categoriaTragos = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Tragos")
+//                     Categoria.builder()
+//                             .denominacion("Tragos")
 //                             .tipoCategoria(categoriaBebidas)
-//                             .sucursal(sucursal).build());
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
+//
+//
 //
 //             // 5. Imágenes para cada tipo de producto
 //             Imagen imagenHamburguesa = imagenRepo
