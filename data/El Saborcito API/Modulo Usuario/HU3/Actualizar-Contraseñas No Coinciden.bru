@@ -5,9 +5,26 @@ meta {
 }
 
 put {
-  url: {{API_BASE_URL}}/clientes/{id}/actualizar-datos
-  body: text
+  url: {{API_BASE_URL}}/clientes/53/actualizar-datos
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "telefono": "3512345678",
+    "email": "juan.actualizado@example.com",
+    "domicilios": [
+      {
+        "calle": "Mitre",
+        "numero": "456",
+        "departamento": "B"
+      }
+    ],
+    "nuevaPassword": "NuevaClave@2024",
+    "confirmarPassword": "OtraClave@2024"
+  }
+  
 }
 
 body:text {

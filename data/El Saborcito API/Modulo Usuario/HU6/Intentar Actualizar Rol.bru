@@ -5,9 +5,16 @@ meta {
 }
 
 put {
-  url: {{API_BASE_URL}}/empleados/{id}
-  body: text
+  url: {{API_BASE_URL}}/empleados/45
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "rol": "ADMIN"
+  }
+  
 }
 
 body:text {

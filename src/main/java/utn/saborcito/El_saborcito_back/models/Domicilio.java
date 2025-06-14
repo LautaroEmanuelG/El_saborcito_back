@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,12 +20,14 @@ public class Domicilio implements Serializable {
     private String calle;
     private Integer numero;
     private String cp;
-    @Column(name = "es_principal")
-    private Boolean principal; // Nuevo campo para marcar el domicilio principal
+    private Double latitud;
+    private Double longitud;
     // Muchos domicilios para un usuario
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties("domicilios")
     @JoinColumn(name = "usuario_id")
+    @ToString.Exclude
+    @JsonBackReference
     private Usuario usuario;
     // Muchos domicilios para una localidad
     @ManyToOne(fetch = FetchType.LAZY)

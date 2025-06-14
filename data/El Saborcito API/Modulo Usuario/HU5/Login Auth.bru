@@ -1,18 +1,18 @@
 meta {
-  name: Login/Email Inexistente
+  name: Login Auth
   type: http
-  seq: 3
+  seq: 6
 }
 
 post {
-  url: {{API_BASE_URL}}/empleados/login/manual
+  url: {{API_BASE_URL}}/empleados/login/auth0
   body: json
   auth: none
 }
 
 body:json {
   {
-    "email": "noexiste@example.com",
+    "email": "rosa@example.com",
     "password": "Empleado@2024"
   }
   
@@ -20,7 +20,7 @@ body:json {
 
 body:text {
   {
-    "email": "noexiste@example.com",
+    "email": "ana.gomez@example.com",
     "password": "Empleado@2024"
   }
   

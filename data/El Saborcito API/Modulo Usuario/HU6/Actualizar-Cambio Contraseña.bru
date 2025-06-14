@@ -4,10 +4,19 @@ meta {
   seq: 2
 }
 
-put {
-  url: {{API_BASE_URL}}/empleados/{id}
-  body: text
+patch {
+  url: {{API_BASE_URL}}/empleados/45/cambiar-password
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "currentPassword": "NuevoEmpleado@2026",
+    "newPassword": "NuevoEmpleado@2027",
+    "confirmPassword": "NuevoEmpleado@2027"
+  }
+  
 }
 
 body:text {

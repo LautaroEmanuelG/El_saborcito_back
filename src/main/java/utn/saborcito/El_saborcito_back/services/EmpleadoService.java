@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.config.security.JwtUtil;
 import utn.saborcito.El_saborcito_back.dto.*;
 import utn.saborcito.El_saborcito_back.mappers.EmpleadoMapper;
 import utn.saborcito.El_saborcito_back.enums.Rol;
@@ -34,6 +35,7 @@ public class EmpleadoService {
     private final PasswordEncoder passwordEncoder;
     private final HorarioAtencionService horarioAtencionService;
     private final UsuarioService usuarioService;
+    private final JwtUtil jwtUtil;
 
     public List<EmpleadoDTO> findAll() {
         return empleadoRepository.findAll().stream()
@@ -47,14 +49,6 @@ public class EmpleadoService {
         return empleadoMapper.toDTO(empleado);
     }//deberia cambiar los dos metodos anteriores para que se parezcan a clienteservice?
 
-    public Optional<EmpleadoDTO> findByAuth0Id(String auth0Id) {
-        return usuarioService.findByAuth0Id(auth0Id)
-                .map(usuarioDTO -> {
-                    Empleado emp = empleadoRepository.findById(usuarioDTO.getId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado con Auth0 ID: " + auth0Id));
-                    return empleadoMapper.toDTO(emp);
-                });
-    }
     // ✅ Registro flexible (manual o Auth0)
     public EmpleadoDTO registrarEmpleadoFlexible(RegistroEmpleadoDTO dto) {
         usuarioService.validarEmailUnico(dto.getEmail());
@@ -99,10 +93,7 @@ public class EmpleadoService {
         emp.setFechaUltimaModificacion(LocalDateTime.now());
         emp.setFechaIngreso(LocalDate.now());
         emp.setLegajo(generarLegajo(dto.getNombre(), dto.getApellido()));
-        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            usuarioService.procesarYValidarDomicilios(emp, dto.getDomicilios());
-            emp.setFechaUltimaModificacion(LocalDateTime.now());
-        }
+        emp.setDomicilios(new ArrayList<>());
         if (dto.getSucursal() != null && dto.getSucursal().getId() != null) {
             Sucursal sucursal = sucursalRepository.findById(dto.getSucursal().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sucursal no encontrada"));
@@ -129,9 +120,6 @@ public class EmpleadoService {
             usuarioService.validarEmailUnico(dto.getEmail());
             usuario.setEmail(dto.getEmail());
         }
-        if(dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()){
-            usuarioService.procesarYValidarDomicilios(empleadoExistente, dto.getDomicilios()); //o usuario
-        }
         usuario.setFechaUltimaModificacion(LocalDateTime.now());
         empleadoRepository.save(empleadoExistente);
         return empleadoMapper.toDTO(empleadoExistente);
@@ -141,6 +129,13 @@ public class EmpleadoService {
         Empleado empleado = empleadoRepository.findById(empleadoId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado"));
         Usuario usuario = empleado;
+
+        if (dto.getRol() != null) {
+            if (dto.getRol().equals(Rol.ADMIN)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No se puede asignar el rol ADMIN desde este endpoint.");
+            }
+            usuario.setRol(dto.getRol());
+        }
 
         if (dto.getEmail() != null && !dto.getEmail().equals(usuario.getEmail())) {
             usuarioService.validarEmailUnico(dto.getEmail());
@@ -161,37 +156,10 @@ public class EmpleadoService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sucursal no encontrada"));
             empleado.setSucursal(sucursal);
         }
-
-        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
-        }
-
         usuario.setFechaUltimaModificacion(LocalDateTime.now());
         usuarioRepository.save(usuario);
         empleadoRepository.save(empleado);
         return empleadoMapper.toDTO(empleado);
-    }
-
-    public AuthEmpleadoResponseDTO validarEmpleadoAuth0(String email) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No encontrado"));
-
-        if (!usuario.getEstado()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Empleado dado de baja");
-        }
-
-        Empleado empleado = empleadoRepository.findById(usuario.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "No es un empleado válido"));
-
-        validarHorarioLaboral(empleado);
-
-        boolean esPrimeraVez = usuario.getFechaUltimaModificacion() == null;
-
-        return AuthEmpleadoResponseDTO.builder()
-                .mensaje(esPrimeraVez ? "Debe cambiar su contraseña" : "Inicio de sesión exitoso")
-                .cambioRequerido(esPrimeraVez)
-                .empleado(empleadoMapper.toDTO(empleado))
-                .build();
     }
 
     public void toggleEstado(Long empleadoId) {
@@ -202,6 +170,11 @@ public class EmpleadoService {
     }
 
     public void cambiarPassword(Long usuarioId, CambiarPasswordDTO dto) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado con ID: " + usuarioId));
+        if (dto.getCurrentPassword() == null || !passwordEncoder.matches(dto.getCurrentPassword(), usuario.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña actual incorrecta");
+        }
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden");
         }
@@ -209,18 +182,8 @@ public class EmpleadoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La contraseña debe tener al menos 8 caracteres, una mayúscula, minúscula y símbolo.");
         }
-        usuarioService.cambiarContrasena(usuarioId, dto.getNewPassword());
-    }
 
-    public void validarHorarioLaboral(Empleado empleado) {
-        if (empleado.getSucursal() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El empleado no tiene una sucursal asignada.");
-        }
-        List<HorarioAtencionDTO> horarios =
-                horarioAtencionService.getHorariosDeSucursal(empleado.getSucursal().getId());
-        if (!horarioAtencionService.estaEnHorarioLaboral(horarios)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Fuera del horario laboral. Acceso denegado.");
-        }
+        usuarioService.cambiarContrasena(usuarioId, dto.getNewPassword());
     }
 
     private String generarLegajo(String nombre, String apellido) {
@@ -232,13 +195,44 @@ public class EmpleadoService {
                 System.currentTimeMillis() % 10000;
     }
 
+    public AuthEmpleadoResponseDTO loginEmpleadoManual(LoginRequest dto) {
+        // 1. Buscar al usuario por email
+        Usuario usuario = usuarioRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos"));
 
-    public UsuarioDTO loginEmpleadoManual(LoginRequest dto){
-        return usuarioService.loginClienteManual(dto);
+        // 2. Validar estado (baja/lógica)
+        if (!usuario.getEstado()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Empleado dado de baja");
+        }
+
+        // 3. Validar que sea realmente un EMPLEADO
+        if (!(usuario instanceof Empleado)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No es un empleado válido");
+        }
+        Empleado empleado = (Empleado) usuario;
+
+        // 4. Validar contraseña
+        if (dto.getPassword() == null || !passwordEncoder.matches(dto.getPassword(), usuario.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
+        }
+
+        // 6. Verificar si es primer login
+        boolean esPrimeraVez = Boolean.TRUE.equals(empleado.getPrimerLogin());
+
+        // 7. Generar token JWT solo si ya cambió la contraseña
+        String token = null;
+        if (!esPrimeraVez) {
+            token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().name());
+        }
+
+        return AuthEmpleadoResponseDTO.builder()
+                .mensaje(esPrimeraVez ? "Debe cambiar su contraseña" : "Inicio de sesión exitoso")
+                .cambioRequerido(esPrimeraVez)
+                .empleado(empleadoMapper.toDTO(empleado))
+                .token(token)
+                .build();
     }
-    public UsuarioDTO loginEmpleadoAuth0(LoginRequest dto) {
-        return usuarioService.loginClienteAuth0(dto.getEmail());
-    }
+
     public void bajaLogicaEmpleado(Long id){
         Empleado empleado = empleadoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado con ID: " + id));

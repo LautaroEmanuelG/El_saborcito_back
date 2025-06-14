@@ -96,12 +96,7 @@ public class ClienteService {
         cliente.setEstado(true);
         cliente.setFechaRegistro(LocalDateTime.now());
         cliente.setFechaUltimaModificacion(LocalDateTime.now());
-
-        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            usuarioService.procesarYValidarDomicilios(cliente, dto.getDomicilios());
-            cliente.setFechaUltimaModificacion(LocalDateTime.now());
-        }
-
+        cliente.setDomicilios(new ArrayList<>());
         cliente = repo.save(cliente);
         return clienteMapper.toDTO(cliente);
     }
@@ -126,11 +121,6 @@ public class ClienteService {
             }
             usuarioService.validarEmailUnico(dto.getEmail());
             usuario.setEmail(dto.getEmail());
-        }
-
-        // 3. Procesar domicilios solo si vienen en la solicitud
-        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            usuarioService.procesarYValidarDomicilios(clienteExistente, dto.getDomicilios()); // o usuario
         }
 
         // 4. Si hay nueva contraseña, validar y cambiarla

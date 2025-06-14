@@ -1,0 +1,25 @@
+meta {
+  name: Actualizar Domicilio
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{API_BASE_URL}}/domicilios/usuarios/52/update/61
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "calle": "Belgrano",
+    "numero": "456",
+    "cp": "5501",
+    "latitud": -32.89056,
+    "longitud": -68.84483,
+    "localidad": {
+      "id": 1
+    }
+  }
+  
+}

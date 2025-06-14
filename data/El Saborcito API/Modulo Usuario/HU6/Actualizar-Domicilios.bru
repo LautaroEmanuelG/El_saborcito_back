@@ -1,0 +1,32 @@
+meta {
+  name: Actualizar/Domicilios
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{API_BASE_URL}}/empleados/45
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+          "domicilios": [
+            {
+              "calle": "San Martín",
+              "numero": "789",
+              "cp": "5500",
+              "localidad": { "id": 1 },
+              "principal": true
+            },
+            {
+              "calle": "Belgrano",
+              "numero": "123",
+              "cp": "5501",
+              "localidad": { "id": 1 },
+              "principal": false
+            }
+          ]
+        }
+}

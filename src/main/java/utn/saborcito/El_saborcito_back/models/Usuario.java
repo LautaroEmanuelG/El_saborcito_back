@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,6 +39,8 @@ public class Usuario {
     private LocalDateTime fechaUltimaModificacion;
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("usuario")
+    @ToString.Exclude
+    @JsonBackReference
     @Builder.Default
     private List<Domicilio> domicilios = new ArrayList<>();
     @OneToOne(cascade = CascadeType.ALL)

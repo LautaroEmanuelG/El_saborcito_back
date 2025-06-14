@@ -5,14 +5,22 @@ meta {
 }
 
 post {
-  url: {{API_BASE_URL}}/empleados/login
-  body: text
+  url: {{API_BASE_URL}}/empleados/login/manual
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "email": "juan.martinez@example.com",
+    "password": "Password@123"
+  }
+  
 }
 
 body:text {
   {
-    "email": "nuevo.empleado@example.com",
+    "email": "empleado.nuevo@example.com",
     "password": "Empleado@2024"
   }
   
