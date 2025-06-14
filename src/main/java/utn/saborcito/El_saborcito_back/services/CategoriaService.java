@@ -56,6 +56,14 @@ public class CategoriaService {
             }
         }
         Categoria categoria = categoriaMapper.toEntity(categoriaDTO);
+
+        // Copiar tipo del padre si es subcategoría
+        if (categoria.getTipoCategoria() != null) {
+            Categoria padre = repo.findById(categoria.getTipoCategoria().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoría padre no encontrada"));
+            categoria.setTipo(padre.getTipo());
+        }
+
         return categoriaMapper.toDTO(repo.save(categoria));
     }
 
@@ -79,10 +87,15 @@ public class CategoriaService {
             }
             categoriaExistente.setDenominacion(categoriaDTO.getDenominacion());
         }
-        // Actualizar otros campos si los hubiera y fueran modificables
-        // Ejemplo:
-        // categoriaExistente.setDescripcion(categoriaDTO.getDescripcion());
-        // ...otros campos...
+
+        // Si se cambia el padre, actualizar el tipo
+        if (categoriaDTO.getTipoCategoria() != null) {
+            Categoria padre = repo.findById(categoriaDTO.getTipoCategoria().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoría padre no encontrada"));
+            categoriaExistente.setTipoCategoria(padre);
+            categoriaExistente.setTipo(padre.getTipo());
+        }
+
         return categoriaMapper.toDTO(repo.save(categoriaExistente));
     }
 
