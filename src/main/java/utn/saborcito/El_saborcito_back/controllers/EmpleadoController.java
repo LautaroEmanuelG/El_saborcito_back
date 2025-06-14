@@ -34,16 +34,18 @@ public class EmpleadoController {
             return ResponseEntity.notFound().build();
         }
     }
+
     // --- HU8: Obtener empleado por ID ---
     @GetMapping("/{id}")
     public ResponseEntity<EmpleadoDTO> getById(@PathVariable Long id) {
         EmpleadoDTO empleadoDTO = service.findById(id);
         if (empleadoDTO != null) {
-        return ResponseEntity.ok(empleadoDTO);
+            return ResponseEntity.ok(empleadoDTO);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
     // --- HU8 Obtener los roles de un empleado ---
     @GetMapping("/admin/roles")
     public ResponseEntity<List<Rol>> getRolesDisponibles() {
@@ -85,6 +87,7 @@ public class EmpleadoController {
         service.cambiarPassword(id, dto);
         return ResponseEntity.noContent().build();
     }
+
     // --- HU08: Baja lógica del empleado (desde Admin) ---
     @PatchMapping("/admin/{id}/baja")
     public ResponseEntity<Map<String, String>> bajaLogicaEmpleado(@PathVariable Long id) {
@@ -98,6 +101,5 @@ public class EmpleadoController {
         service.altaEmpleado(id);
         return ResponseEntity.ok(Map.of("mensaje", "Empleado dado de alta correctamente"));
     }
-
 
 }
