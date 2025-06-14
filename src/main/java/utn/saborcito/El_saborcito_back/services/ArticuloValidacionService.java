@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ArticuloValidacionService {
 
-    private final ArticuloRepository articuloRepository;
     private final ArticuloInsumoRepository articuloInsumoRepository;
     private final ArticuloManufacturadoRepository articuloManufacturadoRepository;
     private final PromocionRepository promocionRepository;
+    private final ProduccionAnalisisService produccionAnalisisService;
 
     /**
      * 🎯 Busca y valida un artículo por ID
@@ -111,6 +111,7 @@ public class ArticuloValidacionService {
 
     /**
      * 🏭 Valida que un artículo manufacturado se pueda producir
+     * Usa el servicio unificado para evitar duplicación
      * 
      * @param manufacturado      El artículo manufacturado
      * @param cantidadSolicitada Cantidad solicitada
@@ -123,19 +124,14 @@ public class ArticuloValidacionService {
                             " no tiene receta definida");
         }
 
-        // Validar stock de cada insumo necesario
-        for (ArticuloManufacturadoDetalle detalle : manufacturado.getArticuloManufacturadoDetalles()) {
-            ArticuloInsumo insumo = detalle.getArticuloInsumo();
-            Integer cantidadNecesaria = detalle.getCantidad() * cantidadSolicitada;
+        // Usar el servicio unificado para la validación
+        boolean sePuedeProducir = produccionAnalisisService.puedeProducirseManufacturado(manufacturado,
+                cantidadSolicitada);
 
-            if (insumo.getStockActual() == null || insumo.getStockActual() < cantidadNecesaria) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Stock insuficiente del insumo " + insumo.getDenominacion() +
-                                " para fabricar " + manufacturado.getDenominacion() +
-                                ". Stock disponible: " + (insumo.getStockActual() != null ? insumo.getStockActual() : 0)
-                                +
-                                ", cantidad necesaria: " + cantidadNecesaria);
-            }
+        if (!sePuedeProducir) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No se puede fabricar " + cantidadSolicitada + " unidades de " +
+                            manufacturado.getDenominacion() + " por falta de insumos");
         }
     }
 

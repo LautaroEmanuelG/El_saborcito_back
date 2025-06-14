@@ -8,15 +8,20 @@ import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.models.*;
 import utn.saborcito.El_saborcito_back.repositories.ArticuloInsumoRepository;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 📦 Servicio para el manejo de stock de insumos
- * Centraliza toda la lógica de descuento y validación de stock
+ * Centraliza el descuento de stock, pero usa ProduccionAnalisisService para
+ * validaciones
  */
 @Service
 @RequiredArgsConstructor
 public class StockService {
 
     private final ArticuloInsumoRepository articuloInsumoRepository;
+    private final ProduccionAnalisisService produccionAnalisisService;
 
     /**
      * Descuenta stock para un pedido completo
@@ -30,7 +35,7 @@ public class StockService {
                     "No se puede descontar stock: el pedido no tiene detalles");
         }
 
-        // Primero validar que hay suficiente stock
+        // Validar que hay suficiente stock usando el servicio unificado
         validarStockSuficiente(pedido);
 
         // Luego descontar
@@ -45,48 +50,25 @@ public class StockService {
 
     /**
      * Valida que hay suficiente stock antes de procesar el pedido
+     * Usa el servicio unificado de producción para evitar duplicación
      * 
      * @param pedido El pedido a validar
      */
     private void validarStockSuficiente(Pedido pedido) {
+        // Convertir el pedido a formato Map para usar el servicio unificado
+        Map<Long, Integer> articulosMap = new HashMap<>();
+
         for (DetallePedido detalle : pedido.getDetalles()) {
-            if (detalle.getArticulo() instanceof ArticuloInsumo insumo) {
-                if (insumo.getStockActual() < detalle.getCantidad()) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Stock insuficiente para " + insumo.getDenominacion() +
-                                    ". Stock actual: " + insumo.getStockActual() +
-                                    ", cantidad solicitada: " + detalle.getCantidad());
-                }
-            } else if (detalle.getArticulo() instanceof ArticuloManufacturado manufacturado) {
-                validarStockManufacturado(manufacturado, detalle.getCantidad());
-            }
+            articulosMap.merge(detalle.getArticulo().getId(), detalle.getCantidad(), Integer::sum);
         }
-    }
 
-    /**
-     * Valida stock para artículo manufacturado
-     * 
-     * @param manufacturado      El artículo manufacturado
-     * @param cantidadSolicitada Cantidad solicitada del manufacturado
-     */
-    private void validarStockManufacturado(ArticuloManufacturado manufacturado, Integer cantidadSolicitada) {
-        if (manufacturado.getArticuloManufacturadoDetalles() == null) {
+        // Usar el servicio unificado para la validación
+        var analisis = produccionAnalisisService.analizarProduccionCompleta(articulosMap);
+
+        if (!analisis.isSePuedeProducirCompleto()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "El artículo manufacturado " + manufacturado.getDenominacion() +
-                            " no tiene componentes definidos");
-        }
-
-        for (ArticuloManufacturadoDetalle detalle : manufacturado.getArticuloManufacturadoDetalles()) {
-            ArticuloInsumo insumo = detalle.getArticuloInsumo();
-            Integer cantidadNecesaria = detalle.getCantidad() * cantidadSolicitada;
-
-            if (insumo.getStockActual() < cantidadNecesaria) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Stock insuficiente del insumo " + insumo.getDenominacion() +
-                                " para fabricar " + manufacturado.getDenominacion() +
-                                ". Stock actual: " + insumo.getStockActual() +
-                                ", cantidad necesaria: " + cantidadNecesaria);
-            }
+                    "No se puede procesar el pedido: stock insuficiente. " +
+                            "Productos con problemas: " + analisis.getProductosConProblemas().size());
         }
     }
 

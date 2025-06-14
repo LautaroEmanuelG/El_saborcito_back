@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import utn.saborcito.El_saborcito_back.dto.ArticuloManufacturadoDTO;
 import utn.saborcito.El_saborcito_back.services.ArticuloManufacturadoService;
+import utn.saborcito.El_saborcito_back.services.ProduccionAnalisisService;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class ArticuloManufacturadoController {
 
     private final ArticuloManufacturadoService service;
+    private final ProduccionAnalisisService produccionAnalisisService;
 
     @GetMapping
     public List<ArticuloManufacturadoDTO> getAll() {
@@ -66,12 +68,11 @@ public class ArticuloManufacturadoController {
     }
 
     /**
-     * Endpoint para consultar si un artículo manufacturado puede fabricarse (tiene
-     * insumos suficientes).
-     * Ejemplo: GET /api/manufacturados/{id}/can-be-manufactured
+     * 🔍 Endpoint para consultar si un artículo manufacturado puede fabricarse
+     * Usa el servicio unificado de análisis de producción
      */
     @GetMapping("/{id}/can-be-manufactured")
     public boolean canBeManufactured(@PathVariable Long id) {
-        return service.canBeManufactured(id);
+        return produccionAnalisisService.puedeProducirseArticuloManufacturado(id);
     }
 }
