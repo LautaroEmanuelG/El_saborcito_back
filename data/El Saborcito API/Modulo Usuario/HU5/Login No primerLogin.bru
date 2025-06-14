@@ -1,0 +1,27 @@
+meta {
+  name: Login No primerLogin
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{API_BASE_URL}}/empleados/login/manual
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "susana.actualizada@example.com",
+    "password": "NuevoEmpleado@2026"
+  }
+  
+}
+
+body:text {
+  {
+    "email": "ana.gomez@example.com",
+    "password": "Empleado@2024"
+  }
+  
+}

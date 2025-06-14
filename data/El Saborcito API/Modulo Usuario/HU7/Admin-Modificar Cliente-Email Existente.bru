@@ -1,0 +1,28 @@
+meta {
+  name: Admin/Modificar Cliente/Email Existente
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{API_BASE_URL}}/clientes/admin/50
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "email": "lucia@example.com",
+    "telefono": "1122334455",
+    "domicilios": [
+      {
+        "calle": "Lavalle",
+        "numero": "321",
+        "departamento": "PB"
+      }
+    ]
+  }
+  
+}

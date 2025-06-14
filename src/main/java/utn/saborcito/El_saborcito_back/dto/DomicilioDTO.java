@@ -13,5 +13,6 @@ public class DomicilioDTO {
     private Integer numero;
     private String cp;
     private LocalidadDTO localidad;
-    private Boolean principal;
+    private Double latitud;
+    private Double longitud;
 }

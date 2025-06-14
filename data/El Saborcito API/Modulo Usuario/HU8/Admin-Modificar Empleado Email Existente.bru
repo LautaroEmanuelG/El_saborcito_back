@@ -1,0 +1,22 @@
+meta {
+  name: Admin/Modificar Empleado Email Existente
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{API_BASE_URL}}/empleados/admin/29
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Ana",
+    "apellido": "Gómez",
+    "email": "juan.juan@mail.com",
+    "telefono": "1155667788",
+    "rol": "COCINERO"
+  }
+  
+}

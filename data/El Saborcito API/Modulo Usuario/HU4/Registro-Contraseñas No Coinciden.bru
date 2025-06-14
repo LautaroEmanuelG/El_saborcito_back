@@ -5,27 +5,56 @@ meta {
 }
 
 post {
-  url: {{API_BASE_URL}}/empleados/registrar
-  body: text
+  url: {{API_BASE_URL}}/empleados/registro
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "nombre": "Laura",
+    "apellido": "Gómez",
+    "email": "laura@example.com",
+    "password": "Empleado@2024",
+    "confirmarPassword": "OtraClave@2024",
+    "telefono": "1133557799",
+    "rol": "CAJERO",
+    "sucursal": {
+    "id": 1
+  },
+    "domicilios": [
+      {
+        "calle": "San Martín",
+        "numero": "456",
+        "cp": "2B",
+        "localidad": { "id": 1 },
+        "principal": true
+      }
+    ],
+    "esAuth0": false
+  }
+  
 }
 
 body:text {
   {
-    "nombre": "Ana",
+    "nombre": "Laura",
     "apellido": "Gómez",
-    "email": "ana2@example.com",
+    "email": "laura@example.com",
     "password": "Empleado@2024",
-    "confirmarPassword": "Diferente@2024",
-    "telefono": "1122334455",
-    "rol": "COCINERO",
+    "confirmarPassword": "OtraClave@2024",
+    "telefono": "1133557799",
+    "rol": "CAJERO",
     "domicilios": [
       {
-        "calle": "Italia",
-        "numero": "789",
-        "departamento": "1C"
+        "calle": "San Martín",
+        "numero": "456",
+        "cp": "2B",
+        "localidad": { "id": 1 },
+        "principal": true
       }
-    ]
+    ],
+    "esAuth0": false
   }
   
 }

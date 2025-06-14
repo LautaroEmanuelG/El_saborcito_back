@@ -96,12 +96,7 @@ public class ClienteService {
         cliente.setEstado(true);
         cliente.setFechaRegistro(LocalDateTime.now());
         cliente.setFechaUltimaModificacion(LocalDateTime.now());
-
-        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            usuarioService.procesarYValidarDomicilios(cliente, dto.getDomicilios());
-            cliente.setFechaUltimaModificacion(LocalDateTime.now());
-        }
-
+        cliente.setDomicilios(new ArrayList<>());
         cliente = repo.save(cliente);
         return clienteMapper.toDTO(cliente);
     }
@@ -128,11 +123,6 @@ public class ClienteService {
             usuario.setEmail(dto.getEmail());
         }
 
-        // 3. Procesar domicilios solo si vienen en la solicitud
-        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
-            usuarioService.procesarYValidarDomicilios(usuario, dto.getDomicilios());
-        }
-
         // 4. Si hay nueva contraseña, validar y cambiarla
         if (dto.getNuevaContraseña() != null && !dto.getNuevaContraseña().isBlank()) {
             validarCambioContrasena(usuario.getId(), dto);
@@ -145,6 +135,37 @@ public class ClienteService {
 
         return clienteMapper.toDTO(clienteExistente);
     }
+
+    public ClienteDTO updateClienteAdmin(Long clienteId, ActualizarClienteAdminDTO dto) {
+        Cliente cliente = repo.findById(clienteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
+
+        Usuario usuario = cliente;
+
+        // Validar y actualizar email
+        if (dto.getEmail() != null && !dto.getEmail().equals(usuario.getEmail())) {
+            if (!usuarioService.isValidEmail(dto.getEmail())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de email inválido");
+            }
+            usuarioService.validarEmailUnico(dto.getEmail());
+            usuario.setEmail(dto.getEmail());
+        }
+
+        // Actualizar datos básicos
+        if (dto.getNombre() != null) usuario.setNombre(dto.getNombre());
+        if (dto.getApellido() != null) usuario.setApellido(dto.getApellido());
+        if (dto.getTelefono() != null) usuario.setTelefono(dto.getTelefono());
+
+        // Actualizar estado si fue incluido
+        if (dto.getEstado() != null) {
+            usuario.setEstado(dto.getEstado());
+        }
+
+        usuario.setFechaUltimaModificacion(LocalDateTime.now());
+        usuarioRepository.save(usuario);
+        return clienteMapper.toDTO(cliente);
+    }
+
 
     // ✅ NUEVO: Validación de cambio de contraseña (HU3)
     private void validarCambioContrasena(Long usuarioId, ActualizarDatosClienteDTO dto) {
@@ -186,6 +207,9 @@ public class ClienteService {
     public void bajaLogicaCliente(Long id) {
         Cliente cliente = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado con ID: " + id));
+        if (!cliente.getEstado()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cliente ya está dado de baja");
+        }
         usuarioService.bajaLogicaUsuario(cliente.getId());
     }
 
@@ -193,6 +217,9 @@ public class ClienteService {
     public void altaCliente(Long id) {
         Cliente cliente = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado con ID: " + id));
+        if (cliente.getEstado()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cliente ya está activo");
+        }
         usuarioService.altaUsuario(cliente.getId());
     }
 

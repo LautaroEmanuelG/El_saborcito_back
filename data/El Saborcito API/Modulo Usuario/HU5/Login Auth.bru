@@ -1,0 +1,27 @@
+meta {
+  name: Login Auth
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{API_BASE_URL}}/empleados/login/auth0
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "rosa@example.com",
+    "password": "Empleado@2024"
+  }
+  
+}
+
+body:text {
+  {
+    "email": "ana.gomez@example.com",
+    "password": "Empleado@2024"
+  }
+  
+}

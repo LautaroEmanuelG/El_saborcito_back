@@ -1,0 +1,22 @@
+meta {
+  name: Admin/Modificar Cliente No Existe
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{API_BASE_URL}}/clientes/admin/500
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Juana",
+    "apellido": "Pérez",
+    "telefono": "2619999999",
+    "email": "juana.perez@correo.com",
+    "estado": true
+  }
+  
+}

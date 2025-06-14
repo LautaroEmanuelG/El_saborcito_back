@@ -8,6 +8,11 @@ import utn.saborcito.El_saborcito_back.config.security.JwtUtil;
 import utn.saborcito.El_saborcito_back.dto.*;
 import utn.saborcito.El_saborcito_back.services.ClienteService;
 import utn.saborcito.El_saborcito_back.services.EmpleadoService;
+import utn.saborcito.El_saborcito_back.services.HorarioAtencionService;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -16,6 +21,7 @@ public class AuthController {
 
     private final ClienteService clienteService;
     private final EmpleadoService empleadoService;
+    private final HorarioAtencionService horarioAtencionService;
     private final JwtUtil jwtUtil;
 
     // ✅ HU01 - Registro manual de cliente (o desde Auth0)
@@ -64,17 +70,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(empleado);
     }
 
-    // ✅ HU05 - Login empleado con Auth0 (solo valida que exista y esté activo)
-    @PostMapping("/empleados/auth0/login")
-    public ResponseEntity<AuthEmpleadoResponseDTO> loginEmpleadoAuth0(@RequestBody LoginRequest dto) {
-        AuthEmpleadoResponseDTO response = empleadoService.validarEmpleadoAuth0(dto.getEmail());
+    // ✅ HU05 - Login empleado (solo valida que exista y esté activo)
+    // Login manual
+    @PostMapping("/empleados/login/manual")
+    public ResponseEntity<AuthEmpleadoResponseDTO> loginEmpleadoManual(@RequestBody LoginRequest dto) {
+        AuthEmpleadoResponseDTO response = empleadoService.loginEmpleadoManual(dto);
         return ResponseEntity.ok(response);
     }
 
-    // ✅ HU01/HU02 - Registro o sincronización desde Auth0
-    @PostMapping("/empleados/auth0")
-    public ResponseEntity<EmpleadoDTO> registrarOActualizarDesdeAuth0Empleado(@RequestBody RegistroEmpleadoAuth0DTO dto) {
-        EmpleadoDTO empleado = empleadoService.sincronizarAuth0Usuario(dto);
-        return ResponseEntity.ok(empleado);
-    }
 }

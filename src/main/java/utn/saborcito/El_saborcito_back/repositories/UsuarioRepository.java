@@ -13,4 +13,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
     Optional<Usuario> findByAuth0Id(String auth0Id); // ✅ AGREGAR
     List<Usuario> findByEstado(Boolean estado); // ✅ ÚTIL para admin
+    boolean existsByAuth0Id(String auth0Id);
 } //aun no se usa findByEstado

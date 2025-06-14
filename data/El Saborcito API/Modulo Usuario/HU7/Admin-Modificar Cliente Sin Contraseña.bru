@@ -5,24 +5,18 @@ meta {
 }
 
 put {
-  url: {{API_BASE_URL}}/clientes/admin/{id}
+  url: {{API_BASE_URL}}/clientes/admin/50
   body: json
   auth: none
 }
 
 body:json {
   {
-    "nombre": "Juan",
-    "apellido": "Pérez Modificado",
-    "email": "juan.modificado@example.com",
-    "telefono": "1122334455",
-    "domicilios": [
-      {
-        "calle": "Lavalle",
-        "numero": "321",
-        "departamento": "PB"
-      }
-    ]
+    "nombre": "Juana",
+    "apellido": "Pérez",
+    "telefono": "2619999999",
+    "email": "pedro.gomeez@example.com",
+    "estado": true
   }
   
 }

@@ -10,6 +10,7 @@ import utn.saborcito.El_saborcito_back.dto.LoginRequest;
 import utn.saborcito.El_saborcito_back.dto.UsuarioDTO;
 import utn.saborcito.El_saborcito_back.mappers.UsuarioMapper;
 import utn.saborcito.El_saborcito_back.models.Domicilio;
+import utn.saborcito.El_saborcito_back.models.Empleado;
 import utn.saborcito.El_saborcito_back.models.Localidad;
 import utn.saborcito.El_saborcito_back.models.Usuario;
 import utn.saborcito.El_saborcito_back.repositories.LocalidadRepository;
@@ -17,6 +18,7 @@ import utn.saborcito.El_saborcito_back.repositories.UsuarioRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -158,81 +160,11 @@ public class UsuarioService {
                         "Usuario no encontrado"));
         usuario.setPassword(passwordEncoder.encode(nuevaContrasena));
         usuario.setFechaUltimaModificacion(LocalDateTime.now());
+        // ✅ Si es empleado y primer login, lo marcamos como completado
+        if (usuario instanceof Empleado empleado && Boolean.TRUE.equals(empleado.getPrimerLogin())) {
+            empleado.setPrimerLogin(false);
+        }
         repo.save(usuario);
-    }
-
-    //Cuenta cuántos domicilios tienen el campo principal en true
-    public void validarUnSoloDomicilioPrincipal(List<Domicilio> domicilios) {
-        long principales = domicilios.stream()
-                .filter(d -> Boolean.TRUE.equals(d.getPrincipal()))
-                .count();
-
-        if (principales > 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Solo puede haber un domicilio principal por usuario.");
-        }
-    }
-
-    //Valida que haya al menos un domicilio marcado como principal
-    public void validarAlMenosUnPrincipal(List<Domicilio> domicilios) {
-        boolean tienePrincipal = domicilios.stream()
-                .anyMatch(d -> Boolean.TRUE.equals(d.getPrincipal()));
-
-        if (!tienePrincipal) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Debe haber al menos un domicilio marcado como principal.");
-        }
-    }
-
-    public void procesarYValidarDomicilios(Usuario usuario, List<DomicilioDTO> domiciliosDTOs) {
-        if (domiciliosDTOs == null || domiciliosDTOs.isEmpty()) {
-            return; // No hay domicilios en la solicitud → no se hace nada
-        }
-
-        Map<Long, Domicilio> domiciliosExistentesMap = new HashMap<>();
-
-        // Cargar domicilios existentes si ya tiene
-        if (usuario.getDomicilios() != null) {
-            for (Domicilio d : usuario.getDomicilios()) {
-                if (d.getId() != null) {
-                    domiciliosExistentesMap.put(d.getId(), d);
-                }
-            }
-        } else {
-            usuario.setDomicilios(new ArrayList<>());
-        }
-
-        // Procesar cada DTO y actualizar o crear
-        for (DomicilioDTO dto : domiciliosDTOs) {
-            Domicilio domicilio;
-
-            if (dto.getId() != null && domiciliosExistentesMap.containsKey(dto.getId())) {
-                // Existe → actualizar
-                domicilio = domiciliosExistentesMap.get(dto.getId());
-            } else {
-                // Nuevo → crear
-                domicilio = new Domicilio();
-                domicilio.setUsuario(usuario);
-            }
-
-            Localidad localidad = localidadRepository.findById(dto.getLocalidad().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Localidad no encontrada"));
-
-            // Actualizar campos
-            domicilio.setCalle(dto.getCalle());
-            domicilio.setNumero(dto.getNumero());
-            domicilio.setCp(dto.getCp());
-            domicilio.setLocalidad(localidad);
-            domicilio.setPrincipal(Boolean.TRUE.equals(dto.getPrincipal()));
-
-            // Solo agregar si es nuevo
-            if (domicilio.getId() == null) {
-                usuario.getDomicilios().add(domicilio);
-            }
-        }
-
-        validarUnSoloDomicilioPrincipal(usuario.getDomicilios());
-        validarAlMenosUnPrincipal(usuario.getDomicilios());
     }
 
     // --- Métodos privados de validación (sin cambios) ---
@@ -246,5 +178,11 @@ public class UsuarioService {
                 password.matches(".*[A-Z].*") &&
                 password.matches(".*[a-z].*") &&
                 password.matches(".*[!@#$%^&*(),.?\":{}|<>].*");
+    }
+    public void validarAuth0IdUnico(String auth0Id) {
+        if (auth0Id != null && !auth0Id.isEmpty() && repo.existsByAuth0Id(auth0Id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Ya existe un usuario registrado con este auth0Id");
+        }
     }
 }

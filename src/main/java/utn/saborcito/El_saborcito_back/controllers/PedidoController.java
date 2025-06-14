@@ -3,8 +3,10 @@ package utn.saborcito.El_saborcito_back.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import utn.saborcito.El_saborcito_back.dto.PedidoDTO;
+import utn.saborcito.El_saborcito_back.dto.PedidoCreacionDTO;
 import utn.saborcito.El_saborcito_back.models.Pedido;
 import utn.saborcito.El_saborcito_back.services.PedidoService;
+import utn.saborcito.El_saborcito_back.services.PedidoServiceMejorado;
 
 import java.util.List;
 
@@ -13,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PedidoController {
     private final PedidoService service;
+    private final PedidoServiceMejorado serviceMejorado;
 
     @GetMapping
     public List<PedidoDTO> getAll() {
@@ -25,8 +28,8 @@ public class PedidoController {
     }
 
     @PostMapping
-    public PedidoDTO create(@RequestBody Pedido pedido) {
-        return service.save(pedido);
+    public PedidoDTO create(@RequestBody PedidoCreacionDTO pedidoDTO) {
+        return serviceMejorado.crearPedidoCompleto(pedidoDTO);
     }
 
     @PutMapping("/{id}")

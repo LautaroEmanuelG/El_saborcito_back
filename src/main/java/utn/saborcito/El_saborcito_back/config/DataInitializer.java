@@ -1,5 +1,5 @@
 // package utn.saborcito.El_saborcito_back.config;
-//
+
 // import org.springframework.boot.CommandLineRunner;
 // import org.springframework.context.annotation.Bean;
 // import org.springframework.context.annotation.Configuration;
@@ -60,14 +60,15 @@
 // import java.time.LocalDate;
 // import java.time.LocalDateTime;
 // import java.time.LocalTime;
-//
+// import java.util.List;
+
 // /**
 //  * 🚀 Inicializador de datos para la aplicación
 //  * Carga datos de ejemplo cuando la aplicación arranca
 //  */
 // @Configuration
 // public class DataInitializer {
-//
+
 //     /**
 //      * 📋 Bean que se ejecuta al iniciar la aplicación para cargar datos de prueba
 //      */
@@ -112,11 +113,11 @@
 //                     .fechaNacimiento(LocalDate.of(1990, 1, 1)).rol(Rol.ADMIN).estado(true)
 //                     .fechaRegistro(LocalDateTime.now()).fechaUltimaModificacion(LocalDateTime.now())
 //                     .build());
-//
+
 //             // 2. Empresa, sucursal y domicilio
 //             Empresa empresa = empresaRepo.save(Empresa.builder().nombre("El Saborcito SA")
 //                     .razonSocial("El Saborcito SRL").cuil("20-12345678-9").build());
-//
+
 //             // Primero creamos el domicilio sin persistirlo
 //             Domicilio domicilio = Domicilio.builder()
 //                     .calle("San Martín")
@@ -125,19 +126,19 @@
 //                     .usuario(usuario)
 //                     .localidad(localidad)
 //                     .build();
-//
+
 //             // Luego creamos la sucursal con el domicilio (se persistirá en cascada)
 //             Sucursal sucursal = sucursalRepo
 //                     .save(Sucursal.builder().nombre("Sucursal Centro").empresa(empresa)
 //                             .domicilio(domicilio).build());
-//
+
 //             // Agregamos horarios de atención para la sucursal
 //             for (DiaSemana dia : DiaSemana.values()) {
 //                 // Horario de 10 a 22 de lunes a jueves, 10 a 0 viernes y sábado, cerrado
 //                 // domingo
 //                 LocalTime apertura = LocalTime.of(10, 0);
 //                 LocalTime cierre;
-//
+
 //                 if (dia == DiaSemana.VIERNES || dia == DiaSemana.SABADO) {
 //                     cierre = LocalTime.of(0, 0); // Hasta medianoche
 //                 } else if (dia == DiaSemana.DOMINGO) {
@@ -146,7 +147,7 @@
 //                 } else {
 //                     cierre = LocalTime.of(22, 0); // De lunes a jueves
 //                 }
-//
+
 //                 if (apertura != null && cierre != null) {
 //                     horarioRepo.save(HorarioAtencion.builder()
 //                             .diaSemana(dia)
@@ -300,7 +301,7 @@
 //             Imagen imagenDefault = imagenRepo
 //                     .save(Imagen.builder().url("/img/default.png")
 //                             .build());
-//
+
 //             // Nuevas imágenes para pizzas
 //             Imagen imagenPizzaMuzarella = imagenRepo
 //                     .save(Imagen.builder().url("/img/productos/pizza/pizzamuzarella.png")
@@ -317,7 +318,7 @@
 //             Imagen imagenPizzaPepperoni = imagenRepo
 //                     .save(Imagen.builder().url("/img/productos/pizza/pizzapepperoni.png")
 //                             .build());
-//
+
 //             // Nuevas imágenes para hamburguesas
 //             Imagen imagenHamburguesaBbq = imagenRepo
 //                     .save(Imagen.builder()
@@ -335,7 +336,7 @@
 //                     .save(Imagen.builder().url(
 //                             "/img/productos/hamburguesas/hamburguesavegetariana.png")
 //                             .build());
-//
+
 //             // Nuevas imágenes para bebidas
 //             Imagen imagenAguaMineralNueva = imagenRepo
 //                     .save(Imagen.builder().url("/img/productos/bebidas/aguamineral.jpg")
@@ -350,7 +351,7 @@
 //             Imagen imagenJugoDeNaranja = imagenRepo
 //                     .save(Imagen.builder().url("/img/productos/bebidas/jugodenaranja.png")
 //                             .build());
-//
+
 //             // 6. Unidades de medida
 //             UnidadMedida unidadGramos = unidadMedidaRepo
 //                     .save(UnidadMedida.builder().denominacion("Gramos").build());
@@ -358,7 +359,7 @@
 //                     .save(UnidadMedida.builder().denominacion("Litros").build());
 //             UnidadMedida unidadUnidad = unidadMedidaRepo
 //                     .save(UnidadMedida.builder().denominacion("Unidad").build());
-//
+
 //             // 5. Creamos artículos insumo (ingredientes y productos no elaborados)
 //             // -- Ingredientes para elaboración (esParaElaborar = true)
 //             ArticuloInsumo insumoHarina = articuloInsumoRepo.save(ArticuloInsumo.builder()
@@ -372,7 +373,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoQueso = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Mozzarella")
 //                     .precioVenta(2500.0)
@@ -384,7 +385,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoCarne = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Carne Molida Premium")
 //                     .precioVenta(3500.0)
@@ -396,7 +397,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoPan = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Pan de Hamburguesa")
 //                     .precioVenta(1500.0)
@@ -408,7 +409,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoLechuga = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Lechuga Fresca")
 //                     .precioVenta(800.0)
@@ -420,7 +421,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoTomate = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Tomate")
 //                     .precioVenta(900.0)
@@ -432,7 +433,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoCebolla = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Cebolla")
 //                     .precioVenta(600.0)
@@ -444,7 +445,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoPanLomo = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Pan de Lomo")
 //                     .precioVenta(1700.0)
@@ -456,7 +457,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoCarneLomo = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Bife de Lomo")
 //                     .precioVenta(5000.0)
@@ -468,7 +469,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoSalsaTomate = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Salsa de Tomate")
 //                     .precioVenta(1200.0)
@@ -480,7 +481,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             // Insumos adicionales para pizzas y hamburguesas
 //             ArticuloInsumo insumoQuesoProvolone = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Provolone")
@@ -493,7 +494,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoQuesoRoquefort = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Roquefort")
 //                     .precioVenta(3000.0)
@@ -505,7 +506,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoQuesoParmesano = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Parmesano")
 //                     .precioVenta(3200.0)
@@ -517,7 +518,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoJamon = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Jamón Cocido")
 //                     .precioVenta(2000.0)
@@ -529,7 +530,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoAnana = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Ananá en Rodajas")
 //                     .precioVenta(1500.0)
@@ -541,7 +542,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoAlbahaca = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Albahaca Fresca")
 //                     .precioVenta(500.0)
@@ -553,7 +554,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoPepperoni = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Pepperoni")
 //                     .precioVenta(2600.0)
@@ -565,7 +566,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoSalsaBBQ = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Salsa BBQ")
 //                     .precioVenta(1300.0)
@@ -577,7 +578,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoPanceta = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Panceta Ahumada")
 //                     .precioVenta(2200.0)
@@ -589,7 +590,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoQuesoCheddar = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Cheddar")
 //                     .precioVenta(2700.0)
@@ -601,7 +602,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             ArticuloInsumo insumoMedallonVegetariano = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Medallón Vegetariano")
 //                     .precioVenta(1800.0)
@@ -613,7 +614,7 @@
 //                     .esParaElaborar(true)
 //                     .imagen(imagenDefault)
 //                     .build());
-//
+
 //             // -- Productos terminados que no se elaboran (esParaElaborar = false)
 //             ArticuloInsumo insumoCocaCola = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Coca Cola 500ml")
@@ -626,7 +627,7 @@
 //                     .esParaElaborar(false)
 //                     .imagen(imagenCocaColaNueva) // Usar la nueva imagen directamente
 //                     .build());
-//
+
 //             ArticuloInsumo insumoAguaMineral = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Agua Mineral 500ml")
 //                     .precioVenta(1200.0)
@@ -638,7 +639,7 @@
 //                     .esParaElaborar(false)
 //                     .imagen(imagenAguaMineralNueva) // Usar la nueva imagen directamente
 //                     .build());
-//
+
 //             ArticuloInsumo insumoFernet = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Fernet 750ml")
 //                     .precioVenta(6000.0)
@@ -650,7 +651,7 @@
 //                     .esParaElaborar(false)
 //                     .imagen(imagenTrago)
 //                     .build());
-//
+
 //             // Nuevas bebidas (ArticuloInsumo)
 //             ArticuloInsumo insumoCervezaArtesanal = articuloInsumoRepo
 //                     .save(ArticuloInsumo.builder()
@@ -664,7 +665,7 @@
 //                             .esParaElaborar(false)
 //                             .imagen(imagenCervezaArtesanal)
 //                             .build());
-//
+
 //             ArticuloInsumo insumoJugoDeNaranja = articuloInsumoRepo
 //                     .save(ArticuloInsumo.builder()
 //                             .denominacion("Jugo de Naranja")
@@ -677,7 +678,7 @@
 //                             .esParaElaborar(false)
 //                             .imagen(imagenJugoDeNaranja)
 //                             .build());
-//
+
 //             // 7. Productos manufacturados (hamburguesas, pizzas, etc)
 //             // Pizza Mozzarella (se mantiene o actualiza si es necesario)
 //             ArticuloManufacturado pizzaMozzarella = articuloManufacturadoRepo
@@ -689,26 +690,26 @@
 //                             .categoria(categoriaPizzas)
 //                             .imagen(imagenPizzaMuzarella)
 //                             .build());
-//
+
 //             // Detalles de Pizza Mozzarella
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(pizzaMozzarella)
 //                     .articuloInsumo(insumoHarina)
 //                     .cantidad(200)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(pizzaMozzarella)
 //                     .articuloInsumo(insumoQueso)
 //                     .cantidad(150)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(pizzaMozzarella)
 //                     .articuloInsumo(insumoSalsaTomate)
 //                     .cantidad(100)
 //                     .build());
-//
+
 //             // Nuevas Pizzas
 //             ArticuloManufacturado pizzaCuatroQuesos = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder().denominacion("Pizza Cuatro Quesos")
@@ -729,7 +730,7 @@
 //                     .articuloInsumo(insumoQuesoRoquefort).cantidad(50).build());
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder().articuloManufacturado(pizzaCuatroQuesos)
 //                     .articuloInsumo(insumoQuesoParmesano).cantidad(30).build());
-//
+
 //             ArticuloManufacturado pizzaHawaiana = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder().denominacion("Pizza Hawaiana")
 //                             .descripcion("Exótica pizza con jamón, ananá y mozzarella.")
@@ -747,7 +748,7 @@
 //                     .articuloInsumo(insumoJamon).cantidad(100).build());
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder().articuloManufacturado(pizzaHawaiana)
 //                     .articuloInsumo(insumoAnana).cantidad(80).build());
-//
+
 //             ArticuloManufacturado pizzaMargherita = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder().denominacion("Pizza Margherita")
 //                             .descripcion("Clásica pizza con tomate, mozzarella fresca y albahaca.")
@@ -766,7 +767,7 @@
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder().articuloManufacturado(pizzaMargherita)
 //                     .articuloInsumo(insumoTomate).cantidad(100).build()); // Rodajas de tomate
 //                                                                           // fresco
-//
+
 //             ArticuloManufacturado pizzaPepperoni = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder().denominacion("Pizza Pepperoni")
 //                             .descripcion("Sabrosa pizza con abundante pepperoni y mozzarella.")
@@ -782,7 +783,7 @@
 //                     .articuloInsumo(insumoQueso).cantidad(150).build());
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder().articuloManufacturado(pizzaPepperoni)
 //                     .articuloInsumo(insumoPepperoni).cantidad(120).build());
-//
+
 //             // Hamburguesa Clásica (se crea una nueva instancia con la nueva imagen)
 //             ArticuloManufacturado hamburguesaClasica = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder()
@@ -793,38 +794,38 @@
 //                             .categoria(categoriaHamburguesas)
 //                             .imagen(imagenHamburguesaClasicaNueva) // Nueva imagen
 //                             .build());
-//
+
 //             // Detalles de Hamburguesa Clásica
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(hamburguesaClasica)
 //                     .articuloInsumo(insumoCarne)
 //                     .cantidad(150)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(hamburguesaClasica)
 //                     .articuloInsumo(insumoPan)
 //                     .cantidad(1)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(hamburguesaClasica)
 //                     .articuloInsumo(insumoLechuga)
 //                     .cantidad(30)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(hamburguesaClasica)
 //                     .articuloInsumo(insumoTomate)
 //                     .cantidad(50)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(hamburguesaClasica)
 //                     .articuloInsumo(insumoCebolla)
 //                     .cantidad(30)
 //                     .build());
-//
+
 //             // Nuevas Hamburguesas
 //             ArticuloManufacturado hamburguesaBbq = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder()
@@ -847,7 +848,7 @@
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder().articuloManufacturado(hamburguesaBbq)
 //                     .articuloInsumo(insumoCebolla).cantidad(30).build()); // Cebolla caramelizada o
 //                                                                           // frita
-//
+
 //             ArticuloManufacturado hamburguesaConQueso = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder().denominacion("Hamburguesa con Queso")
 //                             .descripcion("Jugosa hamburguesa con doble queso cheddar.")
@@ -865,7 +866,7 @@
 //                     .articuloInsumo(insumoLechuga).cantidad(20).build());
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder().articuloManufacturado(hamburguesaConQueso)
 //                     .articuloInsumo(insumoTomate).cantidad(30).build());
-//
+
 //             ArticuloManufacturado hamburguesaVegetariana = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder().denominacion("Hamburguesa Vegetariana")
 //                             .descripcion("Deliciosa hamburguesa a base de plantas con vegetales frescos.")
@@ -888,7 +889,7 @@
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(hamburguesaVegetariana).articuloInsumo(insumoCebolla)
 //                     .cantidad(30).build());
-//
+
 //             // Lomo Completo
 //             ArticuloManufacturado lomoCompleto = articuloManufacturadoRepo
 //                     .save(ArticuloManufacturado.builder()
@@ -899,38 +900,38 @@
 //                             .categoria(categoriaLomos)
 //                             .imagen(imagenLomo)
 //                             .build());
-//
+
 //             // Detalles de Lomo Completo
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(lomoCompleto)
 //                     .articuloInsumo(insumoCarneLomo)
 //                     .cantidad(200)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(lomoCompleto)
 //                     .articuloInsumo(insumoPanLomo)
 //                     .cantidad(1)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(lomoCompleto)
 //                     .articuloInsumo(insumoLechuga)
 //                     .cantidad(30)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(lomoCompleto)
 //                     .articuloInsumo(insumoTomate)
 //                     .cantidad(50)
 //                     .build());
-//
+
 //             amdRepo.save(ArticuloManufacturadoDetalle.builder()
 //                     .articuloManufacturado(lomoCompleto)
 //                     .articuloInsumo(insumoQueso)
 //                     .cantidad(50)
 //                     .build());
-//
+
 //             // 8. Usuarios con diferentes roles
 //             // Usuario empleado
 //             Usuario usuarioEmpleado = usuarioRepo.save(Usuario.builder()
@@ -947,7 +948,7 @@
 //                     .fechaRegistro(LocalDateTime.now())
 //                     .fechaUltimaModificacion(LocalDateTime.now())
 //                     .build());
-//
+
 //             // Usuario cliente (para el sistema)
 //             Usuario usuarioCliente1 = usuarioRepo.save(Usuario.builder()
 //                     .auth0Id("auth0|3")
@@ -963,7 +964,7 @@
 //                     .fechaRegistro(LocalDateTime.now())
 //                     .fechaUltimaModificacion(LocalDateTime.now())
 //                     .build());
-//
+
 //             Usuario usuarioCliente2 = usuarioRepo.save(Usuario.builder()
 //                     .auth0Id("auth0|4")
 //                     .username("cliente2")
@@ -977,7 +978,8 @@
 //                     .estado(true).fechaRegistro(LocalDateTime.now())
 //                     .fechaUltimaModificacion(LocalDateTime.now())
 //                     .build());
-//
+
+
 //             // 9. Clientes (entidad Cliente, relacionada con Usuario)
 //             // Crear domicilios para clientes
 //             Domicilio domicilioCliente1 = domicilioRepo.save(Domicilio.builder()
@@ -987,7 +989,7 @@
 //                     .usuario(usuarioCliente1)
 //                     .localidad(localidad)
 //                     .build());
-//
+
 //             Domicilio domicilioCliente2 = domicilioRepo.save(Domicilio.builder()
 //                     .calle("Colón")
 //                     .numero(789)
@@ -995,6 +997,7 @@
 //                     .usuario(usuarioCliente2)
 //                     .localidad(localidad)
 //                     .build()); // Crear entidades Cliente
+        
 //             Cliente cliente1 = clienteRepo.save(Cliente.builder()
 //                     .id(usuarioCliente1.getId())
 //                     .auth0Id(usuarioCliente1.getAuth0Id())
@@ -1012,7 +1015,7 @@
 //                     .domicilios(usuarioCliente1.getDomicilios())
 //                     .imagen(usuarioCliente1.getImagen())
 //                     .build());
-//
+
 //             Cliente cliente2 = clienteRepo.save(Cliente.builder()
 //                     .id(usuarioCliente2.getId())
 //                     .auth0Id(usuarioCliente2.getAuth0Id())
@@ -1030,7 +1033,7 @@
 //                     .domicilios(usuarioCliente2.getDomicilios())
 //                     .imagen(usuarioCliente2.getImagen())
 //                     .build());
-//
+
 //             // Empleado cocinero
 //             Empleado empleadoCocinero = empleadoRepo.save(Empleado.builder()
 //                     .id(usuarioEmpleado.getId())
@@ -1053,7 +1056,7 @@
 //                     .sucursal(sucursal)
 //                     .primerLogin(true) // Agregando primerLogin como true para nuevos empleados
 //                     .build());
-//
+
 //             // Empleado cajero
 //             Usuario usuarioCajero = usuarioRepo.save(Usuario.builder()
 //                     .auth0Id("auth0|5")
@@ -1090,7 +1093,7 @@
 //                     .sucursal(sucursal)
 //                     .primerLogin(true) // Agregando primerLogin como true para nuevos empleados
 //                     .build());
-//
+
 //             // Empleado delivery
 //             Usuario usuarioDelivery = usuarioRepo.save(Usuario.builder()
 //                     .auth0Id("auth0|6")
@@ -1127,7 +1130,7 @@
 //                     .sucursal(sucursal)
 //                     .primerLogin(true) // Agregando primerLogin como true para el nuevo empleado
 //                     .build());
-//
+
 //             // 10. Pedidos, detalles de pedido y facturas
 //             // Pedido del Cliente 1
 //             Pedido pedidoCliente1 = pedidoRepo.save(Pedido.builder()
@@ -1141,14 +1144,14 @@
 //                     .tipoEnvio(tipoDelivery) // Tipo de envío
 //                     .formaPago(formaPagoEfectivo) // Forma de pago
 //                     .build());
-//
+
 //             // Detalles del pedido del Cliente 1
 //             DetallePedido detallePedido1_1 = detallePedidoRepo.save(DetallePedido.builder()
 //                     .cantidad(1)
 //                     .pedido(pedidoCliente1)
 //                     .articulo(hamburguesaClasica)
 //                     .build());
-//
+
 //             DetallePedido detallePedido1_2 = detallePedidoRepo.save(DetallePedido.builder()
 //                     .cantidad(1)
 //                     .pedido(pedidoCliente1)
@@ -1171,14 +1174,14 @@
 //                     .tipoEnvio(tipoTakeAway) // Tipo de envío
 //                     .formaPago(formaPagoMercadoPago) // Forma de pago
 //                     .build());
-//
+
 //             // Detalles del pedido del Cliente 2
 //             DetallePedido detallePedido2_1 = detallePedidoRepo.save(DetallePedido.builder()
 //                     .cantidad(2)
 //                     .pedido(pedidoCliente2)
 //                     .articulo(pizzaMozzarella)
 //                     .build());
-//
+
 //             DetallePedido detallePedido2_2 = detallePedidoRepo.save(DetallePedido.builder()
 //                     .cantidad(1)
 //                     .pedido(pedidoCliente2)
@@ -1205,11 +1208,431 @@
 //                     .statusDetail("accredited")
 //                     .factura(facturaCliente2)
 //                     .build());
-//
+
+
+//             //NUEVOS PEDIDOS Y USUARIOS CLIENTES CON DIRECCIONES
+
+//             // ————————————— Agregar Clientes 3 a 7 con sus pedidos —————————————
+
+// // CLIENTE 3
+// Usuario usuario3 = usuarioRepo.save(Usuario.builder()
+//     .auth0Id("auth0|5")
+//     .username("cliente3")
+//     .email("cliente3@ejemplo.com")
+//     .password("pass")
+//     .nombre("Lucía")
+//     .apellido("Martínez")
+//     .telefono("+54555555123")
+//     .fechaNacimiento(LocalDate.of(1990, 5, 15))
+//     .rol(Rol.CLIENTE)
+//     .estado(true)
+//     .fechaRegistro(LocalDateTime.now())
+//     .fechaUltimaModificacion(LocalDateTime.now())
+//     .build());
+
+// Domicilio dom3 = domicilioRepo.save(Domicilio.builder()
+//     .calle("San Martín")
+//     .numero(123)
+//     .cp("5500")
+//     .usuario(usuario3)
+//     .localidad(localidad)
+//     .build());
+
+// Cliente cliente3 = clienteRepo.save(Cliente.builder()
+//     .id(usuario3.getId())
+//     .auth0Id(usuario3.getAuth0Id())
+//     .username(usuario3.getUsername())
+//     .email(usuario3.getEmail())
+//     .password(usuario3.getPassword())
+//     .nombre(usuario3.getNombre())
+//     .apellido(usuario3.getApellido())
+//     .telefono(usuario3.getTelefono())
+//     .fechaNacimiento(usuario3.getFechaNacimiento())
+//     .rol(usuario3.getRol())
+//     .estado(usuario3.getEstado())
+//     .fechaRegistro(usuario3.getFechaRegistro())
+//     .fechaUltimaModificacion(usuario3.getFechaUltimaModificacion())
+//     .domicilios(List.of(dom3))
+//     .build());
+
+// // Pedidos de cliente3
+// Pedido p3_1 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(5))
+//     .horasEstimadaFinalizacion(LocalTime.of(19, 0))
+//     .total(7500.0)
+//     .totalCosto(5000.0)
+//     .cliente(cliente3)
+//     .sucursal(sucursal)
+//     .estado(estadoEntregado)
+//     .tipoEnvio(tipoDelivery)
+//     .formaPago(formaPagoEfectivo)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p3_1).cantidad(2).articulo(hamburguesaClasica).build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p3_1).cantidad(1).articulo(insumoCocaCola).build());
+
+// Pedido p3_2 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(3))
+//     .horasEstimadaFinalizacion(LocalTime.of(20, 30))
+//     .total(11200.0)
+//     .totalCosto(7000.0)
+//     .cliente(cliente3)
+//     .sucursal(sucursal)
+//     .estado(estadoConfirmado)
+//     .tipoEnvio(tipoTakeAway)
+//     .formaPago(formaPagoMercadoPago)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p3_2).cantidad(1).articulo(pizzaMozzarella).build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p3_2).cantidad(2).articulo(pizzaMargherita).build());
+
+// // CLIENTE 4
+// Usuario usuario4 = usuarioRepo.save(Usuario.builder()
+//     .auth0Id("auth0|6")
+//     .username("cliente4")
+//     .email("cliente4@ejemplo.com")
+//     .password("pass")
+//     .nombre("Diego")
+//     .apellido("Peralta")
+//     .telefono("+54555555234")
+//     .fechaNacimiento(LocalDate.of(1985, 11, 2))
+//     .rol(Rol.CLIENTE)
+//     .estado(true)
+//     .fechaRegistro(LocalDateTime.now())
+//     .fechaUltimaModificacion(LocalDateTime.now())
+//     .build());
+
+// Domicilio dom4 = domicilioRepo.save(Domicilio.builder()
+//     .calle("Belgrano")
+//     .numero(456)
+//     .cp("5501")
+//     .usuario(usuario4)
+//     .localidad(localidad)
+//     .build());
+
+// Cliente cliente4 = clienteRepo.save(Cliente.builder()
+//     .id(usuario4.getId())
+//     .auth0Id(usuario4.getAuth0Id())
+//     .username(usuario4.getUsername())
+//     .email(usuario4.getEmail())
+//     .password(usuario4.getPassword())
+//     .nombre(usuario4.getNombre())
+//     .apellido(usuario4.getApellido())
+//     .telefono(usuario4.getTelefono())
+//     .fechaNacimiento(usuario4.getFechaNacimiento())
+//     .rol(usuario4.getRol())
+//     .estado(usuario4.getEstado())
+//     .fechaRegistro(usuario4.getFechaRegistro())
+//     .fechaUltimaModificacion(usuario4.getFechaUltimaModificacion())
+//     .domicilios(List.of(dom4))
+//     .build());
+
+// // Pedidos de cliente4
+// Pedido p4_1 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(4))
+//     .horasEstimadaFinalizacion(LocalTime.of(18, 45))
+//     .total(6400.0)
+//     .totalCosto(4200.0)
+//     .cliente(cliente4)
+//     .sucursal(sucursal)
+//     .estado(estadoPendiente)
+//     .tipoEnvio(tipoLocal)
+//     .formaPago(formaPagoEfectivo)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p4_1).cantidad(1).articulo(pizzaMozzarella).build());
+
+// Pedido p4_2 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(2))
+//     .horasEstimadaFinalizacion(LocalTime.of(20, 0))
+//     .total(9800.0)
+//     .totalCosto(6100.0)
+//     .cliente(cliente4)
+//     .sucursal(sucursal)
+//     .estado(estadoEnPreparacion)
+//     .tipoEnvio(tipoDelivery)
+//     .formaPago(formaPagoTarjeta)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p4_2).cantidad(2).articulo(hamburguesaClasica).build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p4_2).cantidad(1).articulo(pizzaMozzarella).build());
+
+// Pedido p4_3 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(1))
+//     .horasEstimadaFinalizacion(LocalTime.of(21, 15))
+//     .total(5500.0)
+//     .totalCosto(3500.0)
+//     .cliente(cliente4)
+//     .sucursal(sucursal)
+//     .estado(estadoConfirmado)
+//     .tipoEnvio(tipoTakeAway)
+//     .formaPago(formaPagoMercadoPago)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p4_3).cantidad(1).articulo(pizzaMozzarella).build());
+
+// // CLIENTE 5
+// Usuario usuario5 = usuarioRepo.save(Usuario.builder()
+//     .auth0Id("auth0|7")
+//     .username("cliente5")
+//     .email("cliente5@ejemplo.com")
+//     .password("pass")
+//     .nombre("María")
+//     .apellido("Gómez")
+//     .telefono("+54555555345")
+//     .fechaNacimiento(LocalDate.of(1992, 3, 20))
+//     .rol(Rol.CLIENTE)
+//     .estado(true)
+//     .fechaRegistro(LocalDateTime.now())
+//     .fechaUltimaModificacion(LocalDateTime.now())
+//     .build());
+
+// Domicilio dom5 = domicilioRepo.save(Domicilio.builder()
+//     .calle("Rodríguez")
+//     .numero(789)
+//     .cp("5502")
+//     .usuario(usuario5)
+//     .localidad(localidad)
+//     .build());
+
+// Cliente cliente5 = clienteRepo.save(Cliente.builder()
+//     .id(usuario5.getId())
+//     .auth0Id(usuario5.getAuth0Id())
+//     .username(usuario5.getUsername())
+//     .email(usuario5.getEmail())
+//     .password(usuario5.getPassword())
+//     .nombre(usuario5.getNombre())
+//     .apellido(usuario5.getApellido())
+//     .telefono(usuario5.getTelefono())
+//     .fechaNacimiento(usuario5.getFechaNacimiento())
+//     .rol(usuario5.getRol())
+//     .estado(usuario5.getEstado())
+//     .fechaRegistro(usuario5.getFechaRegistro())
+//     .fechaUltimaModificacion(usuario5.getFechaUltimaModificacion())
+//     .domicilios(List.of(dom5))
+//     .build());
+
+// // Pedidos de cliente5
+// Pedido p5_1 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(3))
+//     .horasEstimadaFinalizacion(LocalTime.of(19, 30))
+//     .total(7200.0)
+//     .totalCosto(4800.0)
+//     .cliente(cliente5)
+//     .sucursal(sucursal)
+//     .estado(estadoEntregado)
+//     .tipoEnvio(tipoDelivery)
+//     .formaPago(formaPagoMercadoPago)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p5_1).cantidad(2).articulo(pizzaPepperoni).build());
+
+// Pedido p5_2 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(1))
+//     .horasEstimadaFinalizacion(LocalTime.of(20, 45))
+//     .total(4300.0)
+//     .totalCosto(2900.0)
+//     .cliente(cliente5)
+//     .sucursal(sucursal)
+//     .estado(estadoPendiente)
+//     .tipoEnvio(tipoLocal)
+//     .formaPago(formaPagoEfectivo)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p5_2).cantidad(1).articulo(hamburguesaClasica).build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p5_2).cantidad(1).articulo(insumoCocaCola).build());
+
+// // CLIENTE 6
+// Usuario usuario6 = usuarioRepo.save(Usuario.builder()
+//     .auth0Id("auth0|8")
+//     .username("cliente6")
+//     .email("cliente6@ejemplo.com")
+//     .password("pass")
+//     .nombre("Juan")
+//     .apellido("Pérez")
+//     .telefono("+54555555456")
+//     .fechaNacimiento(LocalDate.of(1988, 7, 8))
+//     .rol(Rol.CLIENTE)
+//     .estado(true)
+//     .fechaRegistro(LocalDateTime.now())
+//     .fechaUltimaModificacion(LocalDateTime.now())
+//     .build());
+
+// Domicilio dom6 = domicilioRepo.save(Domicilio.builder()
+//     .calle("San Juan")
+//     .numero(321)
+//     .cp("5503")
+//     .usuario(usuario6)
+//     .localidad(localidad)
+//     .build());
+
+// Cliente cliente6 = clienteRepo.save(Cliente.builder()
+//     .id(usuario6.getId())
+//     .auth0Id(usuario6.getAuth0Id())
+//     .username(usuario6.getUsername())
+//     .email(usuario6.getEmail())
+//     .password(usuario6.getPassword())
+//     .nombre(usuario6.getNombre())
+//     .apellido(usuario6.getApellido())
+//     .telefono(usuario6.getTelefono())
+//     .fechaNacimiento(usuario6.getFechaNacimiento())
+//     .rol(usuario6.getRol())
+//     .estado(usuario6.getEstado())
+//     .fechaRegistro(usuario6.getFechaRegistro())
+//     .fechaUltimaModificacion(usuario6.getFechaUltimaModificacion())
+//     .domicilios(List.of(dom6))
+//     .build());
+
+// // Pedidos de cliente6 (4 pedidos)
+// Pedido p6_1 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(6))
+//     .horasEstimadaFinalizacion(LocalTime.of(18, 0))
+//     .total(6800.0)
+//     .totalCosto(4500.0)
+//     .cliente(cliente6)
+//     .sucursal(sucursal)
+//     .estado(estadoConfirmado)
+//     .tipoEnvio(tipoDelivery)
+//     .formaPago(formaPagoTarjeta)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p6_1).cantidad(1).articulo(pizzaMozzarella).build());
+
+// Pedido p6_2 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(4))
+//     .horasEstimadaFinalizacion(LocalTime.of(20, 0))
+//     .total(10200.0)
+//     .totalCosto(6500.0)
+//     .cliente(cliente6)
+//     .sucursal(sucursal)
+//     .estado(estadoEntregado)
+//     .tipoEnvio(tipoTakeAway)
+//     .formaPago(formaPagoEfectivo)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p6_2).cantidad(2).articulo(hamburguesaClasica).build());
+
+// Pedido p6_3 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(2))
+//     .horasEstimadaFinalizacion(LocalTime.of(21, 0))
+//     .total(5300.0)
+//     .totalCosto(3300.0)
+//     .cliente(cliente6)
+//     .sucursal(sucursal)
+//     .estado(estadoEnPreparacion)
+//     .tipoEnvio(tipoLocal)
+//     .formaPago(formaPagoMercadoPago)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p6_3).cantidad(1).articulo(pizzaMozzarella).build());
+
+// Pedido p6_4 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(1))
+//     .horasEstimadaFinalizacion(LocalTime.of(19, 30))
+//     .total(8900.0)
+//     .totalCosto(5700.0)
+//     .cliente(cliente6)
+//     .sucursal(sucursal)
+//     .estado(estadoPendiente)
+//     .tipoEnvio(tipoDelivery)
+//     .formaPago(formaPagoTarjeta)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p6_4).cantidad(2).articulo(pizzaMozzarella).build());
+
+// // CLIENTE 7
+// Usuario usuario7 = usuarioRepo.save(Usuario.builder()
+//     .auth0Id("auth0|9")
+//     .username("cliente7")
+//     .email("cliente7@ejemplo.com")
+//     .password("pass")
+//     .nombre("Carla")
+//     .apellido("Fernández")
+//     .telefono("+54555555567")
+//     .fechaNacimiento(LocalDate.of(1995, 12, 30))
+//     .rol(Rol.CLIENTE)
+//     .estado(true)
+//     .fechaRegistro(LocalDateTime.now())
+//     .fechaUltimaModificacion(LocalDateTime.now())
+//     .build());
+
+// Domicilio dom7 = domicilioRepo.save(Domicilio.builder()
+//     .calle("Rivadavia")
+//     .numero(654)
+//     .cp("5504")
+//     .usuario(usuario7)
+//     .localidad(localidad)
+//     .build());
+
+// Cliente cliente7 = clienteRepo.save(Cliente.builder()
+//     .id(usuario7.getId())
+//     .auth0Id(usuario7.getAuth0Id())
+//     .username(usuario7.getUsername())
+//     .email(usuario7.getEmail())
+//     .password(usuario7.getPassword())
+//     .nombre(usuario7.getNombre())
+//     .apellido(usuario7.getApellido())
+//     .telefono(usuario7.getTelefono())
+//     .fechaNacimiento(usuario7.getFechaNacimiento())
+//     .rol(usuario7.getRol())
+//     .estado(usuario7.getEstado())
+//     .fechaRegistro(usuario7.getFechaRegistro())
+//     .fechaUltimaModificacion(usuario7.getFechaUltimaModificacion())
+//     .domicilios(List.of(dom7))
+//     .build());
+
+// // Pedidos de cliente7 (3 pedidos)
+// Pedido p7_1 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(5))
+//     .horasEstimadaFinalizacion(LocalTime.of(20, 15))
+//     .total(8100.0)
+//     .totalCosto(5300.0)
+//     .cliente(cliente7)
+//     .sucursal(sucursal)
+//     .estado(estadoEntregado)
+//     .tipoEnvio(tipoDelivery)
+//     .formaPago(formaPagoMercadoPago)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p7_1).cantidad(1).articulo(pizzaMozzarella).build());
+
+// Pedido p7_2 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(3))
+//     .horasEstimadaFinalizacion(LocalTime.of(19, 45))
+//     .total(4600.0)
+//     .totalCosto(3000.0)
+//     .cliente(cliente7)
+//     .sucursal(sucursal)
+//     .estado(estadoConfirmado)
+//     .tipoEnvio(tipoLocal)
+//     .formaPago(formaPagoEfectivo)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p7_2).cantidad(2).articulo(hamburguesaConQueso).build());
+
+// Pedido p7_3 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now().minusDays(1))
+//     .horasEstimadaFinalizacion(LocalTime.of(21, 30))
+//     .total(10200.0)
+//     .totalCosto(6500.0)
+//     .cliente(cliente7)
+//     .sucursal(sucursal)
+//     .estado(estadoPendiente)
+//     .tipoEnvio(tipoTakeAway)
+//     .formaPago(formaPagoTarjeta)
+//     .build());
+// detallePedidoRepo.save(DetallePedido.builder()
+//     .pedido(p7_3).cantidad(1).articulo(insumoCocaCola).build());
+
+
 //             // 11. Promociones
 //             LocalDate fechaInicio = LocalDate.now();
 //             LocalDate fechaFin = LocalDate.now().plusDays(30);
-//
+
 //             // Promoción hamburguesa + gaseosa (combo)
 //             Promocion promocionComboHamburguesa = promocionRepo.save(Promocion.builder()
 //                     .denominacion("Combo Hamburguesa + Bebida")
@@ -1220,7 +1643,7 @@
 //                     .precioPromocional(5040.0) // 10% de descuento sobre 5600 (3800 + 1800)
 //                     .articulo(hamburguesaClasica)
 //                     .build());
-//
+
 //             // Promoción 2x1 en pizzas
 //             Promocion promocion2x1Pizzas = promocionRepo.save(Promocion.builder()
 //                     .denominacion("2x1 en Pizzas")
@@ -1231,7 +1654,7 @@
 //                     .precioPromocional(4500.0) // Precio de una sola pizza
 //                     .articulo(pizzaMozzarella)
 //                     .build());
-//
+
 //             // 12. Historial de Pedidos
 //             // Historial para el pedido del Cliente 1
 //             HistorialPedido historialPedido1 = historialPedidoRepo.save(HistorialPedido.builder()
@@ -1240,7 +1663,7 @@
 //                     .fechaRegistro(LocalDateTime.now().minusDays(2))
 //                     .observacion("Pedido entregado correctamente")
 //                     .build());
-//
+
 //             // Historial para el pedido del Cliente 2
 //             HistorialPedido historialPedido2 = historialPedidoRepo.save(HistorialPedido.builder()
 //                     .cliente(cliente2)
@@ -1248,7 +1671,7 @@
 //                     .fechaRegistro(LocalDateTime.now())
 //                     .observacion("Pedido confirmado, en espera de preparación")
 //                     .build());
-//
+
 //             // Historial adicional para cambio de estado del Pedido 2
 //             HistorialPedido historialPedido2EnPreparacion = historialPedidoRepo
 //                     .save(HistorialPedido.builder()
@@ -1257,7 +1680,7 @@
 //                             .fechaRegistro(LocalDateTime.now().plusHours(1))
 //                             .observacion("Pedido en preparación")
 //                             .build());
-//
+
 //             // Historial adicional para Cliente 1 (pedido anterior)
 //             HistorialPedido historialPedidoAnterior = historialPedidoRepo.save(HistorialPedido.builder()
 //                     .cliente(cliente1)
@@ -1265,58 +1688,7 @@
 //                     .fechaRegistro(LocalDateTime.now().minusDays(15))
 //                     .observacion("Historial de pedido anterior del cliente")
 //                     .build());
-//             // --- Pedidos de prueba para KANBAN MODULO COCINA ---
-//             for (int i = 1; i <= 4; i++) {
-//                 Pedido pedidoPendiente = pedidoRepo.save(Pedido.builder()
-//                         .estado(estadoPendiente)
-//                         .cliente(i % 2 == 0 ? cliente1 : cliente2)
-//                         .sucursal(sucursal)
-//                         .fechaPedido(LocalDate.now())
-//                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(30 + i * 5))
-//                         .tipoEnvio(i % 2 == 0 ? tipoDelivery : tipoLocal)
-//                         .formaPago(i % 2 == 0 ? formaPagoEfectivo : formaPagoTarjeta)
-//                         .build());
-//                 detallePedidoRepo.save(DetallePedido.builder()
-//                         .pedido(pedidoPendiente)
-//                         .cantidad(1 + i % 2)
-//                         .articulo(pizzaMozzarella)
-//                         .build());
-//             }
-//
-//             for (int i = 1; i <= 2; i++) {
-//                 Pedido pedidoEnProceso = pedidoRepo.save(Pedido.builder()
-//                         .estado(estadoEnPreparacion)
-//                         .cliente(i % 2 == 0 ? cliente1 : cliente2)
-//                         .sucursal(sucursal)
-//                         .fechaPedido(LocalDate.now())
-//                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(40 + i * 5))
-//                         .tipoEnvio(tipoTakeAway)
-//                         .formaPago(formaPagoMercadoPago)
-//                         .build());
-//                 detallePedidoRepo.save(DetallePedido.builder()
-//                         .pedido(pedidoEnProceso)
-//                         .cantidad(2)
-//                         .articulo(hamburguesaBbq)
-//                         .build());
-//             }
-//
-//             for (int i = 1; i <= 2; i++) {
-//                 Pedido pedidoDemorado = pedidoRepo.save(Pedido.builder()
-//                         .estado(estadoListo) // Cambia a estadoDemorado si tienes uno, si no usa LISTO para simular
-//                         .cliente(i % 2 == 0 ? cliente1 : cliente2)
-//                         .sucursal(sucursal)
-//                         .fechaPedido(LocalDate.now())
-//                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(60 + i * 5))
-//                         .tipoEnvio(tipoDelivery)
-//                         .formaPago(formaPagoTransferencia)
-//                         .build());
-//                 detallePedidoRepo.save(DetallePedido.builder()
-//                         .pedido(pedidoDemorado)
-//                         .cantidad(1)
-//                         .articulo(pizzaPepperoni)
-//                         .build());
-//             }
-//
+
 // // Si tienes un estado DEMORADO, usa estadoDemorado, si no, crea uno arriba y úsalo aquí
 //             Estado estadoDemorado = estadoRepo.findByNombre("DEMORADO")
 //                     .orElseGet(() -> estadoRepo.save(Estado.builder().nombre("DEMORADO").build()));
@@ -1336,7 +1708,7 @@
 //                         .articulo(hamburguesaVegetariana)
 //                         .build());
 //             }
-//
+
 //             for (int i = 1; i <= 3; i++) {
 //                 Pedido pedidoListo = pedidoRepo.save(Pedido.builder()
 //                         .estado(estadoListo)
@@ -1353,29 +1725,29 @@
 //                         .articulo(pizzaCuatroQuesos)
 //                         .build());
 //             }
-//
+
 //             //  Verificación: listar y mostrar entidades para probar interacciones
-////              System.out.println("=== Verificación de datos cargados ===");
-////              System.out.println("Paises: " + paisRepo.findAll());
-////              System.out.println("Provincias: " + provinciaRepo.findAll());
-////              System.out.println("Localidades: " + localidadRepo.findAll());
-////              System.out.println("Usuarios: " + usuarioRepo.findAll());
-////              System.out.println("Empresas: " + empresaRepo.findAll());
-////              System.out.println("Domicilios: " + domicilioRepo.findAll());
-////              System.out.println("Sucursales: " + sucursalRepo.findAll());
-////              System.out.println("UnidadMedida: " + unidadMedidaRepo.findAll());
-////              System.out.println("Categorias: " + categoriaRepo.findAll());
-////              System.out.println("Imagenes: " + imagenRepo.findAll());
-////              System.out.println("Insumos: " + articuloInsumoRepo.findAll());
-////              System.out.println("Manufacturados: " + articuloManufacturadoRepo.findAll());
-////              System.out.println("Detalles Manufacturado: " + amdRepo.findAll());
-////              System.out.println("Promociones: " + promocionRepo.findAll());
-////              System.out.println("Clientes: " + clienteRepo.findAll());
-////              System.out.println("Pedidos: " + pedidoRepo.findAll());
-////              System.out.println("DetallePedido: " + detallePedidoRepo.findAll());
-////              System.out.println("Facturas: " + facturaRepo.findAll());
-////              System.out.println("Datos MercadoPago: " + datosMPRepo.findAll());
-////              System.out.println("Horarios: " + horarioRepo.findAll());
+// //              System.out.println("=== Verificación de datos cargados ===");
+// //              System.out.println("Paises: " + paisRepo.findAll());
+// //              System.out.println("Provincias: " + provinciaRepo.findAll());
+// //              System.out.println("Localidades: " + localidadRepo.findAll());
+// //              System.out.println("Usuarios: " + usuarioRepo.findAll());
+// //              System.out.println("Empresas: " + empresaRepo.findAll());
+// //              System.out.println("Domicilios: " + domicilioRepo.findAll());
+// //              System.out.println("Sucursales: " + sucursalRepo.findAll());
+// //              System.out.println("UnidadMedida: " + unidadMedidaRepo.findAll());
+// //              System.out.println("Categorias: " + categoriaRepo.findAll());
+// //              System.out.println("Imagenes: " + imagenRepo.findAll());
+// //              System.out.println("Insumos: " + articuloInsumoRepo.findAll());
+// //              System.out.println("Manufacturados: " + articuloManufacturadoRepo.findAll());
+// //              System.out.println("Detalles Manufacturado: " + amdRepo.findAll());
+// //              System.out.println("Promociones: " + promocionRepo.findAll());
+// //              System.out.println("Clientes: " + clienteRepo.findAll());
+// //              System.out.println("Pedidos: " + pedidoRepo.findAll());
+// //              System.out.println("DetallePedido: " + detallePedidoRepo.findAll());
+// //              System.out.println("Facturas: " + facturaRepo.findAll());
+// //              System.out.println("Datos MercadoPago: " + datosMPRepo.findAll());
+// //              System.out.println("Horarios: " + horarioRepo.findAll());
 //         };
 //     }
 // }

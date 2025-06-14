@@ -28,6 +28,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import utn.saborcito.El_saborcito_back.repositories.UsuarioRepository;
+import utn.saborcito.El_saborcito_back.services.HorarioAtencionService;
 
 import java.util.Arrays;
 
@@ -48,9 +49,14 @@ public class SecurityConfiguration {
     boolean webSecurityDebug;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-//    @Bean
-//    public InactivityTimeoutFilter inactivityTimeoutFilter(UsuarioRepository usuarioRepository) {
-//        return new InactivityTimeoutFilter(usuarioRepository);}
+    private final UsuarioRepository usuarioRepository;
+    private final HorarioAtencionService horarioService;
+    @Bean
+    public InactivityTimeoutFilter inactivityTimeoutFilter(UsuarioRepository repo,
+                                                           HorarioAtencionService horarioService) {
+        return new InactivityTimeoutFilter(repo, horarioService);
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -58,7 +64,7 @@ public class SecurityConfiguration {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .cors(withDefaults()) //por defecto spring va a buscar un bean con el nombre "corsConfigurationSource".
-                //.addFilterBefore(inactivityTimeoutFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterBefore(inactivityTimeoutFilter(usuarioRepository,horarioService), BearerTokenAuthenticationFilter.class)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests                 //falta configurar bien los roles
                                 // Auth endpoints (públicos o semi-públicos)

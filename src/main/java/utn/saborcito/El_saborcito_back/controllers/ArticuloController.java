@@ -7,7 +7,7 @@ import utn.saborcito.El_saborcito_back.dto.ProduccionAnalisisDTO;
 import utn.saborcito.El_saborcito_back.dto.ProduccionAnalisisRequestDTO;
 import utn.saborcito.El_saborcito_back.models.Articulo;
 import utn.saborcito.El_saborcito_back.services.ArticuloService;
-import utn.saborcito.El_saborcito_back.services.ArticuloManufacturadoService;
+import utn.saborcito.El_saborcito_back.services.ProduccionAnalisisService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class ArticuloController {
 
     private final ArticuloService service;
-    private final ArticuloManufacturadoService articuloManufacturadoService;
+    private final ProduccionAnalisisService produccionAnalisisService;
 
     @GetMapping
     public List<ArticuloDTO> getAll() {
@@ -68,13 +68,11 @@ public class ArticuloController {
     }
 
     /**
-     * Endpoint para analizar si es posible producir un ticket completo.
+     * 🎯 Endpoint para analizar si es posible producir un ticket completo
      * Este endpoint recibe un array de IDs de artículos con sus cantidades y
      * analiza:
      * 1. Para artículos manufacturados: si hay insumos suficientes para producirlos
      * 2. Para artículos insumo (bebidas, etc.): si hay stock suficiente
-     *
-     * Ejemplo: POST /api/articulos/analizar-produccion
      *
      * @param requestDTO Objeto con la lista de artículos y cantidades a analizar
      * @return Objeto con el resultado del análisis de producción
@@ -90,7 +88,7 @@ public class ArticuloController {
             articulosMap.merge(articulo.getArticuloId(), articulo.getCantidad(), Integer::sum);
         }
 
-        // Llamar al servicio que hace el análisis real
-        return articuloManufacturadoService.analizarProduccion(articulosMap);
+        // Llamar al servicio unificado que hace el análisis real
+        return produccionAnalisisService.analizarProduccionCompleta(articulosMap);
     }
 }
