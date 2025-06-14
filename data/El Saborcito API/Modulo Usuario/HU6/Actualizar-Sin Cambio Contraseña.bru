@@ -4,23 +4,16 @@ meta {
   seq: 1
 }
 
-put {
-  url: {{API_BASE_URL}}/empleados/{id}
+patch {
+  url: {{API_BASE_URL}}/empleados/45
   body: json
   auth: none
 }
 
 body:json {
   {
-    "telefono": "1133557799",
-    "email": "ana.gomez.actualizada@example.com",
-    "domicilios": [
-      {
-        "calle": "San Martín",
-        "numero": "987",
-        "departamento": "2B"
-      }
-    ]
+    "nombre": "Susana",
+    "apellido": "Torres Actualizada",
+    "telefono": "+5491122334455"
   }
-  
 }

@@ -1,89 +1,96 @@
 package utn.saborcito.El_saborcito_back.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.DomicilioDTO;
+import utn.saborcito.El_saborcito_back.mappers.DomicilioMapper;
 import utn.saborcito.El_saborcito_back.models.Domicilio;
 import utn.saborcito.El_saborcito_back.models.Localidad;
+import utn.saborcito.El_saborcito_back.models.Usuario;
 import utn.saborcito.El_saborcito_back.repositories.DomicilioRepository;
 import utn.saborcito.El_saborcito_back.repositories.LocalidadRepository;
+import utn.saborcito.El_saborcito_back.repositories.UsuarioRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DomicilioService {
     private final DomicilioRepository repo;
+    private final UsuarioRepository usuarioRepository;
     private final LocalidadRepository localidadRepository;
+    private final DomicilioMapper domicilioMapper;
 
-    public DomicilioService(DomicilioRepository repo, LocalidadRepository localidadRepository) {
-        this.repo = repo;
-        this.localidadRepository = localidadRepository;
+    public DomicilioDTO crearDomicilio(Long usuarioId, DomicilioDTO dto) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        if (dto.getLocalidad() == null || dto.getLocalidad().getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Localidad obligatoria");
+        }
+
+        Localidad localidad = localidadRepository.findById(dto.getLocalidad().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Localidad inválida"));
+
+        Domicilio domicilio = new Domicilio();
+        domicilio.setCalle(dto.getCalle());
+        domicilio.setNumero(dto.getNumero());
+        domicilio.setCp(dto.getCp());
+        domicilio.setLatitud(dto.getLatitud());
+        domicilio.setLongitud(dto.getLongitud());
+        domicilio.setLocalidad(localidad);
+        domicilio.setUsuario(usuario);
+        // Asegúrate de que el usuario tenga la lista inicializada
+        if (usuario.getDomicilios() == null) {
+            usuario.setDomicilios(new ArrayList<>());
+        }
+
+        // Guardar domicilio
+        Domicilio guardado = repo.save(domicilio);
+
+        // Agregar a la lista del usuario
+        usuario.getDomicilios().add(guardado);
+        usuarioRepository.save(usuario); // Actualiza el usuario
+
+        // Mapear y devolver
+        return domicilioMapper.toDTO(guardado);
     }
 
-    public List<Domicilio> findAll() {
-        return repo.findAll();
+    public DomicilioDTO actualizarDomicilio(Long usuarioId, Long domicilioId, DomicilioDTO dto) {
+        Domicilio existente = repo.findById(domicilioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Domicilio no encontrado"));
+
+        if (!existente.getUsuario().getId().equals(usuarioId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puede editar este domicilio");
+        }
+
+        if (dto.getLocalidad() != null && dto.getLocalidad().getId() != null) {
+            Localidad localidad = localidadRepository.findById(dto.getLocalidad().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Localidad inválida"));
+            existente.setLocalidad(localidad);
+        }
+
+        existente.setCalle(dto.getCalle());
+        existente.setNumero(dto.getNumero());
+        existente.setCp(dto.getCp());
+        existente.setLatitud(dto.getLatitud());
+        existente.setLongitud(dto.getLongitud());
+
+        repo.save(existente);
+        dto.setId(domicilioId);
+        return dto;
     }
 
-    public Domicilio findById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Domicilio no encontrado con ID: " + id));
-    }
-
-    public Domicilio create(Domicilio dom) {
-        // Aquí se podrían añadir validaciones antes de guardar, por ejemplo, campos
-        // obligatorios.
-        if (dom.getCalle() == null || dom.getCalle().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La calle no puede estar vacía.");
-        }
-        if (dom.getLocalidad() == null || dom.getLocalidad().getId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La localidad es obligatoria.");
-        }
-        return repo.save(dom);
-    }
-
-    public Domicilio update(Long id, Domicilio domicilioActualizado) {
-        Domicilio domicilioExistente = findById(id); // findById ya lanza la excepción si no se encuentra
-
-        // Actualizar campos. Se podrían añadir validaciones para cada campo.
-        if (domicilioActualizado.getCalle() != null) {
-            domicilioExistente.setCalle(domicilioActualizado.getCalle());
-        }
-        if (domicilioActualizado.getNumero() != null) {
-            domicilioExistente.setNumero(domicilioActualizado.getNumero());
-        }
-        if (domicilioActualizado.getCp() != null) {
-            domicilioExistente.setCp(domicilioActualizado.getCp());
-        }
-        // Validar que la localidad exista si se proporciona una nueva.
-        if (domicilioActualizado.getLocalidad() != null && domicilioActualizado.getLocalidad().getId() != null) {
-            // Aquí se podría verificar si la localidad existe en la base de datos
-            Localidad localidad = localidadRepository.findById(domicilioActualizado.getLocalidad().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Localidad no válida."));
-            domicilioExistente.setLocalidad(localidad);
-            domicilioExistente.setLocalidad(domicilioActualizado.getLocalidad());
-        } else if (domicilioActualizado.getLocalidad() != null && domicilioActualizado.getLocalidad().getId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "ID de Localidad no puede ser nulo si se proporciona el objeto Localidad.");
+    public void eliminarDomicilio(Long usuarioId, Long domicilioId) {
+        Domicilio domicilio = repo.findById(domicilioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Domicilio no encontrado"));
+        if (!domicilio.getUsuario().getId().equals(usuarioId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puede eliminar este domicilio");
         }
 
-        // La actualización del usuario asociado a un domicilio debe manejarse con
-        // cuidado.
-        // Generalmente, un domicilio pertenece a un usuario y no se cambia de
-        // propietario fácilmente.
-        // Si se permite, se necesitarían validaciones.
-        if (domicilioActualizado.getUsuario() != null) {
-            // Validar que el usuario exista, etc.
-            domicilioExistente.setUsuario(domicilioActualizado.getUsuario());
-        }
-
-        return repo.save(domicilioExistente);
-    }
-
-    public void delete(Long id) {
-        if (!repo.existsById(id))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "No se puede eliminar: Domicilio no encontrado con ID: " + id);
-        repo.deleteById(id);
+        repo.deleteById(domicilioId);
     }
 }

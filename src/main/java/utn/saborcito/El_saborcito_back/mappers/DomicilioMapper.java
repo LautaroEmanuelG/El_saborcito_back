@@ -17,7 +17,6 @@ public interface DomicilioMapper {
 
     @Mappings({
             @Mapping(target = "usuario", ignore = true),
-            @Mapping(target = "principal", source = "principal"), // 👈 aseguramos este campo
             @Mapping(target = "localidad", source = "localidad")
     })
     Domicilio toEntity(DomicilioDTO domicilioDTO);

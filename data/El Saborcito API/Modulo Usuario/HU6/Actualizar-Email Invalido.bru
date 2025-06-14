@@ -5,9 +5,24 @@ meta {
 }
 
 put {
-  url: {{API_BASE_URL}}/empleados/{id}
-  body: text
+  url: {{API_BASE_URL}}/empleados/45
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "telefono": "1133557799",
+    "email": "correo-mal-formado",
+    "domicilios": [
+      {
+        "calle": "San Martín",
+        "numero": "987",
+        "cp": "2B"
+      }
+    ]
+  }
+  
 }
 
 body:text {

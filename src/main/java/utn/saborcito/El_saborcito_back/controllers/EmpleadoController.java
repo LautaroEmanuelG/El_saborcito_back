@@ -43,16 +43,26 @@ public class EmpleadoController {
 
 
     // --- HU06: Actualización general de datos del empleado ---
-    @PutMapping("/{id}")
+    // PATCH: Edición parcial por el empleado (autogestión)
+    @PatchMapping("/{id}")
     public ResponseEntity<EmpleadoDTO> updateEmpleado(
             @PathVariable Long id,
             @RequestBody ActualizarDatosEmpleadoDTO dto) {
         EmpleadoDTO updated = service.updateEmpleado(id, dto);
         if (updated != null) {
-        return ResponseEntity.ok(updated);
+            return ResponseEntity.ok(updated);
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // PUT: Edición completa por el admin (rol, estado, sucursal, etc)
+    @PutMapping("/admin/{id}")
+    public ResponseEntity<EmpleadoDTO> updateEmpleadoAdmin(
+            @PathVariable Long id,
+            @RequestBody ActualizarEmpleadoAdminDTO dto) {
+        EmpleadoDTO updated = service.updateEmpleadoAdmin(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
     // --- HU06: Cambio de contraseña desde el empleado ---
@@ -70,6 +80,4 @@ public class EmpleadoController {
         service.toggleEstado(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

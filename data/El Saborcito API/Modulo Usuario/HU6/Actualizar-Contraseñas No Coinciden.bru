@@ -5,9 +5,18 @@ meta {
 }
 
 put {
-  url: {{API_BASE_URL}}/empleados/{id}
-  body: text
+  url: {{API_BASE_URL}}/empleados/45/cambiar-password
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "currentPassword": "NuevoEmpleado@2026",
+    "newPassword": "NuevoEmpleado",
+    "confirmPassword": "NuevoEmpleado@2026"
+  }
+  
 }
 
 body:text {
