@@ -99,4 +99,5 @@ public class EmpleadoController {
         return ResponseEntity.ok(Map.of("mensaje", "Empleado dado de alta correctamente"));
     }
 
+
 }
