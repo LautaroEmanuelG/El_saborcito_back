@@ -45,6 +45,17 @@ public class SucursalController {
     }
 
 
+    @GetMapping("/exportar-pedidos-cliente-excel")
+    public void exportarPedidosClienteExcel(
+        @RequestParam Long clienteId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+        HttpServletResponse response
+    ) throws IOException {
+        service.exportarPedidosClienteExcel(clienteId, desde, hasta, response);
+    }
+
+
 
     @GetMapping("/exportar-ranking-clientes-excel")
     public void exportarRankingClientesExcel(

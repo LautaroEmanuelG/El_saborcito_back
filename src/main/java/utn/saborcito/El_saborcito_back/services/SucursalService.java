@@ -156,6 +156,63 @@ public class SucursalService {
                 .collect(Collectors.toList());
     }
 
+    public void exportarPedidosClienteExcel(
+    Long clienteId,
+    LocalDate desde,
+    LocalDate hasta,
+    HttpServletResponse response
+) throws IOException {
+    List<PedidoResumenPorClienteDTO> pedidos = getPedidosPorCliente(clienteId, desde, hasta);
+
+    try (Workbook workbook = new XSSFWorkbook()) {
+        Sheet sheet = workbook.createSheet("Pedidos Cliente " + clienteId);
+
+        // 1) Cabecera
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("ID Pedido");
+        header.createCell(1).setCellValue("Fecha Pedido");
+        header.createCell(2).setCellValue("Artículo");
+        header.createCell(3).setCellValue("Cantidad");
+        header.createCell(4).setCellValue("Precio Unitario");
+        header.createCell(5).setCellValue("Subtotal");
+
+        // 2) Filas de detalle
+        int rowNum = 1;
+        for (PedidoResumenPorClienteDTO pedido : pedidos) {
+            for (DetallePedidoDTO det : pedido.getDetalles()) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(pedido.getIdPedido());
+                row.createCell(1).setCellValue(pedido.getFechaPedido().toString());
+                row.createCell(2).setCellValue(det.getArticulo().getDenominacion());
+                row.createCell(3).setCellValue(det.getCantidad());
+                double precio = det.getArticulo().getPrecioVenta() != null
+                    ? det.getArticulo().getPrecioVenta()
+                    : 0;
+                row.createCell(4).setCellValue(precio);
+                row.createCell(5).setCellValue(det.getCantidad() * precio);
+            }
+            // fila de total de pedido
+            Row totalRow = sheet.createRow(rowNum++);
+            totalRow.createCell(4).setCellValue("Total Pedido");
+            totalRow.createCell(5).setCellValue(pedido.getTotal());
+        }
+
+        // 3) Ajustar ancho de columnas
+        for (int i = 0; i <= 5; i++) sheet.autoSizeColumn(i);
+
+        // 4) Envío de la respuesta
+        response.setContentType(
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        // El nombre real lo pondrá el front al descargar
+        response.setHeader(
+          "Content-Disposition",
+          "attachment; filename=pedidos-cliente-" + clienteId + ".xlsx"
+        );
+        workbook.write(response.getOutputStream());
+    }
+}
+
 
     public void exportarRankingClientesExcel(LocalDate desde, LocalDate hasta, String ordenarPor, HttpServletResponse response) {
         List<ClienteRankingDTO> ranking = getRankingClientes(desde, hasta, ordenarPor);
