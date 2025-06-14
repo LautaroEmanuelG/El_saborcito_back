@@ -1,0 +1,18 @@
+meta {
+  name: Admin/Modificar Empleado Con Rol Invalido
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{API_BASE_URL}}/empleados/admin/32
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "rol": "ADMIN"
+  }
+  
+}

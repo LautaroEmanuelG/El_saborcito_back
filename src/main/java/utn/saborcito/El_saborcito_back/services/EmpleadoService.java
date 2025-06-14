@@ -162,13 +162,6 @@ public class EmpleadoService {
         return empleadoMapper.toDTO(empleado);
     }
 
-    public void toggleEstado(Long empleadoId) {
-        Empleado empleado = empleadoRepository.findById(empleadoId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado"));
-        empleado.setEstado(!empleado.getEstado());
-        usuarioRepository.save(empleado);
-    }
-
     public void cambiarPassword(Long usuarioId, CambiarPasswordDTO dto) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado con ID: " + usuarioId));
@@ -233,19 +226,26 @@ public class EmpleadoService {
                 .build();
     }
 
-    public void bajaLogicaEmpleado(Long id){
+    // --- HU08: Baja lógica del empleado ---
+    public void bajaLogicaEmpleado(Long id) {
         Empleado empleado = empleadoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado con ID: " + id));
         if (!empleado.getEstado()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El empleado ya está dado de baja");
         }
         empleado.setEstado(false);
+        usuarioRepository.save(empleado);
         usuarioService.bajaLogicaUsuario(empleado.getId());
     }
-
-    public void altaCliente(Long id){
+    // --- HU08: Alta lógica del empleado ---
+    public void altaEmpleado(Long id) {
         Empleado empleado = empleadoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado con ID: " + id));
+        if (empleado.getEstado()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El empleado ya está activo");
+        }
+        empleado.setEstado(true);
+        usuarioRepository.save(empleado);
         usuarioService.altaUsuario(empleado.getId());
     }
 }
