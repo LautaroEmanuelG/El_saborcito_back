@@ -1,0 +1,26 @@
+{
+  "clienteId": 5,
+  "sucursalId": 1,
+  "tipoEnvioId": 1,
+  "formaPagoId": 1,
+  "estadoId": null,
+  "domicilio": {
+    "calle": "Nueva Calle",
+    "numero": 45678,
+    "cp": "5500",
+    "latitud": -32.8895,
+    "longitud": -68.8458,
+    "localidadId": 1
+  },
+  "domicilioExistenteId": null,
+  "detalles": [
+    {
+      "cantidad": 3,
+      "articuloId": 25
+    },
+    {
+      "cantidad": 3,
+      "articuloId": 34
+    }
+  ]
+}
