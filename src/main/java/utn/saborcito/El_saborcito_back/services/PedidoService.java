@@ -3,14 +3,16 @@ package utn.saborcito.El_saborcito_back.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.FacturaDTO;
 import utn.saborcito.El_saborcito_back.dto.PedidoDTO;
+import utn.saborcito.El_saborcito_back.dto.PedidoCreacionDTO;
 import utn.saborcito.El_saborcito_back.mappers.PedidoMapper;
-import utn.saborcito.El_saborcito_back.models.ArticuloManufacturado;
-import utn.saborcito.El_saborcito_back.models.Pedido;
+import utn.saborcito.El_saborcito_back.models.*;
 import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
-import utn.saborcito.El_saborcito_back.models.DetallePedido;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -190,7 +192,8 @@ public class PedidoService {
      * @param motivo La razón de la cancelación
      */
     private void notificarClienteSobreCancelacion(Pedido pedido, String motivo) {
-        if (pedido.getCliente() != null && pedido.getCliente() != null) {  //lo cambie porque cliente ya no tiene un usuario
+        if (pedido.getCliente() != null && pedido.getCliente() != null) { // lo cambie porque cliente ya no tiene un
+                                                                          // usuario
             // Aquí se implementaría el código para enviar una notificación al cliente
             // Por ejemplo, usando un servicio de email, SMS, o notificaciones push
 
