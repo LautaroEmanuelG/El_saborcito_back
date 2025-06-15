@@ -115,7 +115,7 @@ public class UsuarioService {
 //    }
 
     // ✅ NUEVO: Login Auth0 (HU1 y HU2)
-    public UsuarioDTO loginClienteManual(LoginRequest dto) {
+    public UsuarioDTO loginManual(LoginRequest dto) {
         Usuario usuario = repo.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos"));
 
@@ -130,7 +130,7 @@ public class UsuarioService {
         return usuarioMapper.toDTO(usuario);
     }
 
-    public UsuarioDTO loginClienteAuth0(String email) {
+    public UsuarioDTO loginAuth0(String email) {
         Usuario usuario = repo.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no registrado"));
 
@@ -140,6 +140,10 @@ public class UsuarioService {
 
         if (usuario.getAuth0Id() == null || usuario.getAuth0Id().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este usuario no se autentica con Auth0");
+        }
+        if (!usuario.getAuth0Id().equals(email)) {
+            // Conflicto: mismo email, diferente Auth0 ID
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email ya registrado con otro método");
         }
 
         return usuarioMapper.toDTO(usuario);

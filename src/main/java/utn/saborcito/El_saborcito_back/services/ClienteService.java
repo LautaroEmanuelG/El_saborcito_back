@@ -197,11 +197,11 @@ public class ClienteService {
 //        return usuario;
 //    }
     public UsuarioDTO loginClienteManual(LoginRequest dto) {
-        return usuarioService.loginClienteManual(dto);
+        return usuarioService.loginManual(dto);
     }
 
     public UsuarioDTO loginClienteAuth0(LoginRequest dto) {
-        return usuarioService.loginClienteAuth0(dto.getEmail());
+        return usuarioService.loginAuth0(dto.getEmail());
     }
     // --- HU07: Baja lógica del cliente ---
     public void bajaLogicaCliente(Long id) {
@@ -230,6 +230,12 @@ public class ClienteService {
         if (clienteExistente.isPresent()) {
             return actualizarDatosAuth0(clienteExistente.get(), auth0User);
         } else {
+            Optional<UsuarioDTO> emailExistente = usuarioService.findByEmail(auth0User.getEmail());
+
+            if (emailExistente.isPresent() && emailExistente.get().getAuth0Id() != null
+                    && !emailExistente.get().getAuth0Id().equals(auth0User.getSub())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email ya registrado con otro método");
+            }
             RegistroClienteDTO dto = new RegistroClienteDTO();
             dto.setNombre(auth0User.getGivenName());
             dto.setApellido(auth0User.getFamilyName());
