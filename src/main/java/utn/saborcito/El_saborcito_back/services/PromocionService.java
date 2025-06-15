@@ -8,9 +8,12 @@ import utn.saborcito.El_saborcito_back.dto.PromocionDTO;
 import utn.saborcito.El_saborcito_back.mappers.PromocionMapper;
 import utn.saborcito.El_saborcito_back.models.Promocion;
 import utn.saborcito.El_saborcito_back.models.Imagen;
+import utn.saborcito.El_saborcito_back.models.PromocionDetalle;
+import utn.saborcito.El_saborcito_back.models.Articulo;
 import utn.saborcito.El_saborcito_back.repositories.PromocionRepository;
 import utn.saborcito.El_saborcito_back.repositories.SucursalRepository;
 import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
+import utn.saborcito.El_saborcito_back.repositories.ArticuloRepository;
 import utn.saborcito.El_saborcito_back.models.Sucursal;
 
 import java.time.LocalDate;
@@ -24,6 +27,7 @@ public class PromocionService {
     private final PromocionRepository repo;
     private final SucursalRepository sucursalRepository;
     private final ImagenRepository imagenRepository;
+    private final ArticuloRepository articuloRepository;
     private final PromocionMapper promocionMapper;
 
     public List<PromocionDTO> findAll() {
@@ -46,6 +50,21 @@ public class PromocionService {
     public PromocionDTO save(PromocionDTO promocionDTO) {
         Promocion promocion = promocionMapper.toEntity(promocionDTO);
         validarPromocion(promocion, false, promocionDTO);
+
+        // Setear referencia inversa y asignar artículo concreto en los detalles
+        if (promocion.getPromocionDetalles() != null && promocionDTO.getPromocionDetalles() != null) {
+            for (int i = 0; i < promocion.getPromocionDetalles().size(); i++) {
+                PromocionDetalle detalle = promocion.getPromocionDetalles().get(i);
+                var detalleDTO = promocionDTO.getPromocionDetalles().get(i);
+                if (detalleDTO.getArticulo() != null && detalleDTO.getArticulo().getId() != null) {
+                    Articulo articulo = articuloRepository.findById(detalleDTO.getArticulo().getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId()));
+                    detalle.setArticulo(articulo);
+                }
+                detalle.setPromocion(promocion);
+            }
+        }
+
         Promocion savedPromocion = repo.save(promocion);
         return promocionMapper.toDTO(savedPromocion);
     }
@@ -68,8 +87,23 @@ public class PromocionService {
         existingPromocion.setPrecioPromocional(promocionActualizada.getPrecioPromocional());
         existingPromocion.setSucursal(promocionActualizada.getSucursal());
         existingPromocion.setImagen(promocionActualizada.getImagen());
-        existingPromocion.setPromocionDetalles(promocionActualizada.getPromocionDetalles());
         existingPromocion.setEliminado(promocionActualizada.isEliminado());
+
+        // Manejo correcto de la colección para evitar error Hibernate
+        existingPromocion.getPromocionDetalles().clear();
+        if (promocionActualizada.getPromocionDetalles() != null && promocionDTO.getPromocionDetalles() != null) {
+            for (int i = 0; i < promocionActualizada.getPromocionDetalles().size(); i++) {
+                PromocionDetalle detalle = promocionActualizada.getPromocionDetalles().get(i);
+                var detalleDTO = promocionDTO.getPromocionDetalles().get(i);
+                if (detalleDTO.getArticulo() != null && detalleDTO.getArticulo().getId() != null) {
+                    Articulo articulo = articuloRepository.findById(detalleDTO.getArticulo().getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId()));
+                    detalle.setArticulo(articulo);
+                }
+                detalle.setPromocion(existingPromocion);
+                existingPromocion.getPromocionDetalles().add(detalle);
+            }
+        }
 
         Promocion savedPromocion = repo.save(existingPromocion);
         return promocionMapper.toDTO(savedPromocion);
@@ -120,29 +154,23 @@ public class PromocionService {
         boolean tieneDescuento = p.getDescuento() != null && p.getDescuento() > 0;
         boolean tienePrecioPromocional = p.getPrecioPromocional() != null && p.getPrecioPromocional() > 0;
 
-        if (tieneDescuento && tienePrecioPromocional) { // Corregido 'y' a '&&'
+        if (tieneDescuento && tienePrecioPromocional) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "No puede usar descuento y precio promocional al mismo tiempo.");
         }
-        if (!tieneDescuento && !tienePrecioPromocional) { // Corregido 'y' a '&&'
+        if (!tieneDescuento && !tienePrecioPromocional) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Debe especificar un descuento o un precio promocional.");
         }
-        if (tieneDescuento && (p.getDescuento() <= 0 || p.getDescuento() >= 100)) { // Corregido 'y' a '&&'
+        if (tieneDescuento && (p.getDescuento() <= 0 || p.getDescuento() >= 100)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "El descuento debe ser un porcentaje entre 1 y 99.");
         }
-        if (tienePrecioPromocional && p.getPrecioPromocional() <= 0) { // Corregido 'y' a '&&'
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio promocional debe ser mayor a cero.");
-        } // Validación de artículos se maneja ahora a través de PromocionDetalles
-        // TODO: Implementar validación específica para el nuevo modelo
-
         if (tienePrecioPromocional && p.getPrecioPromocional() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "El precio promocional debe ser mayor a cero.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio promocional debe ser mayor a cero.");
         }
 
-        if (dto.getSucursal() != null && dto.getSucursal().getId() != null) { // Corregido 'y' a '&&'
+        if (dto.getSucursal() != null && dto.getSucursal().getId() != null) {
             Sucursal sucursal = sucursalRepository.findById(dto.getSucursal().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                             "Sucursal asociada no encontrada con ID: " + dto.getSucursal().getId()));
