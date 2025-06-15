@@ -16,8 +16,8 @@ public class DetallePedidoDTO {
     private Integer cantidad;
     private Integer cantidadConPromocion;
     private Integer cantidadSinPromocion;
-    private Double subtotal; // 💰 Subtotal guardado al momento de la venta
-    private OrigenDetalle origen; // 🏷️ Origen del detalle (INDIVIDUAL/PROMOCION)
-    private Long promocionOrigenId; // 🎁 ID de promoción si origen=PROMOCION
-    private ArticuloDTO articulo; // Usar ArticuloDTO para evitar recursividad
+    private Double subtotal;
+    private OrigenDetalle origen;
+    private Long promocionOrigenId;
+    private ArticuloDTO articulo;
 }

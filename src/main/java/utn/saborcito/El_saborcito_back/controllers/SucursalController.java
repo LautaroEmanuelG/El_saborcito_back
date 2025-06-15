@@ -34,6 +34,7 @@ public class SucursalController {
         this.service = service;
     }
 
+    //CLIENTES Y PEDIDOS
 
     @GetMapping("/pedidos-cliente")
     public List<PedidoResumenPorClienteDTO> getPedidosPorCliente(
@@ -42,6 +43,15 @@ public class SucursalController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
     ) {
         return service.getPedidosPorCliente(clienteId, desde, hasta);
+    }
+
+    @GetMapping("/ranking-clientes")
+    public List<ClienteRankingDTO> getRankingClientes(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+        @RequestParam(defaultValue = "cantidad") String ordenarPor
+    ) {
+        return service.getRankingClientes(desde, hasta, ordenarPor);
     }
 
 
@@ -68,15 +78,8 @@ public class SucursalController {
     }
 
 
-    @GetMapping("/exportar-excel")
-    public ResponseEntity<byte[]> exportarRankingProductosExcel(
-        @RequestParam LocalDate desde,
-        @RequestParam LocalDate hasta
-    ) {
-        return service.exportarRankingProductosExcel(desde, hasta);
-    }
 
-
+    //MOVIMIENTOS MONETARIOS
     @GetMapping("/movimientos")
     public MovimientoMonetarioDTO getMovimientos(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
@@ -120,23 +123,6 @@ public class SucursalController {
     }
 
 
-    @GetMapping("/ranking-clientes")
-    public List<ClienteRankingDTO> getRankingClientes(
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
-        @RequestParam(defaultValue = "cantidad") String ordenarPor
-    ) {
-        return service.getRankingClientes(desde, hasta, ordenarPor);
-    }
-
-    @GetMapping("/ranking-productos")
-    public ProductoRankingConResumenDTO getRankingProductos(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
-    ) {
-        return service.getRankingProductos(desde, hasta);
-    }
-
     @GetMapping("/detalle-ganancias")
     public List<PedidoGananciaDetalleDTO> getDetalleGanancias(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
@@ -171,6 +157,23 @@ public class SucursalController {
         service.exportarDetalleCostosExcel(desde, hasta, response);
     }
 
+    // DETALLES DE PEDIDOS Y RANKING DE PRODUCTOS
+
+    @GetMapping("/ranking-productos")
+    public ProductoRankingConResumenDTO getRankingProductos(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+    ) {
+        return service.getRankingProductos(desde, hasta);
+    }
+
+    @GetMapping("/exportar-excel")
+    public ResponseEntity<byte[]> exportarRankingProductosExcel(
+        @RequestParam LocalDate desde,
+        @RequestParam LocalDate hasta
+    ) {
+        return service.exportarRankingProductosExcel(desde, hasta);
+    }
 
     @GetMapping
     public List<SucursalDTO> getAll() {

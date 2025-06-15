@@ -16,15 +16,35 @@ headers {
 
 body:json {
   {
-    "horasEstimadaFinalizacion": "00:45:00",
-    "total": 2500.0,
-    "totalCosto": 1700.0,
-    "fechaPedido": "2025-05-10",
-    "estado": "PENDIENTE",
-    "tipoEnvio": "TAKE_AWAY",
-    "formaPago": "MERCADO_PAGO",
-    "cliente": { "id": 1 },
-    "sucursal": { "id": 1 }
+    "clienteId": 5,
+    "estadoId": 1,
+    "tipoEnvioId": 1,
+    "formaPagoId": 1,
+    "sucursalId": 1,
+    "domicilio": {
+      "calle": "Nueva Calle",
+      "numero": 45678,
+      "cp": "5500",
+      "latitud": -32.8895,
+      "longitud": -68.8458,
+      "localidadId": 1
+    },
+    "detalles": [
+      {
+        "cantidad": 3,
+        "articuloId": 25
+      },
+      {
+        "cantidad": 3,
+        "articuloId": 34
+      }
+    ],
+    "promocionesSeleccionadas": [
+      {
+        "promocionId": 3,
+        "cantidad": 2
+      }
+    ]
   }
   
 }
