@@ -1,51 +1,25 @@
 package utn.saborcito.El_saborcito_back.services;
 
 import lombok.RequiredArgsConstructor;
-
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import utn.saborcito.El_saborcito_back.dto.PedidoResumenPorClienteDTO;
-import utn.saborcito.El_saborcito_back.dto.ArticuloDTO;
-import utn.saborcito.El_saborcito_back.dto.ClienteRankingDTO;
-import utn.saborcito.El_saborcito_back.dto.DetallePedidoDTO;
-import utn.saborcito.El_saborcito_back.dto.MovimientoMonetarioDTO;
-import utn.saborcito.El_saborcito_back.dto.ProductoRankingConResumenDTO;
-import utn.saborcito.El_saborcito_back.dto.ProductoRankingDTO;
-import utn.saborcito.El_saborcito_back.dto.SucursalDTO;
-import utn.saborcito.El_saborcito_back.dto.PedidoGananciaDetalleDTO;
-import utn.saborcito.El_saborcito_back.dto.PedidoCostoDetalleDTO;
+import utn.saborcito.El_saborcito_back.dto.*;
 import utn.saborcito.El_saborcito_back.mappers.SucursalMapper;
-import utn.saborcito.El_saborcito_back.models.Articulo;
-import utn.saborcito.El_saborcito_back.models.Cliente;
-import utn.saborcito.El_saborcito_back.models.DetallePedido;
-import utn.saborcito.El_saborcito_back.models.Domicilio;
-import utn.saborcito.El_saborcito_back.models.Pedido;
-import utn.saborcito.El_saborcito_back.models.Sucursal;
-import utn.saborcito.El_saborcito_back.repositories.DetallePedidoRepository;
-import utn.saborcito.El_saborcito_back.repositories.DomicilioRepository;
-import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
-import utn.saborcito.El_saborcito_back.repositories.SucursalRepository;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.Comparator;
-import org.apache.poi.ss.usermodel.*;
+import utn.saborcito.El_saborcito_back.models.*;
+import utn.saborcito.El_saborcito_back.repositories.*;
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.http.ResponseEntity;
-import java.io.ByteArrayOutputStream;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -55,7 +29,6 @@ public class SucursalService {
     private final SucursalMapper sucursalMapper;
     private final DetallePedidoRepository detallePedidoRepo;
     private final PedidoRepository pedidoRepository;
-    private final CalculadoraPedidoService calculadoraPedidoService; // Agregar esta dependencia
 
     public ResponseEntity<byte[]> exportarRankingProductosExcel(LocalDate desde, LocalDate hasta) {
         List<ProductoRankingDTO> ranking = getRankingProductos(desde, hasta).getProductos();
