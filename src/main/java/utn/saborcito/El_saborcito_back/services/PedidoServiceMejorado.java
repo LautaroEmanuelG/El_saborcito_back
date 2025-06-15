@@ -37,8 +37,26 @@ public class PedidoServiceMejorado {
     private final PromocionComboService promocionComboService;
     private final PedidoMapper pedidoMapper;
 
+    // NUEVO: DTO para respuesta que incluye pedido y factura
+    public static class PedidoConFacturaDTO {
+        private PedidoDTO pedido;
+        private Long facturaId;
+
+        public PedidoConFacturaDTO() {}
+
+        public PedidoConFacturaDTO(PedidoDTO pedido, Long facturaId) {
+            this.pedido = pedido;
+            this.facturaId = facturaId;
+        }
+
+        public PedidoDTO getPedido() { return pedido; }
+        public void setPedido(PedidoDTO pedido) { this.pedido = pedido; }
+        public Long getFacturaId() { return facturaId; }
+        public void setFacturaId(Long facturaId) { this.facturaId = facturaId; }
+    }
+
     @Transactional
-    public PedidoDTO crearPedidoCompleto(PedidoCreacionDTO dto) {
+    public PedidoConFacturaDTO crearPedidoCompleto(PedidoCreacionDTO dto) {
         try {
             validarDatosCreacion(dto);
 
@@ -52,9 +70,9 @@ public class PedidoServiceMejorado {
             calcularTiempoEstimado(pedido);
 
             Pedido pedidoGuardado = pedidoRepository.save(pedido);
-            crearFacturaAutomatica(pedidoGuardado);
+            Long facturaId = crearFacturaAutomatica(pedidoGuardado);
 
-            return pedidoMapper.toDTO(pedidoGuardado);
+            return new PedidoConFacturaDTO(pedidoMapper.toDTO(pedidoGuardado), facturaId);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al crear pedido: " + e.getMessage(), e);
         }
@@ -164,7 +182,7 @@ public class PedidoServiceMejorado {
     }
 
     private List<DetallePedido> crearDetallesPedido(Pedido pedido,
-            List<PedidoCreacionDTO.DetallePedidoCreacionDTO> detallesDTO) {
+                                                    List<PedidoCreacionDTO.DetallePedidoCreacionDTO> detallesDTO) {
         if (detallesDTO == null || detallesDTO.isEmpty()) {
             return new ArrayList<>();
         }
@@ -194,7 +212,7 @@ public class PedidoServiceMejorado {
     }
 
     private void aplicarPromociones(Pedido pedido, List<DetallePedido> detalles,
-            List<PromocionSeleccionadaDTO> promocionesSeleccionadas) {
+                                    List<PromocionSeleccionadaDTO> promocionesSeleccionadas) {
         if (promocionesSeleccionadas != null && !promocionesSeleccionadas.isEmpty()) {
             List<DetallePedidoPromocion> promociones = promocionComboService.aplicarPromocionesSeleccionadas(
                     pedido, detalles, promocionesSeleccionadas, pedido.getSucursal());
@@ -215,25 +233,25 @@ public class PedidoServiceMejorado {
         pedido.setHorasEstimadaFinalizacion(horaEstimada);
     }
 
-    private void crearFacturaAutomatica(Pedido pedido) {
+    // MODIFICADO: Ahora retorna el ID de la factura generada
+    private Long crearFacturaAutomatica(Pedido pedido) {
         try {
-            FacturaDTO facturaDTO = new FacturaDTO();
-            facturaDTO.setTotalVenta(pedido.getTotal());
-            facturaDTO.setFechaFacturacion(LocalDate.now());
-            facturaDTO.setClienteEmail(pedido.getCliente().getEmail());
+            if (pedido.getFormaPago() != null && pedido.getFormaPago().getId() != null) {
+                FacturaDTO facturaDTO = FacturaDTO.builder()
+                        .pedido(pedidoMapper.toDTO(pedido))
+                        .formaPago(FormaPagoDTO.builder().id(pedido.getFormaPago().getId()).build())
+                        .totalVenta(pedido.getTotal())
+                        .fechaFacturacion(LocalDate.now())
+                        .clienteEmail(pedido.getCliente().getEmail())
+                        .build();
 
-            PedidoDTO pedidoRef = new PedidoDTO();
-            pedidoRef.setId(pedido.getId());
-            facturaDTO.setPedido(pedidoRef);
-
-            FormaPagoDTO formaPagoRef = new FormaPagoDTO();
-            formaPagoRef.setId(pedido.getFormaPago().getId());
-            facturaDTO.setFormaPago(formaPagoRef);
-
-            facturaService.save(facturaDTO);
+                FacturaDTO facturaGuardada = facturaService.save(facturaDTO);
+                return facturaGuardada.getId(); // Retornar el ID de la factura
+            }
         } catch (IOException e) {
             System.err.println("Error al generar factura: " + e.getMessage());
         }
+        return null; // Si no se pudo generar la factura
     }
 
     private Map<String, Object> crearInfoValidacion(Promocion promocion) {

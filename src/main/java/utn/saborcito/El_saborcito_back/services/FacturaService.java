@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.DetalleFacturaRenderizadoDTO;
 import utn.saborcito.El_saborcito_back.dto.FacturaDTO;
 import utn.saborcito.El_saborcito_back.mappers.FacturaMapper;
 import utn.saborcito.El_saborcito_back.models.Factura;
@@ -12,6 +13,7 @@ import utn.saborcito.El_saborcito_back.models.Pedido;
 import utn.saborcito.El_saborcito_back.repositories.FacturaRepository;
 import utn.saborcito.El_saborcito_back.repositories.FormaPagoRepository;
 import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
+
 
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +29,8 @@ public class FacturaService {
     private final FormaPagoRepository formaPagoRepository;
     private final FacturaPdfGeneratorService facturaPdfGenerator;
     private final EmailService emailService;
+    private final FacturaRenderService facturaRenderService;
+
 
     public List<FacturaDTO> findAll() {
         return facturaRepository.findAll()
@@ -41,9 +45,48 @@ public class FacturaService {
         return facturaMapper.toDTO(factura);
     }
 
+    // NUEVO: Buscar factura por pedido ID
+    public FacturaDTO findByPedidoId(Long pedidoId) {
+        Factura factura = facturaRepository.findByPedidoId(pedidoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Factura no encontrada para el pedido con id: " + pedidoId));
+        return facturaMapper.toDTO(factura);
+    }
+
     public Factura findEntityById(Long id) {
-        return facturaRepository.findById(id)
+        // Usar fetch join para traer la factura con pedido y detalles inicializados
+        return facturaRepository.findByIdWithPedidoAndDetalles(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Factura no encontrada con id: " + id));
+    }
+
+    // NUEVO: Regenerar PDF de una factura existente
+    public byte[] regenerarPDF(Long facturaId) throws IOException {
+        Factura factura = findEntityById(facturaId);
+
+        // 👇 Asegurar que los detalles se cargan
+        facturaRenderService.cargarDetallesPedido(factura.getPedido());
+
+        List<DetalleFacturaRenderizadoDTO> renderItems = facturaRenderService.construirDetalleFactura(factura.getPedido());
+
+        return facturaPdfGenerator.generarFacturaPdf(factura, renderItems);
+    }
+
+
+    // NUEVO: Reenviar factura por email
+    public void reenviarFacturaPorEmail(Long facturaId) throws IOException {
+        Factura factura = findEntityById(facturaId);
+
+        // Regenerar PDF
+        List<DetalleFacturaRenderizadoDTO> renderItems = facturaRenderService.construirDetalleFactura(factura.getPedido());
+        byte[] pdfBytes = facturaPdfGenerator.generarFacturaPdf(factura, renderItems);
+
+        // Obtener email del cliente
+        String emailCliente = factura.getPedido().getCliente().getEmail();
+        if (emailCliente == null || emailCliente.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cliente no tiene email registrado");
+        }
+
+        // Enviar por email
+        emailService.enviarFacturaPorEmail(emailCliente, pdfBytes, "factura_" + factura.getId() + ".pdf");
     }
 
     public FacturaDTO save(FacturaDTO dto) throws IOException {
@@ -72,7 +115,9 @@ public class FacturaService {
         Factura savedFactura = facturaRepository.save(factura);
 
         // Generar PDF y enviar email
-        byte[] pdfBytes = facturaPdfGenerator.generarFacturaPdf(savedFactura);
+        List<DetalleFacturaRenderizadoDTO> renderItems = facturaRenderService.construirDetalleFactura(savedFactura.getPedido());
+        byte[] pdfBytes = facturaPdfGenerator.generarFacturaPdf(savedFactura, renderItems);
+
         String emailCliente = (dto.getClienteEmail() != null && !dto.getClienteEmail().isEmpty())
                 ? dto.getClienteEmail()
                 : savedFactura.getPedido().getCliente().getEmail();

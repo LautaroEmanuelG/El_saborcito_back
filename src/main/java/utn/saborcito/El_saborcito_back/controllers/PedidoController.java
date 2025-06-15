@@ -29,7 +29,7 @@ public class PedidoController {
     }
 
     @PostMapping
-    public PedidoDTO create(@RequestBody PedidoCreacionDTO pedidoDTO) {
+    public PedidoServiceMejorado.PedidoConFacturaDTO create(@RequestBody PedidoCreacionDTO pedidoDTO) {
         return serviceMejorado.crearPedidoCompleto(pedidoDTO);
     }
 
