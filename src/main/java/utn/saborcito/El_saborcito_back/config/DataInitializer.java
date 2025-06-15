@@ -47,6 +47,7 @@
 // import utn.saborcito.El_saborcito_back.models.Cliente;
 // import utn.saborcito.El_saborcito_back.models.Pedido;
 // import utn.saborcito.El_saborcito_back.models.DetallePedido;
+// import utn.saborcito.El_saborcito_back.models.DetallePedidoPromocion;
 // import utn.saborcito.El_saborcito_back.models.Factura;
 // import utn.saborcito.El_saborcito_back.models.DatosMercadoPago;
 // import utn.saborcito.El_saborcito_back.models.HorarioAtencion;
@@ -58,7 +59,9 @@
 // import utn.saborcito.El_saborcito_back.enums.Rol;
 // import utn.saborcito.El_saborcito_back.enums.DiaSemana;
 // import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
-//
+// import utn.saborcito.El_saborcito_back.repositories.DetallePedidoPromocionRepository;
+
+
 // import java.time.LocalDate;
 // import java.time.LocalDateTime;
 // import java.time.LocalTime;
@@ -100,7 +103,8 @@
 //             TipoEnvioRepository tipoEnvioRepo,
 //             FormaPagoRepository formaPagoRepo,
 //             EmpleadoRepository empleadoRepo,
-//             HistorialPedidoRepository historialPedidoRepo) {
+//             HistorialPedidoRepository historialPedidoRepo,
+//             DetallePedidoPromocionRepository detallePedidoPromocionRepo) {
 //         return args -> {
 //             // 1. Geografía y usuarios
 //             Pais pais = paisRepo.save(Pais.builder().nombre("Argentina").build());
@@ -204,7 +208,7 @@
 //                     .orElseGet(() -> formaPagoRepo
 //                             .save(FormaPago.builder().nombre("TRANSFERENCIA").build()));
 //             // 4. Catálogo de productos - Creamos las categorías principales y subcategorías
-//
+
 //             // -- Categorías principales
 //             Categoria categoriaSandwiches = categoriaRepo.save(
 //                     Categoria.builder()
@@ -234,7 +238,7 @@
 //                             .tipo(CategoriaTipo.INSUMOS)
 //                             .build()
 //             );
-//
+
 //            // -- Subcategorías de Sandwiches
 //             Categoria categoriaHamburguesas = categoriaRepo.save(
 //                     Categoria.builder()
@@ -252,7 +256,7 @@
 //                             .tipo(CategoriaTipo.MANUFACTURADOS)
 //                             .build()
 //             );
-//
+
 //            // -- Subcategorías de Bebidas
 //             Categoria categoriaGaseosas = categoriaRepo.save(
 //                     Categoria.builder()
@@ -278,9 +282,9 @@
 //                             .tipo(CategoriaTipo.INSUMOS)
 //                             .build()
 //             );
-//
-//
-//
+
+
+
 //             // 5. Imágenes para cada tipo de producto
 //             Imagen imagenHamburguesa = imagenRepo
 //                     .save(Imagen.builder().url("/img/productos/hamburguesas/hamburguesa.png")
@@ -1288,6 +1292,7 @@
 //             detallePedidoRepo.save(DetallePedido.builder()
 //                     .pedido(p3_2).cantidad(2).articulo(pizzaMargherita).build());
 
+
 //             // CLIENTE 4
 //             Usuario usuario4 = usuarioRepo.save(Usuario.builder()
 //                     .auth0Id("auth0|6")
@@ -1719,6 +1724,109 @@
 //                     .articulo(insumoCocaCola) // Gaseosa
 //                     .cantidadRequerida(1)
 //                     .build());
+
+        
+//             Pedido p3_3 = pedidoRepo.save(Pedido.builder()
+//                 .fechaPedido(LocalDate.now().minusDays(1))
+//                 .horasEstimadaFinalizacion(LocalTime.of(21, 0))
+//                 .total(comboCervezaHamburguesa.getPrecioPromocional())
+//                 .totalCosto(
+//                         insumoCervezaArtesanal.getPrecioVenta().doubleValue() +
+//                         hamburguesaClasica.getPrecioVenta().doubleValue()
+//                 )
+//                 .cliente(cliente3)
+//                 .sucursal(sucursal)
+//                 .estado(estadoEntregado)
+//                 .tipoEnvio(tipoDelivery)
+//                 .formaPago(formaPagoMercadoPago)
+//                 .build());
+
+//                 // Asociar la promoción al pedido
+//                 detallePedidoPromocionRepo.save(DetallePedidoPromocion.builder()
+//                 .pedido(p3_3)
+//                 .promocion(comboCervezaHamburguesa)
+//                 .cantidadPromocion(1)
+//                 .precioTotalPromocion(comboCervezaHamburguesa.getPrecioPromocional())
+//                 .ahorroTotal(
+//                         // calcula cuánto se hubiera pagado sin promo menos el precio promocional
+//                         insumoCervezaArtesanal.getPrecioVenta().doubleValue() +
+//                         hamburguesaClasica.getPrecioVenta().doubleValue()
+//                         - comboCervezaHamburguesa.getPrecioPromocional()
+//                 )
+//                 .build());
+
+//                 Usuario usuario8 = usuarioRepo.save(Usuario.builder()
+//     .auth0Id("auth0|8")
+//     .username("cliente8")
+//     .email("cliente8@ejemplo.com")
+//     .password("pass")
+//     .nombre("Mariana")
+//     .apellido("Pérez")
+//     .telefono("+5491166677888")
+//     .fechaNacimiento(LocalDate.of(1992,  3, 10))
+//     .rol(Rol.CLIENTE)
+//     .estado(true)
+//     .fechaRegistro(LocalDateTime.now())
+//     .fechaUltimaModificacion(LocalDateTime.now())
+//     .build());
+
+// Domicilio dom8 = domicilioRepo.save(Domicilio.builder()
+//     .calle("Belgrano")
+//     .numero(789)
+//     .cp("5500")
+//     .usuario(usuario8)
+//     .localidad(localidad)
+//     .build());
+
+// Cliente cliente8 = clienteRepo.save(Cliente.builder()
+//     .id(usuario8.getId())
+//     .auth0Id(usuario8.getAuth0Id())
+//     .username(usuario8.getUsername())
+//     .email(usuario8.getEmail())
+//     .password(usuario8.getPassword())
+//     .nombre(usuario8.getNombre())
+//     .apellido(usuario8.getApellido())
+//     .telefono(usuario8.getTelefono())
+//     .fechaNacimiento(usuario8.getFechaNacimiento())
+//     .rol(usuario8.getRol())
+//     .estado(usuario8.getEstado())
+//     .fechaRegistro(usuario8.getFechaRegistro())
+//     .fechaUltimaModificacion(usuario8.getFechaUltimaModificacion())
+//     .domicilios(List.of(dom8))
+//     .build());
+
+// // ————————————————————————————————————————————
+// // 2) Crear pedido promocional p8_1 para cliente8
+// // ————————————————————————————————————————————
+
+// Pedido p8_1 = pedidoRepo.save(Pedido.builder()
+//     .fechaPedido(LocalDate.now())
+//     .horasEstimadaFinalizacion(LocalTime.of(20, 30))
+//     .total(comboCervezaHamburguesa.getPrecioPromocional())
+//     .totalCosto(0.0) // ajustar según coste real si lo deseas
+//     .cliente(cliente8)
+//     .sucursal(sucursal)
+//     .estado(estadoConfirmado)
+//     .tipoEnvio(tipoTakeAway)
+//     .formaPago(formaPagoEfectivo)
+//     .build());
+
+// // ————————————————————————————————————————————
+// // 3) Asociar la promoción al pedido p8_1
+// // ————————————————————————————————————————————
+
+// detallePedidoPromocionRepo.save(DetallePedidoPromocion.builder()
+//     .pedido(p8_1)
+//     .promocion(comboCervezaHamburguesa)
+//     .cantidadPromocion(1)
+//     .precioTotalPromocion(comboCervezaHamburguesa.getPrecioPromocional())
+//     .ahorroTotal(
+//         insumoCervezaArtesanal.getPrecioVenta().doubleValue() +
+//         hamburguesaClasica.getPrecioVenta().doubleValue()
+//         - comboCervezaHamburguesa.getPrecioPromocional()
+//     )
+//     .build());
+        
 
 //             // 12. Historial de Pedidos
 //             // Historial para el pedido del Cliente 1
