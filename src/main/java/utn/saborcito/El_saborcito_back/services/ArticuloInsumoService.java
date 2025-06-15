@@ -80,8 +80,8 @@ public class ArticuloInsumoService {
             if (dto.getStockActual() == null || dto.getStockActual() < 0) {
                 throw new Exception("El stock actual no puede ser negativo.");
             }
-            if (dto.getStockMaximo() == null || dto.getStockMaximo() <= 0) {
-                throw new Exception("El stock máximo debe ser mayor que cero.");
+            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0) {
+                throw new Exception("El stock mínimo no puede ser negativo.");
             }
             if (dto.getEsParaElaborar() == null) {
                 throw new Exception("Debe indicar si el insumo es para elaborar.");
@@ -111,6 +111,8 @@ public class ArticuloInsumoService {
                             "No se encontró la unidad de medida con el ID: " + dto.getUnidadMedida().getId()));
             insumo.setUnidadMedida(unidadMedida);
 
+            insumo.setStockMinimo(dto.getStockMinimo());
+
             return articuloInsumoMapper.toDTO(articuloInsumoRepository.save(insumo));
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -136,17 +138,16 @@ public class ArticuloInsumoService {
             }
             insumoExistente.setStockActual(dto.getStockActual());
 
-            if (dto.getStockMaximo() == null || dto.getStockMaximo() <= 0) {
-                throw new Exception("El stock máximo debe ser mayor que cero.");
+            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0) {
+                throw new Exception("El stock mínimo no puede ser negativo.");
             }
-            insumoExistente.setStockMaximo(dto.getStockMaximo());
+            insumoExistente.setStockMinimo(dto.getStockMinimo());
 
             if (dto.getEsParaElaborar() == null) {
                 throw new Exception("Debe indicar si el insumo es para elaborar.");
             }
             insumoExistente.setEsParaElaborar(dto.getEsParaElaborar());
 
-            // <--- AQUÍ AGREGA ESTO --->
             insumoExistente.setEliminado(dto.getEliminado() != null ? dto.getEliminado() : false);
             if (dto.getEliminado() != null && dto.getEliminado()) {
                 insumoExistente.setFechaEliminacion(LocalDateTime.now());
@@ -184,7 +185,7 @@ public class ArticuloInsumoService {
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
-    } // Método de delete lógico
+    }
 
     @Transactional
     public void delete(Long id) throws Exception {
@@ -259,8 +260,7 @@ public class ArticuloInsumoService {
      */
     private ArticuloInsumoDTO toDtoWithDeletedFields(ArticuloInsumo entity) {
         ArticuloInsumoDTO dto = articuloInsumoMapper.toDTO(entity);
-        // Los campos eliminado y fechaEliminacion se incluirán si el DTO los tiene
-        // definidos
+        // Los campos eliminado y fechaEliminacion se incluirán si el DTO los tiene definidos
         return dto;
     }
 }

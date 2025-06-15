@@ -23,6 +23,7 @@ public class PromocionDTO {
     private SucursalDTO sucursal;
     private ImagenDTO imagen; // 🆕 Nueva imagen para la promoción
     private List<PromocionDetalleDTO> promocionDetalles; // 🆕 Nueva lista de detalles
+    private Boolean eliminado;
 
     // @Deprecated - Mantener por compatibilidad temporal
     private ArticuloDTO articulo;

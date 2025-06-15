@@ -1,12 +1,12 @@
-package utn.saborcito.El_saborcito_back.mappers;
+package com.example.mapper;
 
+import com.example.dto.PromocionDTO;
+import com.example.dto.PromocionDetalleDTO;
+import com.example.entity.Promocion;
+import com.example.entity.PromocionDetalle;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import utn.saborcito.El_saborcito_back.models.Promocion;
-import utn.saborcito.El_saborcito_back.models.PromocionDetalle;
-import utn.saborcito.El_saborcito_back.dto.PromocionDTO;
-import utn.saborcito.El_saborcito_back.dto.PromocionDetalleDTO;
 
 @Mapper(componentModel = "spring", uses = { ImagenMapper.class, SucursalMapper.class })
 public interface PromocionMapper {
