@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
 
 @Entity
 @Data
@@ -25,4 +26,10 @@ public class Categoria {
     @ManyToOne
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;
+
+    @Enumerated(EnumType.STRING)
+    private CategoriaTipo tipo;
+
+    // NUEVO: campo para baja lógica
+    private boolean eliminado = false;
 }

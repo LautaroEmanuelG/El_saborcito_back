@@ -55,7 +55,8 @@
 // import utn.saborcito.El_saborcito_back.models.HistorialPedido;
 // import utn.saborcito.El_saborcito_back.enums.Rol;
 // import utn.saborcito.El_saborcito_back.enums.DiaSemana;
-
+// import utn.saborcito.El_saborcito_back.enums.CategoriaTipo;
+//
 // import java.time.LocalDate;
 // import java.time.LocalDateTime;
 // import java.time.LocalTime;
@@ -201,41 +202,83 @@
 //                     .orElseGet(() -> formaPagoRepo
 //                             .save(FormaPago.builder().nombre("TRANSFERENCIA").build()));
 //             // 4. Catálogo de productos - Creamos las categorías principales y subcategorías
+//
 //             // -- Categorías principales
 //             Categoria categoriaSandwiches = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Sandwiches").sucursal(sucursal).build());
+//                     Categoria.builder()
+//                             .denominacion("Sandwiches")
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.MANUFACTURADOS)
+//                             .build()
+//             );
 //             Categoria categoriaPizzas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Pizzas").sucursal(sucursal).build());
+//                     Categoria.builder()
+//                             .denominacion("Pizzas")
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.MANUFACTURADOS)
+//                             .build()
+//             );
 //             Categoria categoriaBebidas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Bebidas").sucursal(sucursal).build());
+//                     Categoria.builder()
+//                             .denominacion("Bebidas")
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
 //             Categoria categoriaInsumos = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Insumos").sucursal(sucursal).build());
-
-//             // -- Subcategorías
-//             // Subcategorías de Sandwiches
+//                     Categoria.builder()
+//                             .denominacion("Insumos")
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
+//
+//            // -- Subcategorías de Sandwiches
 //             Categoria categoriaHamburguesas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Hamburguesas")
+//                     Categoria.builder()
+//                             .denominacion("Hamburguesas")
 //                             .tipoCategoria(categoriaSandwiches)
-//                             .sucursal(sucursal).build());
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.MANUFACTURADOS)
+//                             .build()
+//             );
 //             Categoria categoriaLomos = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Lomos")
+//                     Categoria.builder()
+//                             .denominacion("Lomos")
 //                             .tipoCategoria(categoriaSandwiches)
-//                             .sucursal(sucursal).build());
-
-//             // Subcategorías de Bebidas
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.MANUFACTURADOS)
+//                             .build()
+//             );
+//
+//            // -- Subcategorías de Bebidas
 //             Categoria categoriaGaseosas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Gaseosas")
+//                     Categoria.builder()
+//                             .denominacion("Gaseosas")
 //                             .tipoCategoria(categoriaBebidas)
-//                             .sucursal(sucursal).build());
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
 //             Categoria categoriaAguas = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Aguas")
+//                     Categoria.builder()
+//                             .denominacion("Aguas")
 //                             .tipoCategoria(categoriaBebidas)
-//                             .sucursal(sucursal).build());
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
 //             Categoria categoriaTragos = categoriaRepo.save(
-//                     Categoria.builder().denominacion("Tragos")
+//                     Categoria.builder()
+//                             .denominacion("Tragos")
 //                             .tipoCategoria(categoriaBebidas)
-//                             .sucursal(sucursal).build());
-
+//                             .sucursal(sucursal)
+//                             .tipo(CategoriaTipo.INSUMOS)
+//                             .build()
+//             );
+//
+//
+//
 //             // 5. Imágenes para cada tipo de producto
 //             Imagen imagenHamburguesa = imagenRepo
 //                     .save(Imagen.builder().url("/img/productos/hamburguesas/hamburguesa.png")
@@ -322,7 +365,7 @@
 //             ArticuloInsumo insumoHarina = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Harina 000")
 //                     .precioVenta(1000.0)
-//                     .categoria(categoriaPizzas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(700.0)
 //                     .stockActual(10000)
@@ -334,7 +377,7 @@
 //             ArticuloInsumo insumoQueso = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Mozzarella")
 //                     .precioVenta(2500.0)
-//                     .categoria(categoriaPizzas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(2000.0)
 //                     .stockActual(5000)
@@ -346,7 +389,7 @@
 //             ArticuloInsumo insumoCarne = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Carne Molida Premium")
 //                     .precioVenta(3500.0)
-//                     .categoria(categoriaHamburguesas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(3000.0)
 //                     .stockActual(4000)
@@ -358,7 +401,7 @@
 //             ArticuloInsumo insumoPan = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Pan de Hamburguesa")
 //                     .precioVenta(1500.0)
-//                     .categoria(categoriaHamburguesas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadUnidad)
 //                     .precioCompra(1200.0)
 //                     .stockActual(100)
@@ -370,7 +413,7 @@
 //             ArticuloInsumo insumoLechuga = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Lechuga Fresca")
 //                     .precioVenta(800.0)
-//                     .categoria(categoriaHamburguesas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(600.0)
 //                     .stockActual(2000)
@@ -382,7 +425,7 @@
 //             ArticuloInsumo insumoTomate = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Tomate")
 //                     .precioVenta(900.0)
-//                     .categoria(categoriaHamburguesas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(700.0)
 //                     .stockActual(3000)
@@ -394,7 +437,7 @@
 //             ArticuloInsumo insumoCebolla = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Cebolla")
 //                     .precioVenta(600.0)
-//                     .categoria(categoriaHamburguesas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(400.0)
 //                     .stockActual(2500)
@@ -406,7 +449,7 @@
 //             ArticuloInsumo insumoPanLomo = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Pan de Lomo")
 //                     .precioVenta(1700.0)
-//                     .categoria(categoriaLomos)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadUnidad)
 //                     .precioCompra(1400.0)
 //                     .stockActual(80)
@@ -418,7 +461,7 @@
 //             ArticuloInsumo insumoCarneLomo = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Bife de Lomo")
 //                     .precioVenta(5000.0)
-//                     .categoria(categoriaLomos)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(4500.0)
 //                     .stockActual(3000)
@@ -430,7 +473,7 @@
 //             ArticuloInsumo insumoSalsaTomate = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Salsa de Tomate")
 //                     .precioVenta(1200.0)
-//                     .categoria(categoriaPizzas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(900.0)
 //                     .stockActual(4000)
@@ -443,7 +486,7 @@
 //             ArticuloInsumo insumoQuesoProvolone = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Provolone")
 //                     .precioVenta(2800.0)
-//                     .categoria(categoriaPizzas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(2200.0)
 //                     .stockActual(1000)
@@ -455,7 +498,7 @@
 //             ArticuloInsumo insumoQuesoRoquefort = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Roquefort")
 //                     .precioVenta(3000.0)
-//                     .categoria(categoriaPizzas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(2500.0)
 //                     .stockActual(800)
@@ -467,7 +510,7 @@
 //             ArticuloInsumo insumoQuesoParmesano = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Parmesano")
 //                     .precioVenta(3200.0)
-//                     .categoria(categoriaPizzas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(2600.0)
 //                     .stockActual(1200)
@@ -479,7 +522,7 @@
 //             ArticuloInsumo insumoJamon = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Jamón Cocido")
 //                     .precioVenta(2000.0)
-//                     .categoria(categoriaPizzas) // También podría ser para sandwiches
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(1500.0)
 //                     .stockActual(3000)
@@ -491,8 +534,8 @@
 //             ArticuloInsumo insumoAnana = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Ananá en Rodajas")
 //                     .precioVenta(1500.0)
-//                     .categoria(categoriaPizzas)
-//                     .unidadMedida(unidadGramos) // O unidad si son latas
+//                     .categoria(categoriaInsumos)
+//                     .unidadMedida(unidadGramos)
 //                     .precioCompra(1000.0)
 //                     .stockActual(500)
 //                     .stockMaximo(1000)
@@ -503,7 +546,7 @@
 //             ArticuloInsumo insumoAlbahaca = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Albahaca Fresca")
 //                     .precioVenta(500.0)
-//                     .categoria(categoriaPizzas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(300.0)
 //                     .stockActual(1000)
@@ -515,7 +558,7 @@
 //             ArticuloInsumo insumoPepperoni = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Pepperoni")
 //                     .precioVenta(2600.0)
-//                     .categoria(categoriaPizzas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(2000.0)
 //                     .stockActual(1500)
@@ -527,8 +570,8 @@
 //             ArticuloInsumo insumoSalsaBBQ = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Salsa BBQ")
 //                     .precioVenta(1300.0)
-//                     .categoria(categoriaHamburguesas)
-//                     .unidadMedida(unidadGramos) // O Litros si es comprada a granel
+//                     .categoria(categoriaInsumos)
+//                     .unidadMedida(unidadGramos)
 //                     .precioCompra(900.0)
 //                     .stockActual(1000)
 //                     .stockMaximo(1500)
@@ -539,7 +582,7 @@
 //             ArticuloInsumo insumoPanceta = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Panceta Ahumada")
 //                     .precioVenta(2200.0)
-//                     .categoria(categoriaHamburguesas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(1700.0)
 //                     .stockActual(2000)
@@ -551,7 +594,7 @@
 //             ArticuloInsumo insumoQuesoCheddar = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Queso Cheddar")
 //                     .precioVenta(2700.0)
-//                     .categoria(categoriaHamburguesas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadGramos)
 //                     .precioCompra(2100.0)
 //                     .stockActual(1500)
@@ -563,7 +606,7 @@
 //             ArticuloInsumo insumoMedallonVegetariano = articuloInsumoRepo.save(ArticuloInsumo.builder()
 //                     .denominacion("Medallón Vegetariano")
 //                     .precioVenta(1800.0)
-//                     .categoria(categoriaHamburguesas)
+//                     .categoria(categoriaInsumos)
 //                     .unidadMedida(unidadUnidad)
 //                     .precioCompra(1300.0)
 //                     .stockActual(100)
@@ -614,8 +657,7 @@
 //                     .save(ArticuloInsumo.builder()
 //                             .denominacion("Cerveza Artesanal")
 //                             .precioVenta(2500.0)
-//                             .categoria(categoriaTragos) // O una nueva categoría Cervezas si
-//                                                         // se prefiere
+//                             .categoria(categoriaTragos) // O una nueva categoría Cervezas si se prefiere
 //                             .unidadMedida(unidadLitros)
 //                             .precioCompra(1800.0)
 //                             .stockActual(100)
