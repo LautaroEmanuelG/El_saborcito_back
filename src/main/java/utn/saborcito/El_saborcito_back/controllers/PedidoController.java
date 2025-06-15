@@ -1,6 +1,7 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utn.saborcito.El_saborcito_back.dto.PedidoDTO;
 import utn.saborcito.El_saborcito_back.dto.PedidoCreacionDTO;
@@ -57,5 +58,20 @@ public class PedidoController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    /**
+     * Endpoint para validar promociones antes de crear un pedido
+     * 
+     * @param promocionIds Lista de IDs de promociones a validar
+     * @return Mapa con el estado de cada promoción
+     */
+    @PostMapping("/validar-promociones")
+    public ResponseEntity<?> validarPromociones(@RequestBody List<Long> promocionIds) {
+        try {
+            return ResponseEntity.ok(serviceMejorado.validarPromociones(promocionIds));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error validando promociones: " + e.getMessage());
+        }
     }
 }

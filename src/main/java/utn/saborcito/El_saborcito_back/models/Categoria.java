@@ -26,10 +26,10 @@ public class Categoria {
     @ManyToOne
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;
-
     @Enumerated(EnumType.STRING)
     private CategoriaTipo tipo;
 
     // NUEVO: campo para baja lógica
+    @Builder.Default
     private boolean eliminado = false;
 }

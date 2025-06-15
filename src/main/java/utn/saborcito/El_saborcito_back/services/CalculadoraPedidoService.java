@@ -114,12 +114,39 @@ public class CalculadoraPedidoService {
     }
 
     /**
-     * Actualiza los totales de un pedido (total y totalCosto).
+     * Actualiza los totales de un pedido incluyendo promociones.
      * 
      * @param pedido El pedido a actualizar
      */
     public void actualizarTotalesPedido(Pedido pedido) {
-        pedido.setTotal(calcularTotalPedido(pedido));
+        pedido.setTotal(calcularTotalPedidoConPromociones(pedido));
         pedido.setTotalCosto(calcularTotalCostoPedido(pedido));
+    }
+
+    /**
+     * 🎁 Calcula el total del pedido con la nueva estructura híbrida:
+     * - Suma subtotales de DetallePedido (solo artículos INDIVIDUALES)
+     * - Suma precios de DetallePedidoPromocion (combos completos)
+     */
+    private Double calcularTotalPedidoConPromociones(Pedido pedido) {
+        double totalDetallesIndividuales = 0.0;
+        double totalPromociones = 0.0;
+
+        // Sumar solo detalles individuales (promociones tienen subtotal = 0.0)
+        if (pedido.getDetalles() != null) {
+            totalDetallesIndividuales = pedido.getDetalles().stream()
+                    .mapToDouble(detalle -> detalle.getSubtotal() != null ? detalle.getSubtotal() : 0.0)
+                    .sum();
+        }
+
+        // Sumar promociones completas
+        if (pedido.getPromociones() != null) {
+            totalPromociones = pedido.getPromociones().stream()
+                    .mapToDouble(
+                            promo -> promo.getPrecioTotalPromocion() != null ? promo.getPrecioTotalPromocion() : 0.0)
+                    .sum();
+        }
+
+        return totalDetallesIndividuales + totalPromociones;
     }
 }
