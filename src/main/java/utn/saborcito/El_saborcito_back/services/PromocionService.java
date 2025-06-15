@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import utn.saborcito.El_saborcito_back.dto.PromocionDTO; // Asegurada la importación correcta
+import utn.saborcito.El_saborcito_back.dto.PromocionDTO;
 import utn.saborcito.El_saborcito_back.mappers.PromocionMapper;
 import utn.saborcito.El_saborcito_back.models.Promocion;
 import utn.saborcito.El_saborcito_back.models.Imagen;
@@ -27,7 +27,13 @@ public class PromocionService {
     private final PromocionMapper promocionMapper;
 
     public List<PromocionDTO> findAll() {
-        return repo.findAll().stream()
+        return repo.findByEliminado(false).stream()
+                .map(promocionMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<PromocionDTO> findDeleted() {
+        return repo.findByEliminado(true).stream()
                 .map(promocionMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -63,9 +69,24 @@ public class PromocionService {
         existingPromocion.setSucursal(promocionActualizada.getSucursal());
         existingPromocion.setImagen(promocionActualizada.getImagen());
         existingPromocion.setPromocionDetalles(promocionActualizada.getPromocionDetalles());
+        existingPromocion.setEliminado(promocionActualizada.isEliminado());
 
         Promocion savedPromocion = repo.save(existingPromocion);
         return promocionMapper.toDTO(savedPromocion);
+    }
+
+    public void delete(Long id) {
+        Promocion promocion = repo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Promoción no encontrada con id: " + id));
+        promocion.setEliminado(true);
+        repo.save(promocion);
+    }
+
+    public void restore(Long id) {
+        Promocion promocion = repo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Promoción no encontrada con id: " + id));
+        promocion.setEliminado(false);
+        repo.save(promocion);
     }
 
     private void validarPromocion(Promocion p, boolean isUpdate, PromocionDTO dto) {
@@ -139,13 +160,6 @@ public class PromocionService {
         } else {
             p.setImagen(null);
         }
-    }
-
-    public void delete(Long id) {
-        if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Promoción no encontrada con id: " + id);
-        }
-        repo.deleteById(id);
     }
 
     /**

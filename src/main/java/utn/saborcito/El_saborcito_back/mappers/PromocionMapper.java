@@ -12,13 +12,15 @@ import utn.saborcito.El_saborcito_back.dto.PromocionDetalleDTO;
 public interface PromocionMapper {
     PromocionMapper INSTANCE = Mappers.getMapper(PromocionMapper.class);
 
-    @Mapping(target = "articulo", ignore = true) // Ignorar campo obsoleto
+    @Mapping(target = "articulo", ignore = true)
     @Mapping(source = "promocionDetalles", target = "promocionDetalles")
+    @Mapping(source = "eliminado", target = "eliminado")
     PromocionDTO toDTO(Promocion promocion);
 
     @Mapping(target = "sucursal", ignore = true)
-    @Mapping(target = "promocionDetalles", ignore = true) // Se maneja por separado
-    Promocion toEntity(PromocionDTO promocionDTO); // Mapeos para PromocionDetalle
+    @Mapping(target = "promocionDetalles", ignore = true)
+    @Mapping(source = "eliminado", target = "eliminado")
+    Promocion toEntity(PromocionDTO promocionDTO);
 
     @Mapping(source = "promocion.id", target = "promocionId")
     @Mapping(source = "articulo", target = "articulo")
