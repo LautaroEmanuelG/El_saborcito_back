@@ -3,6 +3,7 @@ package utn.saborcito.El_saborcito_back.services;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +32,7 @@ public class SucursalService {
     private final DetallePedidoRepository detallePedidoRepo;
     private final PedidoRepository pedidoRepository;
     private final DetallePedidoPromocionRepository detallePromocionRepo;
+    
 
 
     //RANKING DE PRODUCTOS
@@ -105,38 +107,48 @@ public class SucursalService {
 
 
     public ProductoRankingConResumenDTO getRankingProductos(LocalDate desde, LocalDate hasta) {
-        List<DetallePedido> detalles = detallePedidoRepo.findAllByPedido_FechaPedidoBetween(desde, hasta);
-
         Map<Articulo, Long> conteo = new HashMap<>();
-        for (DetallePedido detalle : detalles) {
-            conteo.merge(detalle.getArticulo(), detalle.getCantidad().longValue(), Long::sum);
-        }
 
+        // 1) artículos individuales
+        detallePedidoRepo.findAllByPedido_FechaPedidoBetween(desde, hasta)
+            .forEach(detalle -> 
+                conteo.merge(detalle.getArticulo(),
+                            detalle.getCantidad().longValue(),
+                            Long::sum)
+            );
+
+        // 2) añadir artículos de las promociones
+        detallePromocionRepo.findAllByPedidoFechaPedidoBetween(desde, hasta)
+            .forEach(dpp -> {
+                Promocion promo = dpp.getPromocion();
+                int veces = dpp.getCantidadPromocion();
+                // cada Articulo dentro de la promo
+                promo.getPromocionDetalles().forEach(pd -> {
+                    long unidades = (long) pd.getCantidadRequerida() * veces;
+                    conteo.merge(pd.getArticulo(), unidades, Long::sum);
+                });
+            });
+
+        // 3) armar DTO y resumen
         List<ProductoRankingDTO> ranking = new ArrayList<>();
-        long totalManu = 0;
-        long totalInsumo = 0;
+        long totalManu = 0, totalInsumo = 0;
 
         for (Map.Entry<Articulo, Long> entry : conteo.entrySet()) {
-            Articulo articulo = entry.getKey();
-            String tipo = articulo.getClass().getSimpleName().equals("ArticuloManufacturado") ? "MANUFACTURADO"
-                    : "INSUMO";
-            ProductoRankingDTO dto = new ProductoRankingDTO(
-                    articulo.getId(),
-                    articulo.getDenominacion(),
-                    entry.getValue(),
-                    tipo);
-            ranking.add(dto);
+            Articulo art = entry.getKey();
+            long cant = entry.getValue();
+            String tipo = art instanceof ArticuloManufacturado ? "MANUFACTURADO" : "INSUMO";
 
-            // Sumar al resumen
-            if (tipo.equals("MANUFACTURADO")) {
-                totalManu += entry.getValue();
-            } else {
-                totalInsumo += entry.getValue();
-            }
+            ranking.add(new ProductoRankingDTO(
+                art.getId(),
+                art.getDenominacion(),
+                cant,
+                tipo
+            ));
+            if (tipo.equals("MANUFACTURADO")) totalManu += cant;
+            else                               totalInsumo += cant;
         }
 
         ranking.sort(Comparator.comparingLong(ProductoRankingDTO::getCantidadVendida).reversed());
-
         return new ProductoRankingConResumenDTO(ranking, totalManu, totalInsumo);
     }
 
