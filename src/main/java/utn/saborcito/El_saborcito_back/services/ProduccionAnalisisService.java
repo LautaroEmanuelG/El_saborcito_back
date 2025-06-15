@@ -87,19 +87,13 @@ public class ProduccionAnalisisService {
      */
     @Transactional(readOnly = true)
     public ProduccionAnalisisDTO analizarProduccionCompleta(Map<Long, Integer> articulosConCantidad) {
-        ProduccionAnalisisDTO resultado = new ProduccionAnalisisDTO();
-
-        // Mapa para almacenar el consumo total de cada insumo
-        Map<Long, Integer> consumoTotalPorInsumo = new HashMap<>();
-
-        // Mapa para almacenar la cantidad máxima producible de cada artículo
-        Map<Long, Integer> maximoProducible = new HashMap<>();
-
-        // Lista de productos con problemas
-        List<ProduccionAnalisisDTO.ProductoProblemaDTO> productosConProblemas = new ArrayList<>();
+        ProduccionAnalisisDTO resultado = new ProduccionAnalisisDTO(); // Mapa para almacenar la cantidad máxima
+                                                                       // producible de cada artículo
+        Map<Long, Integer> maximoProducible = new HashMap<>();// Lista de productos con problemas
+        List<ProduccionAnalisisDTO.ProductoConProblema> productosConProblemas = new ArrayList<>();
 
         // Lista de insumos insuficientes
-        List<ProduccionAnalisisDTO.InsumoInsuficienteDTO> insumosInsuficientes = new ArrayList<>();
+        List<ProduccionAnalisisDTO.InsumoInsuficiente> insumosInsuficientes = new ArrayList<>();
 
         boolean sePuedeProducirCompleto = true;
 
@@ -185,13 +179,13 @@ public class ProduccionAnalisisService {
                     "Artículo no encontrado", 0);
             sePuedeProducirCompleto = false;
             maximoProducible.put(articuloId, 0);
-        }
-
-        // Completar resultado
+        } // Completar resultado
         resultado.setSePuedeProducirCompleto(sePuedeProducirCompleto);
         resultado.setProductosConProblemas(productosConProblemas);
-        resultado.setMaximoProducible(maximoProducible);
         resultado.setInsumosInsuficientes(insumosInsuficientes);
+        resultado.setMensaje(sePuedeProducirCompleto
+                ? "✅ Todos los artículos pueden producirse"
+                : "⚠️ Algunos artículos no pueden producirse completamente");
 
         return resultado;
     }
@@ -216,37 +210,40 @@ public class ProduccionAnalisisService {
     /**
      * 📝 Agrega un producto con problema a la lista
      */
-    private void agregarProductoConProblema(List<ProduccionAnalisisDTO.ProductoProblemaDTO> lista,
+    private void agregarProductoConProblema(List<ProduccionAnalisisDTO.ProductoConProblema> lista,
             Long articuloId, String problema, Integer cantidadMaxima) {
-        ProduccionAnalisisDTO.ProductoProblemaDTO producto = new ProduccionAnalisisDTO.ProductoProblemaDTO();
-        producto.setId(articuloId);
-        producto.setDenominacion(problema); // Usar denominación para mostrar el problema
-        producto.setCantidadProducible(cantidadMaxima);
+        ProduccionAnalisisDTO.ProductoConProblema producto = ProduccionAnalisisDTO.ProductoConProblema.builder()
+                .articuloId(articuloId)
+                .denominacion(problema)
+                .motivoProblema(problema)
+                .cantidadMaximaPosible(cantidadMaxima)
+                .build();
         lista.add(producto);
     }
 
     /**
      * 📝 Agrega un insumo insuficiente a la lista
      */
-    private void agregarInsumoInsuficiente(List<ProduccionAnalisisDTO.InsumoInsuficienteDTO> lista,
+    private void agregarInsumoInsuficiente(List<ProduccionAnalisisDTO.InsumoInsuficiente> lista,
             Long insumoId, String nombre, Integer stockActual, Integer cantidadNecesaria) {
         // Verificar si ya existe en la lista y sumar
-        Optional<ProduccionAnalisisDTO.InsumoInsuficienteDTO> existente = lista.stream()
-                .filter(i -> i.getId().equals(insumoId))
+        Optional<ProduccionAnalisisDTO.InsumoInsuficiente> existente = lista.stream()
+                .filter(i -> i.getInsumoId().equals(insumoId))
                 .findFirst();
 
         if (existente.isPresent()) {
-            existente.get().setStockRequerido(
-                    existente.get().getStockRequerido() + cantidadNecesaria);
+            Double stockRequeridoAnterior = existente.get().getCantidadNecesaria();
+            existente.get().setCantidadNecesaria(stockRequeridoAnterior + cantidadNecesaria);
             existente.get().setStockFaltante(
-                    Math.max(0, existente.get().getStockRequerido() - stockActual));
+                    Math.max(0.0, existente.get().getCantidadNecesaria() - stockActual));
         } else {
-            ProduccionAnalisisDTO.InsumoInsuficienteDTO insumo = new ProduccionAnalisisDTO.InsumoInsuficienteDTO();
-            insumo.setId(insumoId);
-            insumo.setDenominacion(nombre);
-            insumo.setStockActual(stockActual != null ? stockActual : 0);
-            insumo.setStockRequerido(cantidadNecesaria);
-            insumo.setStockFaltante(Math.max(0, cantidadNecesaria - (stockActual != null ? stockActual : 0)));
+            ProduccionAnalisisDTO.InsumoInsuficiente insumo = ProduccionAnalisisDTO.InsumoInsuficiente.builder()
+                    .insumoId(insumoId)
+                    .denominacion(nombre)
+                    .stockDisponible(stockActual != null ? stockActual.doubleValue() : 0.0)
+                    .cantidadNecesaria(cantidadNecesaria.doubleValue())
+                    .stockFaltante(Math.max(0.0, cantidadNecesaria - (stockActual != null ? stockActual : 0)))
+                    .build();
             lista.add(insumo);
         }
     }

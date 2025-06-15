@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,5 +21,9 @@ public class PromocionDTO {
     private Double descuento;
     private Double precioPromocional;
     private SucursalDTO sucursal;
+    private ImagenDTO imagen; // 🆕 Nueva imagen para la promoción
+    private List<PromocionDetalleDTO> promocionDetalles; // 🆕 Nueva lista de detalles
+
+    // @Deprecated - Mantener por compatibilidad temporal
     private ArticuloDTO articulo;
 }

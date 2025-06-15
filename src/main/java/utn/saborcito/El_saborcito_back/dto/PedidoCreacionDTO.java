@@ -27,10 +27,11 @@ public class PedidoCreacionDTO {
 
     // Domicilio (puede ser nuevo o existente)
     private DomicilioCreacionDTO domicilio; // null si es TAKE_AWAY o usa domicilio existente
-    private Long domicilioExistenteId; // ID del domicilio existente
-
-    // Detalles del pedido
+    private Long domicilioExistenteId; // ID del domicilio existente // Detalles del pedido
     private List<DetallePedidoCreacionDTO> detalles;
+
+    // 🎁 Promociones seleccionadas por el cliente
+    private List<PromocionSeleccionadaDTO> promocionesSeleccionadas;
 
     /**
      * 🏠 DTO para crear un nuevo domicilio junto con el pedido
