@@ -138,9 +138,9 @@ public class ArticuloService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "El stock actual del insumo es obligatorio y no puede ser negativo.");
             }
-            if (insumo.getStockMaximo() == null || insumo.getStockMaximo() < insumo.getStockActual()) {
+            if (insumo.getStockMinimo() == null || insumo.getStockMinimo() < insumo.getStockActual()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "El stock máximo debe ser mayor o igual al stock actual.");
+                        "El stock mínimo debe ser mayor o igual al stock actual.");
             }
             if (insumo.getEsParaElaborar() == null) {
                 insumo.setEsParaElaborar(false);
@@ -208,10 +208,10 @@ public class ArticuloService {
             if (insumoActualizado.getStockActual() != null && insumoActualizado.getStockActual() >= 0) {
                 insumoExistente.setStockActual(insumoActualizado.getStockActual());
             }
-            if (insumoActualizado.getStockMaximo() != null && insumoActualizado
-                    .getStockMaximo() >= (insumoExistente.getStockActual() != null ? insumoExistente.getStockActual()
-                            : 0)) {
-                insumoExistente.setStockMaximo(insumoActualizado.getStockMaximo());
+            if (insumoActualizado.getStockMinimo() != null && insumoActualizado
+                    .getStockMinimo() >= (insumoExistente.getStockActual() != null ? insumoExistente.getStockActual()
+                    : 0)) {
+                insumoExistente.setStockMinimo(insumoActualizado.getStockMinimo());
             }
             if (insumoActualizado.getEsParaElaborar() != null) {
                 insumoExistente.setEsParaElaborar(insumoActualizado.getEsParaElaborar());
