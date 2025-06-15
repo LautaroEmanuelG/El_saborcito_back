@@ -165,65 +165,67 @@ public class SucursalService {
     /**
      * Devuelve los pedidos de un cliente incluyendo detalles de productos y promociones
      */
-    public List<PedidoResumenPorClienteDTO> getPedidosPorCliente(
-            Long clienteId,
-            LocalDate desde,
-            LocalDate hasta) {
-        List<Pedido> pedidos = pedidoRepository
-            .findAllByCliente_IdAndFechaPedidoBetween(clienteId, desde, hasta);
+    public List<PedidoResumenPorClienteDTO> getPedidosPorCliente(Long clienteId, LocalDate desde, LocalDate hasta) {
+        List<Pedido> pedidos = pedidoRepository.findAllByCliente_IdAndFechaPedidoBetween(clienteId, desde, hasta);
 
-        return pedidos.stream().map(pedido -> {
-            // Detalles individuales
-            List<DetallePedidoDTO> detalles = pedido.getDetalles().stream()
-                .map(dp -> new DetallePedidoDTO(
-                    dp.getId(),
-                    dp.getCantidad(),
-                    dp.getCantidadConPromocion(),
-                    dp.getCantidadSinPromocion(),
-                    dp.getSubtotal(),
-                    dp.getOrigen(),
-                    dp.getPromocionOrigenId(),
-                    new ArticuloDTO(
-                        dp.getArticulo().getId(),
-                        dp.getArticulo().getDenominacion(),
-                        dp.getArticulo().getPrecioVenta(),
-                        null, null, false, null
-                    )
-                ))
-                .collect(Collectors.toList());
+        return pedidos.stream()
+            .map(pedido -> {
+                List<DetallePedidoDTO> detallesDTO = new ArrayList<>();
 
-            // Detalles de promoción
-            detallePromocionRepo.findByPedidoId(pedido.getId())
-              .forEach(prom -> {
-                DetallePedidoDTO dto = new DetallePedidoDTO();
-                dto.setId(null);
-                dto.setCantidad(prom.getCantidadPromocion());
-                dto.setCantidadConPromocion(prom.getCantidadPromocion());
-                dto.setCantidadSinPromocion(0);
-                dto.setSubtotal(prom.getPrecioTotalPromocion());
-                dto.setOrigen(OrigenDetalle.PROMOCION);
-                dto.setPromocionOrigenId(prom.getPromocion().getId());
-                dto.setArticulo(new ArticuloDTO(
-                    prom.getPromocion().getId(),
-                    prom.getPromocion().getDenominacion(),
-                    prom.getPrecioTotalPromocion(),
-                    null, null, false, null
-                ));
-                detalles.add(dto);
-            });
+                // 1) Detalles individuales
+                for (DetallePedido dp : pedido.getDetalles()) {
+                    if (dp.getOrigen() == OrigenDetalle.INDIVIDUAL) {
+                        detallesDTO.add(new DetallePedidoDTO(
+                            dp.getId(),
+                            dp.getCantidad(),
+                            dp.getCantidadConPromocion(),
+                            dp.getCantidadSinPromocion(),
+                            dp.getSubtotal(),           // subtotal histórico
+                            dp.getOrigen(),
+                            dp.getPromocionOrigenId(),
+                            new ArticuloDTO(
+                                dp.getArticulo().getId(),
+                                dp.getArticulo().getDenominacion(),
+                                dp.getArticulo().getPrecioVenta(),
+                                null, null, false, null
+                            )
+                        ));
+                    }
+                }
 
-            // Ordenamos: INDIVIDUAL primero, luego PROMOCION
-            detalles.sort(Comparator.comparing(DetallePedidoDTO::getOrigen));
+                // 2) Detalles de promoción: un DTO por cada promo aplicada
+                List<DetallePedidoPromocion> promos = detallePromocionRepo.findByPedidoId(pedido.getId());
+                for (DetallePedidoPromocion dpp : promos) {
+                    Promocion promo = dpp.getPromocion();
+                    detallesDTO.add(new DetallePedidoDTO(
+                        // usamos el propio ID de la tabla detalle_pedido_promocion
+                        dpp.getId(),
+                        dpp.getCantidadPromocion(),     // cuántas veces aplicó la promo
+                        null,                           // cantidadConPromocion no relevante aquí
+                        null,                           // cantidadSinPromocion
+                        dpp.getPrecioTotalPromocion(), // subtotal de la promo
+                        OrigenDetalle.PROMOCION,
+                        promo.getId(),
+                        // en el artículo devolvemos la promoción en lugar de un artículo simple
+                        new ArticuloDTO(
+                            promo.getId(),
+                            "🎁 " + promo.getDenominacion(),
+                            promo.getPrecioPromocional(),
+                            null, null, false, null
+                        )
+                    ));
+                }
 
-            // Creamos DTO de salida
-            PedidoResumenPorClienteDTO salida = new PedidoResumenPorClienteDTO();
-            salida.setIdPedido(pedido.getId());
-            salida.setFechaPedido(pedido.getFechaPedido());
-            // total incluye promociones
-            salida.setTotal(pedido.calcularTotalConPromociones());
-            salida.setDetalles(detalles);
-            return salida;
-        }).collect(Collectors.toList());
+                // 3) Construcción del resumen
+                PedidoResumenPorClienteDTO dto = new PedidoResumenPorClienteDTO();
+                dto.setIdPedido(pedido.getId());
+                dto.setFechaPedido(pedido.getFechaPedido());
+                // total ya incluye promos y artículos normales
+                dto.setTotal(pedido.getTotal());
+                dto.setDetalles(detallesDTO);
+                return dto;
+            })
+            .collect(Collectors.toList());
     }
 
     /**
