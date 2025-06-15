@@ -1,11 +1,11 @@
 package utn.saborcito.El_saborcito_back.models;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -24,12 +24,15 @@ public class Promocion {
     private LocalTime horaHasta;
     private Double descuento;
     private Double precioPromocional;
-
     @ManyToOne
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;
 
     @ManyToOne
-    @JoinColumn(name = "articulo_id")
-    private Articulo articulo;
+    @JoinColumn(name = "imagen_id")
+    private Imagen imagen;
+
+    // Nueva relación: Una promoción puede tener múltiples artículos
+    @OneToMany(mappedBy = "promocion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<PromocionDetalle> promocionDetalles;
 }

@@ -6,11 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 /**
- * DTO para devolver el resultado del análisis de producción de varios artículos
- * manufacturados
+ * 📊 DTO para el análisis de producción de artículos manufacturados
  */
 @Data
 @NoArgsConstructor
@@ -19,48 +17,110 @@ import java.util.Map;
 public class ProduccionAnalisisDTO {
 
     /**
-     * Indica si se pueden producir todos los artículos solicitados
+     * ✅ Indica si se puede producir todo lo solicitado
      */
     private boolean sePuedeProducirCompleto;
 
     /**
-     * Lista de IDs de productos que no se pueden fabricar
+     * 📝 Mensaje descriptivo del análisis
      */
-    private List<ProductoProblemaDTO> productosConProblemas;
+    private String mensaje;
 
     /**
-     * Mapa con la cantidad máxima que se puede producir de cada artículo
-     * Key: ID del artículo manufacturado
-     * Value: Cantidad máxima que se puede producir
+     * 📋 Lista de productos analizados
      */
-    private Map<Long, Integer> maximoProducible;
+    private List<ProductoAnalisis> productos;
 
     /**
-     * Insumos insuficientes que están causando las limitaciones
+     * ⚠️ Lista de productos que tienen problemas de producción
      */
-    private List<InsumoInsuficienteDTO> insumosInsuficientes;
+    private List<ProductoConProblema> productosConProblemas;
 
+    /**
+     * 📉 Lista de insumos insuficientes
+     */
+    private List<InsumoInsuficiente> insumosInsuficientes;
+
+    /**
+     * 🛠️ Análisis de un producto específico
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class ProductoProblemaDTO {
-        private Long id;
+    public static class ProductoAnalisis {
+        private Long articuloId;
         private String denominacion;
         private Integer cantidadSolicitada;
-        private Integer cantidadProducible;
-        private List<InsumoInsuficienteDTO> insumosInsuficientes;
+        private Integer cantidadPosible;
+        private boolean sePuedeProducir;
+        private List<InsumoNecesario> insumosNecesarios;
     }
 
+    /**
+     * 🚫 Producto con problemas de producción
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class InsumoInsuficienteDTO {
-        private Long id;
+    public static class ProductoConProblema {
+        private Long articuloId;
         private String denominacion;
-        private Integer stockActual;
-        private Integer stockRequerido;
-        private Integer stockFaltante;
+        private String motivoProblema;
+        private Integer cantidadSolicitada;
+        private Integer cantidadMaximaPosible;
+    }
+
+    /**
+     * 📦 Insumo necesario para producción
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class InsumoNecesario {
+        private Long insumoId;
+        private String denominacion;
+        private Double cantidadNecesaria;
+        private Double stockDisponible;
+        private String unidadMedida;
+        private boolean esSuficiente;
+    }
+
+    /**
+     * ⚠️ Insumo con stock insuficiente
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class InsumoInsuficiente {
+        private Long insumoId;
+        private String denominacion;
+        private Double cantidadNecesaria;
+        private Double stockDisponible;
+        private Double stockFaltante;
+        private String unidadMedida;
+    }
+
+    /**
+     * 🎁 DTO para validación de promociones específicas
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PromocionValidacionDTO {
+        private Long promocionId;
+        private String promocionDenominacion;
+        private Integer cantidadSolicitada;
+        private Integer cantidadMaximaAplicable;
+        private boolean esValida;
+        private String motivoNoValida;
+        private List<ProductoConProblema> productosConProblemas;
+        private List<InsumoInsuficiente> insumosInsuficientes;
+        private Double precioTotalPromocion;
+        private Double ahorroTotal;
     }
 }

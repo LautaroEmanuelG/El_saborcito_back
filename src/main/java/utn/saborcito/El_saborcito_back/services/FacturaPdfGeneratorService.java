@@ -22,7 +22,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class FacturaPdfGeneratorService {
 
-    // === PALETA DE COLORES  ===
+    // === PALETA DE COLORES ===
     private static final Color COLOR_ROSA_CLARO = new Color(0xFDEAEA);
     private static final Color COLOR_ROSA_INTENSO = new Color(0xEC2C4E);
     private static final Color COLOR_GRIS_OSCURO = new Color(0x151313);
@@ -43,14 +43,22 @@ public class FacturaPdfGeneratorService {
         }
     }
 
-    // === DEFINICIÓN DE FUENTES  ===
+    // === DEFINICIÓN DE FUENTES ===
     private static final Font FONT_TITULO_NOTA = FontFactory.getFont("Montserrat-ExtraBold", 18, COLOR_GRIS_OSCURO);
-    private static final Font FONT_ETIQUETA_FECHAS = FontFactory.getFont("Montserrat-ExtraBold", 10,  COLOR_GRIS_OSCURO); // Subido a ExtraBold y tamaño 10
-    private static final Font FONT_DIRECCION = FontFactory.getFont("Montserrat-SemiBold", 9,  COLOR_GRIS_OSCURO);
+    private static final Font FONT_ETIQUETA_FECHAS = FontFactory.getFont("Montserrat-ExtraBold", 10, COLOR_GRIS_OSCURO); // Subido
+                                                                                                                         // a
+                                                                                                                         // ExtraBold
+                                                                                                                         // y
+                                                                                                                         // tamaño
+                                                                                                                         // 10
+    private static final Font FONT_DIRECCION = FontFactory.getFont("Montserrat-SemiBold", 9, COLOR_GRIS_OSCURO);
     private static final Font FONT_RESTAURANT = FontFactory.getFont("Montserrat-SemiBold", 10, COLOR_ROSA_INTENSO);
-    private static final Font FONT_TEXTO_CUERPO_REGULAR = FontFactory.getFont("Montserrat-Regular", 11, COLOR_GRIS_OSCURO);
-    private static final Font FONT_TEXTO_CUERPO_BOLD = FontFactory.getFont("Montserrat-ExtraBold", 12, COLOR_GRIS_OSCURO); // Subido a ExtraBold y tamaño 12
-    private static final Font FONT_TEXTO_TABLA_HEADER = FontFactory.getFont("Montserrat-ExtraBold", 12, COLOR_GRIS_OSCURO); // Tamaño 12
+    private static final Font FONT_TEXTO_CUERPO_REGULAR = FontFactory.getFont("Montserrat-Regular", 11,
+            COLOR_GRIS_OSCURO);
+    private static final Font FONT_TEXTO_CUERPO_BOLD = FontFactory.getFont("Montserrat-ExtraBold", 12,
+            COLOR_GRIS_OSCURO); // Subido a ExtraBold y tamaño 12
+    private static final Font FONT_TEXTO_TABLA_HEADER = FontFactory.getFont("Montserrat-ExtraBold", 12,
+            COLOR_GRIS_OSCURO); // Tamaño 12
     private static final Font FONT_FIRMA = FontFactory.getFont("Pacifico", 16, COLOR_ROSA_INTENSO);
     private static final Font FONT_TOTAL_CAJA = FontFactory.getFont("Montserrat-ExtraBold", 14, Color.WHITE);
     private static final Font FONT_GRACIAS_BOTON = FontFactory.getFont("Montserrat-Bold", 12, Color.WHITE);
@@ -75,12 +83,12 @@ public class FacturaPdfGeneratorService {
         return baos.toByteArray();
     }
 
-    // --- SECCIÓN HEADER  ---
+    // --- SECCIÓN HEADER ---
     private PdfPTable createHeader(Factura factura) throws DocumentException, IOException {
         // Tabla principal del header con 2 columnas: [Logo+Info] y [Datos Nota]
         PdfPTable headerTable = new PdfPTable(2);
         headerTable.setWidthPercentage(100);
-        headerTable.setWidths(new float[]{1.5f, 1f}); // Dar más espacio a la parte izquierda
+        headerTable.setWidths(new float[] { 1.5f, 1f }); // Dar más espacio a la parte izquierda
 
         // --- Celda Izquierda: Contenedor del Logo y Texto del Restaurante ---
         PdfPCell leftCell = new PdfPCell();
@@ -90,7 +98,7 @@ public class FacturaPdfGeneratorService {
         // Tabla interna para alinear logo y texto horizontalmente
         PdfPTable contentTable = new PdfPTable(2);
         contentTable.setWidthPercentage(100);
-        contentTable.setWidths(new float[]{45f, 105f}); // Logo 45mm, Texto 105mm
+        contentTable.setWidths(new float[] { 45f, 105f }); // Logo 45mm, Texto 105mm
 
         // Columna 1: El logo
         PdfPCell logoContainer = new PdfPCell();
@@ -103,7 +111,7 @@ public class FacturaPdfGeneratorService {
             Image logo = Image.getInstance(logoResource.getURL());
             logo.scaleAbsolute(127.5f, 127.5f); // 45mm = 127.5pt
             logoContainer.addElement(logo);
-        } catch(Exception e) {
+        } catch (Exception e) {
             logoContainer.addElement(new Paragraph("Logo"));
         }
         contentTable.addCell(logoContainer);
@@ -146,7 +154,6 @@ public class FacturaPdfGeneratorService {
         leftCell.addElement(contentTable);
         headerTable.addCell(leftCell);
 
-
         // --- Celda Derecha: Datos de la Factura ---
         PdfPCell rightCell = new PdfPCell();
         rightCell.setBorder(Rectangle.NO_BORDER);
@@ -154,27 +161,32 @@ public class FacturaPdfGeneratorService {
         rightCell.setPaddingTop(10);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", new Locale("es", "ES"));
-        rightCell.addElement(new Paragraph("Factura Número Nº " + String.format("%03d", factura.getId()), FONT_TITULO_NOTA));
+        rightCell.addElement(
+                new Paragraph("Factura Número Nº " + String.format("%03d", factura.getId()), FONT_TITULO_NOTA));
         rightCell.addElement(new Paragraph(" "));
-        rightCell.addElement(new Paragraph("Fecha de expedición: " + factura.getFechaFacturacion().format(formatter), FONT_ETIQUETA_FECHAS));
+        rightCell.addElement(new Paragraph("Fecha de expedición: " + factura.getFechaFacturacion().format(formatter),
+                FONT_ETIQUETA_FECHAS));
         rightCell.addElement(new Paragraph("Número de pedido: " + factura.getPedido().getId(), FONT_ETIQUETA_FECHAS));
-        rightCell.addElement(new Paragraph("Fecha de vencimiento: " + factura.getFechaFacturacion().plusDays(30).format(formatter), FONT_ETIQUETA_FECHAS));
+        rightCell.addElement(
+                new Paragraph("Fecha de vencimiento: " + factura.getFechaFacturacion().plusDays(30).format(formatter),
+                        FONT_ETIQUETA_FECHAS));
         headerTable.addCell(rightCell);
 
         return headerTable;
     }
 
-
     private PdfPTable createDatosCliente(Factura factura) {
         PdfPTable mainTable = new PdfPTable(3);
         mainTable.setWidthPercentage(100);
-        try { mainTable.setWidths(new float[]{70, 20, 70}); } catch (DocumentException e) {}
+        try {
+            mainTable.setWidths(new float[] { 70, 20, 70 });
+        } catch (DocumentException e) {
+        }
 
         mainTable.addCell(createCeldaDatos("Datos del cliente:",
                 factura.getPedido().getCliente().getNombre() + " " + factura.getPedido().getCliente().getApellido(),
                 factura.getPedido().getCliente().getEmail(),
-                factura.getPedido().getCliente().getTelefono()
-        ));
+                factura.getPedido().getCliente().getTelefono()));
 
         PdfPCell gapCell = new PdfPCell();
         gapCell.setBorder(Rectangle.NO_BORDER);
@@ -183,14 +195,13 @@ public class FacturaPdfGeneratorService {
         mainTable.addCell(createCeldaDatos("Enviar a:",
                 factura.getPedido().getCliente().getNombre() + " " + factura.getPedido().getCliente().getApellido(),
                 "Dirección de envío...",
-                "Mendoza, Argentina"
-        ));
+                "Mendoza, Argentina"));
 
         return mainTable;
     }
 
     private PdfPTable createTablaItems(Factura factura) throws DocumentException {
-        PdfPTable table = new PdfPTable(new float[]{80, 30, 35, 35}); // Anchos en mm
+        PdfPTable table = new PdfPTable(new float[] { 80, 30, 35, 35 }); // Anchos en mm
         table.setWidthPercentage(100);
         table.setHeaderRows(1);
 
@@ -204,8 +215,10 @@ public class FacturaPdfGeneratorService {
             Color bgColor = alternar ? COLOR_FILA_ALTERNADA : Color.WHITE;
             table.addCell(createItemCell(detalle.getArticulo().getDenominacion(), Element.ALIGN_LEFT, bgColor));
             table.addCell(createItemCell(String.valueOf(detalle.getCantidad()), Element.ALIGN_CENTER, bgColor));
-            table.addCell(createItemCell(formatCurrency(detalle.getArticulo().getPrecioVenta()), Element.ALIGN_RIGHT, bgColor));
-            table.addCell(createItemCell(formatCurrency(detalle.calcularSubtotal()), Element.ALIGN_RIGHT, bgColor));
+            table.addCell(createItemCell(formatCurrency(detalle.getArticulo().getPrecioVenta()), Element.ALIGN_RIGHT,
+                    bgColor));
+            table.addCell(createItemCell(formatCurrency(detalle.getSubtotal() != null ? detalle.getSubtotal() : 0.0),
+                    Element.ALIGN_RIGHT, bgColor));
             alternar = !alternar;
         }
         return table;
@@ -214,7 +227,7 @@ public class FacturaPdfGeneratorService {
     private PdfPTable createFirmaYTotales(Factura factura) throws DocumentException {
         PdfPTable mainTable = new PdfPTable(2);
         mainTable.setWidthPercentage(100);
-        mainTable.setWidths(new float[]{1, 1});
+        mainTable.setWidths(new float[] { 1, 1 });
 
         PdfPCell firmaCell = new PdfPCell();
         firmaCell.setBorder(Rectangle.NO_BORDER);
@@ -226,10 +239,9 @@ public class FacturaPdfGeneratorService {
 
         PdfPTable totalesTable = new PdfPTable(2);
         totalesTable.setWidthPercentage(100);
-        totalesTable.setWidths(new float[]{2, 1});
-
+        totalesTable.setWidths(new float[] { 2, 1 });
         BigDecimal subtotal = factura.getPedido().getDetalles().stream()
-                .map(d -> BigDecimal.valueOf(d.calcularSubtotal()))
+                .map(d -> BigDecimal.valueOf(d.getSubtotal() != null ? d.getSubtotal() : 0.0))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Si no hay descuentos ni recargos, el total es igual al subtotal
@@ -280,8 +292,10 @@ public class FacturaPdfGeneratorService {
         condicionesCell.setBorder(Rectangle.NO_BORDER);
         condicionesCell.setPaddingLeft(10);
         condicionesCell.addElement(new Paragraph("Condiciones de pago y contacto:", FONT_ETIQUETA_FECHAS));
-        condicionesCell.addElement(new Paragraph("Monto acreditado mediante anulación total y parcial.", FONT_TEXTO_CUERPO_REGULAR));
-        condicionesCell.addElement(new Paragraph("elsaborcito2024@gmail.com | +54 9 2616903538", FONT_TEXTO_CUERPO_REGULAR));
+        condicionesCell.addElement(
+                new Paragraph("Monto acreditado mediante anulación total y parcial.", FONT_TEXTO_CUERPO_REGULAR));
+        condicionesCell
+                .addElement(new Paragraph("elsaborcito2024@gmail.com | +54 9 2616903538", FONT_TEXTO_CUERPO_REGULAR));
         table.addCell(condicionesCell);
 
         return table;

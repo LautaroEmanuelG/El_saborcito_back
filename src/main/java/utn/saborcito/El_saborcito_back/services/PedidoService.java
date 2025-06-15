@@ -57,7 +57,8 @@ public class PedidoService {
         // Asegurar que los estados, tipos de envío y formas de pago existan
         validarReferencias(pedido);
 
-        // Usar el servicio de calculadora para actualizar los totales
+        // Usar el servicio de calculadora para actualizar los totales (incluye
+        // promociones)
         calculadoraService.actualizarTotalesPedido(pedido);
         calcularHoraEstimada(pedido);
         return pedidoMapper.toDTO(repo.save(pedido));
@@ -87,9 +88,8 @@ public class PedidoService {
         existing.setFormaPago(pedido.getFormaPago());
         existing.setSucursal(pedido.getSucursal());
         existing.setCliente(pedido.getCliente());
-        existing.setEstado(pedido.getEstado());
-
-        // Usar el servicio de calculadora para actualizar los totales
+        existing.setEstado(pedido.getEstado()); // Usar el servicio de calculadora para actualizar los totales (incluye
+                                                // promociones)
         calculadoraService.actualizarTotalesPedido(existing);
         calcularHoraEstimada(existing);
 

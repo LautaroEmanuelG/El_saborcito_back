@@ -40,7 +40,6 @@ import java.io.ByteArrayOutputStream;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -58,19 +57,18 @@ public class SucursalService {
     private final PedidoRepository pedidoRepository;
     private final CalculadoraPedidoService calculadoraPedidoService; // Agregar esta dependencia
 
-
     public ResponseEntity<byte[]> exportarRankingProductosExcel(LocalDate desde, LocalDate hasta) {
         List<ProductoRankingDTO> ranking = getRankingProductos(desde, hasta).getProductos();
 
         long totalManu = ranking.stream()
-            .filter(p -> "MANUFACTURADO".equals(p.getTipoProducto()))
-            .mapToLong(ProductoRankingDTO::getCantidadVendida)
-            .sum();
+                .filter(p -> "MANUFACTURADO".equals(p.getTipoProducto()))
+                .mapToLong(ProductoRankingDTO::getCantidadVendida)
+                .sum();
 
         long totalInsumo = ranking.stream()
-            .filter(p -> "INSUMO".equals(p.getTipoProducto()))
-            .mapToLong(ProductoRankingDTO::getCantidadVendida)
-            .sum();
+                .filter(p -> "INSUMO".equals(p.getTipoProducto()))
+                .mapToLong(ProductoRankingDTO::getCantidadVendida)
+                .sum();
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Ranking Productos");
@@ -133,18 +131,20 @@ public class SucursalService {
 
         return pedidos.stream()
                 .map(pedido -> {
-                    List<DetallePedidoDTO> detallesDTO = pedido.getDetalles().stream().map(dp ->
-                            new DetallePedidoDTO(
-                                    dp.getId(),
-                                    dp.getCantidad(),
-                                    new ArticuloDTO(
-                                            dp.getArticulo().getId(),
-                                            dp.getArticulo().getDenominacion(),
-                                            dp.getArticulo().getPrecioVenta(),
-                                            null, null, false, null
-                                    )
-                            )
-                    ).collect(Collectors.toList());
+                    List<DetallePedidoDTO> detallesDTO = pedido.getDetalles().stream().map(dp -> new DetallePedidoDTO(
+                            dp.getId(),
+                            dp.getCantidad(),
+                            dp.getCantidadConPromocion(),
+                            dp.getCantidadSinPromocion(),
+                            dp.getSubtotal(),
+                            dp.getOrigen(),
+                            dp.getPromocionOrigenId(),
+                            new ArticuloDTO(
+                                    dp.getArticulo().getId(),
+                                    dp.getArticulo().getDenominacion(),
+                                    dp.getArticulo().getPrecioVenta(),
+                                    null, null, false, null)))
+                            .collect(Collectors.toList());
 
                     PedidoResumenPorClienteDTO dto = new PedidoResumenPorClienteDTO();
                     dto.setIdPedido(pedido.getId());
@@ -157,64 +157,62 @@ public class SucursalService {
     }
 
     public void exportarPedidosClienteExcel(
-    Long clienteId,
-    LocalDate desde,
-    LocalDate hasta,
-    HttpServletResponse response
-) throws IOException {
-    List<PedidoResumenPorClienteDTO> pedidos = getPedidosPorCliente(clienteId, desde, hasta);
+            Long clienteId,
+            LocalDate desde,
+            LocalDate hasta,
+            HttpServletResponse response) throws IOException {
+        List<PedidoResumenPorClienteDTO> pedidos = getPedidosPorCliente(clienteId, desde, hasta);
 
-    try (Workbook workbook = new XSSFWorkbook()) {
-        Sheet sheet = workbook.createSheet("Pedidos Cliente " + clienteId);
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Pedidos Cliente " + clienteId);
 
-        // 1) Cabecera
-        Row header = sheet.createRow(0);
-        header.createCell(0).setCellValue("ID Pedido");
-        header.createCell(1).setCellValue("Fecha Pedido");
-        header.createCell(2).setCellValue("Artículo");
-        header.createCell(3).setCellValue("Cantidad");
-        header.createCell(4).setCellValue("Precio Unitario");
-        header.createCell(5).setCellValue("Subtotal");
+            // 1) Cabecera
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("ID Pedido");
+            header.createCell(1).setCellValue("Fecha Pedido");
+            header.createCell(2).setCellValue("Artículo");
+            header.createCell(3).setCellValue("Cantidad");
+            header.createCell(4).setCellValue("Precio Unitario");
+            header.createCell(5).setCellValue("Subtotal");
 
-        // 2) Filas de detalle
-        int rowNum = 1;
-        for (PedidoResumenPorClienteDTO pedido : pedidos) {
-            for (DetallePedidoDTO det : pedido.getDetalles()) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(pedido.getIdPedido());
-                row.createCell(1).setCellValue(pedido.getFechaPedido().toString());
-                row.createCell(2).setCellValue(det.getArticulo().getDenominacion());
-                row.createCell(3).setCellValue(det.getCantidad());
-                double precio = det.getArticulo().getPrecioVenta() != null
-                    ? det.getArticulo().getPrecioVenta()
-                    : 0;
-                row.createCell(4).setCellValue(precio);
-                row.createCell(5).setCellValue(det.getCantidad() * precio);
+            // 2) Filas de detalle
+            int rowNum = 1;
+            for (PedidoResumenPorClienteDTO pedido : pedidos) {
+                for (DetallePedidoDTO det : pedido.getDetalles()) {
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(pedido.getIdPedido());
+                    row.createCell(1).setCellValue(pedido.getFechaPedido().toString());
+                    row.createCell(2).setCellValue(det.getArticulo().getDenominacion());
+                    row.createCell(3).setCellValue(det.getCantidad());
+                    double precio = det.getArticulo().getPrecioVenta() != null
+                            ? det.getArticulo().getPrecioVenta()
+                            : 0;
+                    row.createCell(4).setCellValue(precio);
+                    row.createCell(5).setCellValue(det.getCantidad() * precio);
+                }
+                // fila de total de pedido
+                Row totalRow = sheet.createRow(rowNum++);
+                totalRow.createCell(4).setCellValue("Total Pedido");
+                totalRow.createCell(5).setCellValue(pedido.getTotal());
             }
-            // fila de total de pedido
-            Row totalRow = sheet.createRow(rowNum++);
-            totalRow.createCell(4).setCellValue("Total Pedido");
-            totalRow.createCell(5).setCellValue(pedido.getTotal());
+
+            // 3) Ajustar ancho de columnas
+            for (int i = 0; i <= 5; i++)
+                sheet.autoSizeColumn(i);
+
+            // 4) Envío de la respuesta
+            response.setContentType(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            // El nombre real lo pondrá el front al descargar
+            response.setHeader(
+                    "Content-Disposition",
+                    "attachment; filename=pedidos-cliente-" + clienteId + ".xlsx");
+            workbook.write(response.getOutputStream());
         }
-
-        // 3) Ajustar ancho de columnas
-        for (int i = 0; i <= 5; i++) sheet.autoSizeColumn(i);
-
-        // 4) Envío de la respuesta
-        response.setContentType(
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        );
-        // El nombre real lo pondrá el front al descargar
-        response.setHeader(
-          "Content-Disposition",
-          "attachment; filename=pedidos-cliente-" + clienteId + ".xlsx"
-        );
-        workbook.write(response.getOutputStream());
     }
-}
 
-
-    public void exportarRankingClientesExcel(LocalDate desde, LocalDate hasta, String ordenarPor, HttpServletResponse response) {
+    public void exportarRankingClientesExcel(LocalDate desde, LocalDate hasta, String ordenarPor,
+            HttpServletResponse response) {
         List<ClienteRankingDTO> ranking = getRankingClientes(desde, hasta, ordenarPor);
 
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -314,19 +312,21 @@ public class SucursalService {
                             // CAMBIO: Usar la misma lógica que getMovimientos()
                             // Solo sumar pedidos que tienen total válido (distinto de null y mayor a 0)
                             double totalImporte = pedidosCliente.stream()
-                                    .mapToDouble(pedido -> pedido.getTotal() != null && pedido.getTotal() > 0 ? pedido.getTotal() : 0.0)
+                                    .mapToDouble(pedido -> pedido.getTotal() != null && pedido.getTotal() > 0
+                                            ? pedido.getTotal()
+                                            : 0.0)
                                     .sum();
 
                             String nombreCompleto = construirNombreCompleto(cliente);
 
-                            System.out.println("Cliente: " + nombreCompleto + " - Pedidos: " + cantidadPedidos + " - Total: " + totalImporte);
+                            System.out.println("Cliente: " + nombreCompleto + " - Pedidos: " + cantidadPedidos
+                                    + " - Total: " + totalImporte);
 
                             return new ClienteRankingDTO(
                                     clienteId, // Usar Long directamente
                                     nombreCompleto,
                                     cantidadPedidos,
-                                    totalImporte
-                            );
+                                    totalImporte);
                         } catch (Exception e) {
                             System.err.println("Error procesando cliente: " + e.getMessage());
                             e.printStackTrace();
@@ -369,8 +369,10 @@ public class SucursalService {
             String apellido = cliente.getApellido();
 
             // Manejar casos de nombres/apellidos nulos o vacíos
-            if (nombre == null) nombre = "";
-            if (apellido == null) apellido = "";
+            if (nombre == null)
+                nombre = "";
+            if (apellido == null)
+                apellido = "";
 
             String nombreCompleto = (nombre.trim() + " " + apellido.trim()).trim();
 
@@ -387,7 +389,6 @@ public class SucursalService {
         }
     }
 
-
     public ProductoRankingConResumenDTO getRankingProductos(LocalDate desde, LocalDate hasta) {
         List<DetallePedido> detalles = detallePedidoRepo.findAllByPedido_FechaPedidoBetween(desde, hasta);
 
@@ -402,13 +403,13 @@ public class SucursalService {
 
         for (Map.Entry<Articulo, Long> entry : conteo.entrySet()) {
             Articulo articulo = entry.getKey();
-            String tipo = articulo.getClass().getSimpleName().equals("ArticuloManufacturado") ? "MANUFACTURADO" : "INSUMO";
+            String tipo = articulo.getClass().getSimpleName().equals("ArticuloManufacturado") ? "MANUFACTURADO"
+                    : "INSUMO";
             ProductoRankingDTO dto = new ProductoRankingDTO(
                     articulo.getId(),
                     articulo.getDenominacion(),
                     entry.getValue(),
-                    tipo
-            );
+                    tipo);
             ranking.add(dto);
 
             // Sumar al resumen
@@ -423,7 +424,6 @@ public class SucursalService {
 
         return new ProductoRankingConResumenDTO(ranking, totalManu, totalInsumo);
     }
-
 
     public List<SucursalDTO> findAll() {
         return repo.findAll().stream()
@@ -554,6 +554,7 @@ public class SucursalService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sucursal no encontrada con id " + id);
         repo.deleteById(id);
     }
+
     public List<PedidoGananciaDetalleDTO> getDetalleGanancias(LocalDate desde, LocalDate hasta) {
         List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
 
@@ -562,8 +563,7 @@ public class SucursalService {
                 .map(pedido -> new PedidoGananciaDetalleDTO(
                         pedido.getId(),
                         pedido.getFechaPedido(),
-                        pedido.getTotal()
-                ))
+                        pedido.getTotal()))
                 .collect(Collectors.toList());
     }
 
@@ -575,12 +575,13 @@ public class SucursalService {
                 .map(pedido -> new PedidoCostoDetalleDTO(
                         pedido.getId(),
                         pedido.getFechaPedido(),
-                        pedido.getTotalCosto()  // ← CAMBIAR AQUÍ: usar getTotalCosto() en lugar de calcularCostoTotal()
+                        pedido.getTotalCosto() // ← CAMBIAR AQUÍ: usar getTotalCosto() en lugar de calcularCostoTotal()
                 ))
                 .collect(Collectors.toList());
     }
 
-    public void exportarDetalleGananciasExcel(LocalDate desde, LocalDate hasta, HttpServletResponse response) throws IOException {
+    public void exportarDetalleGananciasExcel(LocalDate desde, LocalDate hasta, HttpServletResponse response)
+            throws IOException {
         List<PedidoGananciaDetalleDTO> ganancias = getDetalleGanancias(desde, hasta);
 
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -615,7 +616,8 @@ public class SucursalService {
         }
     }
 
-    public void exportarDetalleCostosExcel(LocalDate desde, LocalDate hasta, HttpServletResponse response) throws IOException {
+    public void exportarDetalleCostosExcel(LocalDate desde, LocalDate hasta, HttpServletResponse response)
+            throws IOException {
         List<PedidoCostoDetalleDTO> costos = getDetalleCostos(desde, hasta);
 
         try (Workbook workbook = new XSSFWorkbook()) {

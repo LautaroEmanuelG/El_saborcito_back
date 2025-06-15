@@ -40,4 +40,12 @@ public class PromocionController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+    /**
+     * 🎁 Obtiene promociones vigentes para una sucursal específica
+     */
+    @GetMapping("/vigentes/{sucursalId}")
+    public List<PromocionDTO> getPromocionesVigentes(@PathVariable Long sucursalId) {
+        return service.findPromocionesVigentes(sucursalId);
+    }
 }

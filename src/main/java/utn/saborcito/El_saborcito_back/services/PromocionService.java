@@ -7,13 +7,14 @@ import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.dto.PromocionDTO; // Asegurada la importación correcta
 import utn.saborcito.El_saborcito_back.mappers.PromocionMapper;
 import utn.saborcito.El_saborcito_back.models.Promocion;
+import utn.saborcito.El_saborcito_back.models.Imagen;
 import utn.saborcito.El_saborcito_back.repositories.PromocionRepository;
-import utn.saborcito.El_saborcito_back.repositories.ArticuloRepository;
 import utn.saborcito.El_saborcito_back.repositories.SucursalRepository;
-import utn.saborcito.El_saborcito_back.models.Articulo;
+import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 import utn.saborcito.El_saborcito_back.models.Sucursal;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,8 +22,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PromocionService {
     private final PromocionRepository repo;
-    private final ArticuloRepository articuloRepository;
     private final SucursalRepository sucursalRepository;
+    private final ImagenRepository imagenRepository;
     private final PromocionMapper promocionMapper;
 
     public List<PromocionDTO> findAll() {
@@ -52,7 +53,6 @@ public class PromocionService {
         promocionActualizada.setId(id);
 
         validarPromocion(promocionActualizada, true, promocionDTO);
-
         existingPromocion.setDenominacion(promocionActualizada.getDenominacion());
         existingPromocion.setFechaDesde(promocionActualizada.getFechaDesde());
         existingPromocion.setFechaHasta(promocionActualizada.getFechaHasta());
@@ -60,8 +60,9 @@ public class PromocionService {
         existingPromocion.setHoraHasta(promocionActualizada.getHoraHasta());
         existingPromocion.setDescuento(promocionActualizada.getDescuento());
         existingPromocion.setPrecioPromocional(promocionActualizada.getPrecioPromocional());
-        existingPromocion.setArticulo(promocionActualizada.getArticulo());
         existingPromocion.setSucursal(promocionActualizada.getSucursal());
+        existingPromocion.setImagen(promocionActualizada.getImagen());
+        existingPromocion.setPromocionDetalles(promocionActualizada.getPromocionDetalles());
 
         Promocion savedPromocion = repo.save(existingPromocion);
         return promocionMapper.toDTO(savedPromocion);
@@ -112,21 +113,12 @@ public class PromocionService {
         }
         if (tienePrecioPromocional && p.getPrecioPromocional() <= 0) { // Corregido 'y' a '&&'
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio promocional debe ser mayor a cero.");
-        }
+        } // Validación de artículos se maneja ahora a través de PromocionDetalles
+        // TODO: Implementar validación específica para el nuevo modelo
 
-        if (dto.getArticulo() == null || dto.getArticulo().getId() == null) {
+        if (tienePrecioPromocional && p.getPrecioPromocional() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "La promoción debe estar asociada a un artículo.");
-        }
-        Articulo articulo = articuloRepository.findById(dto.getArticulo().getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Artículo asociado no encontrado con ID: " + dto.getArticulo().getId()));
-        p.setArticulo(articulo);
-
-        if (tienePrecioPromocional && articulo.getPrecioVenta() != null
-                && p.getPrecioPromocional() >= articulo.getPrecioVenta()) { // Corregido 'y' a '&&'
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "El precio promocional debe ser menor al precio de venta original del artículo.");
+                    "El precio promocional debe ser mayor a cero.");
         }
 
         if (dto.getSucursal() != null && dto.getSucursal().getId() != null) { // Corregido 'y' a '&&'
@@ -137,12 +129,57 @@ public class PromocionService {
         } else {
             p.setSucursal(null);
         }
+
+        // 🖼️ Validar imagen si está especificada
+        if (dto.getImagen() != null && dto.getImagen().getId() != null) {
+            Imagen imagen = imagenRepository.findById(dto.getImagen().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Imagen no encontrada con ID: " + dto.getImagen().getId()));
+            p.setImagen(imagen);
+        } else {
+            p.setImagen(null);
+        }
     }
 
     public void delete(Long id) {
         if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Promoción no encontrada con ID: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Promoción no encontrada con id: " + id);
         }
         repo.deleteById(id);
+    }
+
+    /**
+     * 🎁 Busca promociones vigentes para una sucursal específica
+     */
+    public List<PromocionDTO> findPromocionesVigentes(Long sucursalId) {
+        LocalDate hoy = LocalDate.now();
+        LocalTime ahora = LocalTime.now();
+
+        return repo.findAll().stream()
+                .filter(promocion -> {
+                    // Filtrar por sucursal
+                    if (promocion.getSucursal() != null &&
+                            !promocion.getSucursal().getId().equals(sucursalId)) {
+                        return false;
+                    }
+
+                    // Filtrar por fechas
+                    if (promocion.getFechaDesde() != null && promocion.getFechaDesde().isAfter(hoy)) {
+                        return false;
+                    }
+                    if (promocion.getFechaHasta() != null && promocion.getFechaHasta().isBefore(hoy)) {
+                        return false;
+                    }
+
+                    // Filtrar por horarios
+                    if (promocion.getHoraDesde() != null && promocion.getHoraHasta() != null) {
+                        return !ahora.isBefore(promocion.getHoraDesde()) &&
+                                !ahora.isAfter(promocion.getHoraHasta());
+                    }
+
+                    return true;
+                })
+                .map(promocionMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
