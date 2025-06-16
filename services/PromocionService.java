@@ -9,6 +9,7 @@ import utn.saborcito.El_saborcito_back.mappers.PromocionMapper;
 import utn.saborcito.El_saborcito_back.repositories.ArticuloRepository;
 import utn.saborcito.El_saborcito_back.repositories.PromocionRepository;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Service
@@ -29,12 +30,16 @@ public class PromocionService {
                 PromocionDetalle detalle = promocion.getPromocionDetalles().get(i);
                 var detalleDTO = promocionDTO.getPromocionDetalles().get(i);
                 if (detalleDTO.getArticulo() != null && detalleDTO.getArticulo().getId() != null) {
-                    detalle.setArticulo(articuloRepository.findById(detalleDTO.getArticulo().getId())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId())));
+                    Articulo articulo = articuloRepository.findById(detalleDTO.getArticulo().getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId()));
+                    detalle.setArticulo(articulo);
                 }
                 detalle.setPromocion(promocion);
             }
         }
+
+        // Calcular y asignar descuento antes de guardar
+        promocion.setDescuento(calcularDescuento(promocion));
 
         Promocion savedPromocion = repo.save(promocion);
         return promocionMapper.toDTO(savedPromocion);
@@ -54,7 +59,6 @@ public class PromocionService {
         existingPromocion.setFechaHasta(promocionActualizada.getFechaHasta());
         existingPromocion.setHoraDesde(promocionActualizada.getHoraDesde());
         existingPromocion.setHoraHasta(promocionActualizada.getHoraHasta());
-        existingPromocion.setDescuento(promocionActualizada.getDescuento());
         existingPromocion.setPrecioPromocional(promocionActualizada.getPrecioPromocional());
         existingPromocion.setSucursal(promocionActualizada.getSucursal());
         existingPromocion.setImagen(promocionActualizada.getImagen());
@@ -67,13 +71,17 @@ public class PromocionService {
                 PromocionDetalle detalle = promocionActualizada.getPromocionDetalles().get(i);
                 var detalleDTO = promocionDTO.getPromocionDetalles().get(i);
                 if (detalleDTO.getArticulo() != null && detalleDTO.getArticulo().getId() != null) {
-                    detalle.setArticulo(articuloRepository.findById(detalleDTO.getArticulo().getId())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId())));
+                    Articulo articulo = articuloRepository.findById(detalleDTO.getArticulo().getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId()));
+                    detalle.setArticulo(articulo);
                 }
                 detalle.setPromocion(existingPromocion);
                 existingPromocion.getPromocionDetalles().add(detalle);
             }
         }
+
+        // Calcular y asignar descuento antes de guardar
+        existingPromocion.setDescuento(calcularDescuento(existingPromocion));
 
         Promocion savedPromocion = repo.save(existingPromocion);
         return promocionMapper.toDTO(savedPromocion);
@@ -110,5 +118,20 @@ public class PromocionService {
         if (!esActualizacion && repo.existsByDenominacionAndEliminadoFalse(promocion.getDenominacion())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe una promoción activa con esa denominación.");
         }
+    }
+
+    private Double calcularDescuento(Promocion promocion) {
+        if (promocion.getPromocionDetalles() == null || promocion.getPromocionDetalles().isEmpty()) return null;
+        double sumaArticulos = promocion.getPromocionDetalles().stream()
+            .mapToDouble(detalle -> {
+                Double precio = detalle.getArticulo() != null && detalle.getArticulo().getPrecioVenta() != null
+                    ? detalle.getArticulo().getPrecioVenta()
+                    : 0.0;
+                return precio * (detalle.getCantidadRequerida() != null ? detalle.getCantidadRequerida() : 1);
+            })
+            .sum();
+        if (sumaArticulos == 0 || promocion.getPrecioPromocional() == null) return null;
+        double descuento = 100 - (promocion.getPrecioPromocional() / sumaArticulos) * 100;
+        return descuento > 0 ? descuento : 0;
     }
 }

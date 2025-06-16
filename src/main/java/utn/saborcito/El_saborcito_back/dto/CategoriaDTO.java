@@ -13,4 +13,5 @@ public class CategoriaDTO {
     private String denominacion;
     private CategoriaDTO tipoCategoria;
     private CategoriaTipo tipo;
+    private SucursalDTO sucursal; // <--- AGREGAR ESTA LÍNEA
 }
