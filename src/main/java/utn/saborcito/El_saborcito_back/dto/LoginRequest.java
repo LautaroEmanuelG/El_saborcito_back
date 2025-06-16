@@ -18,5 +18,6 @@ public class LoginRequest {
     @NotBlank
     private String email;
     private String password;
+    private String auth0Id;
     private Boolean esAuth0Login; // Para saber si viene de Auth0 o manual
 }
