@@ -23,6 +23,11 @@ public class PedidoController {
         return service.findAll();
     }
 
+    @GetMapping("/cliente/{clienteId}")
+    public List<PedidoDTO> getPedidosByCliente(@PathVariable Long clienteId) {
+        return service.findByClienteId(clienteId);
+    }
+
     @GetMapping("/{id}")
     public PedidoDTO getById(@PathVariable Long id) {
         return service.findById(id);
