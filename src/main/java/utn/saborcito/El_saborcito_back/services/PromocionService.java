@@ -198,6 +198,7 @@ public class PromocionService {
         LocalTime ahora = LocalTime.now();
 
         return repo.findAll().stream()
+                .filter(promocion -> !promocion.isEliminado()) // Solo promociones habilitadas
                 .filter(promocion -> {
                     // Filtrar por sucursal
                     if (promocion.getSucursal() != null &&
