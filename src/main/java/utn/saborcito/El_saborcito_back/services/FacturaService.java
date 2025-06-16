@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.DetalleFacturaRenderizadoDTO;
 import utn.saborcito.El_saborcito_back.dto.FacturaDTO;
 import utn.saborcito.El_saborcito_back.mappers.FacturaMapper;
 import utn.saborcito.El_saborcito_back.models.Factura;
@@ -12,6 +13,7 @@ import utn.saborcito.El_saborcito_back.models.Pedido;
 import utn.saborcito.El_saborcito_back.repositories.FacturaRepository;
 import utn.saborcito.El_saborcito_back.repositories.FormaPagoRepository;
 import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
+
 
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +29,8 @@ public class FacturaService {
     private final FormaPagoRepository formaPagoRepository;
     private final FacturaPdfGeneratorService facturaPdfGenerator;
     private final EmailService emailService;
+    private final FacturaRenderService facturaRenderService;
+
 
     public List<FacturaDTO> findAll() {
         return facturaRepository.findAll()
@@ -41,9 +45,25 @@ public class FacturaService {
         return facturaMapper.toDTO(factura);
     }
 
+    // NUEVO: Buscar factura por pedido ID
+    public FacturaDTO findByPedidoId(Long pedidoId) {
+        Factura factura = facturaRepository.findByPedidoId(pedidoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Factura no encontrada para el pedido con id: " + pedidoId));
+        return facturaMapper.toDTO(factura);
+    }
+
     public Factura findEntityById(Long id) {
-        return facturaRepository.findById(id)
+        // Usar fetch join para traer la factura con pedido y detalles inicializados
+        return facturaRepository.findByIdWithPedidoAndDetalles(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Factura no encontrada con id: " + id));
+    }
+
+    public byte[] regenerarPDF(Long facturaId) throws IOException {
+        Factura factura = findEntityById(facturaId);
+        facturaRenderService.cargarDetallesPedido(factura.getPedido());
+
+        List<DetalleFacturaRenderizadoDTO> renderItems = facturaRenderService.construirDetalleFactura(factura.getPedido());
+        return facturaPdfGenerator.generarFacturaPdf(factura, renderItems);
     }
 
     public FacturaDTO save(FacturaDTO dto) throws IOException {
@@ -57,28 +77,29 @@ public class FacturaService {
             Pedido pedido = pedidoRepository.findById(dto.getPedido().getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado con id: " + dto.getPedido().getId()));
             factura.setPedido(pedido);
-        } else if (dto.getPedido() != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID de Pedido es requerido para asociar a la Factura.");
         }
 
         if (dto.getFormaPago() != null && dto.getFormaPago().getId() != null) {
             FormaPago formaPago = formaPagoRepository.findById(dto.getFormaPago().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Forma de Pago no encontrada con id: " + dto.getFormaPago().getId()));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Forma de Pago no encontrada"));
             factura.setFormaPago(formaPago);
-        } else if (dto.getFormaPago() != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID de Forma de Pago es requerido para asociar a la Factura.");
         }
 
-        Factura savedFactura = facturaRepository.save(factura);
+        Factura saved = facturaRepository.save(factura);
 
-        // Generar PDF y enviar email
-        byte[] pdfBytes = facturaPdfGenerator.generarFacturaPdf(savedFactura);
+        facturaRenderService.cargarDetallesPedido(saved.getPedido());
+        List<DetalleFacturaRenderizadoDTO> renderItems = facturaRenderService.construirDetalleFactura(saved.getPedido());
+        byte[] pdfBytes = facturaPdfGenerator.generarFacturaPdf(saved, renderItems);
+
         String emailCliente = (dto.getClienteEmail() != null && !dto.getClienteEmail().isEmpty())
                 ? dto.getClienteEmail()
-                : savedFactura.getPedido().getCliente().getEmail();
-        emailService.enviarFacturaPorEmail(emailCliente, pdfBytes, "factura_" + savedFactura.getId() + ".pdf");
-        return facturaMapper.toDTO(savedFactura);
+                : saved.getPedido().getCliente().getEmail();
+
+        emailService.enviarFacturaPorEmail(emailCliente, pdfBytes, "factura_" + saved.getId() + ".pdf");
+
+        return facturaMapper.toDTO(saved);
     }
+
 
     public FacturaDTO update(Long id, FacturaDTO dto) {
         Factura facturaExistente = facturaRepository.findById(id)

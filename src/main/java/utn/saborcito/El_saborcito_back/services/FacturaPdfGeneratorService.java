@@ -7,6 +7,7 @@ import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import utn.saborcito.El_saborcito_back.dto.DetalleFacturaRenderizadoDTO;
 import utn.saborcito.El_saborcito_back.models.DetallePedido;
 import utn.saborcito.El_saborcito_back.models.Factura;
 
@@ -63,7 +64,7 @@ public class FacturaPdfGeneratorService {
     private static final Font FONT_TOTAL_CAJA = FontFactory.getFont("Montserrat-ExtraBold", 14, Color.WHITE);
     private static final Font FONT_GRACIAS_BOTON = FontFactory.getFont("Montserrat-Bold", 12, Color.WHITE);
 
-    public byte[] generarFacturaPdf(Factura factura) throws DocumentException, IOException {
+    public byte[] generarFacturaPdf(Factura factura, java.util.List<DetalleFacturaRenderizadoDTO> items) throws DocumentException, IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Document doc = new Document(PageSize.A4, 42.5f, 42.5f, 42.5f, 42.5f); // 15mm Margen
         PdfWriter.getInstance(doc, baos);
@@ -73,9 +74,9 @@ public class FacturaPdfGeneratorService {
         doc.add(createLineaSeparadora(COLOR_ROSA_INTENSO, 1f, 10f));
         doc.add(createDatosCliente(factura));
         doc.add(new Paragraph(" "));
-        doc.add(createTablaItems(factura));
+        doc.add(createTablaItems(items));
         doc.add(new Paragraph(" "));
-        doc.add(createFirmaYTotales(factura));
+        doc.add(createFirmaYTotales(items));
         doc.add(createLineaSeparadora(COLOR_ROSA_INTENSO, 1f, 20f));
         doc.add(createFooter());
 
@@ -200,7 +201,7 @@ public class FacturaPdfGeneratorService {
         return mainTable;
     }
 
-    private PdfPTable createTablaItems(Factura factura) throws DocumentException {
+    private PdfPTable createTablaItems(java.util.List<DetalleFacturaRenderizadoDTO> items) throws DocumentException {
         PdfPTable table = new PdfPTable(new float[] { 80, 30, 35, 35 }); // Anchos en mm
         table.setWidthPercentage(100);
         table.setHeaderRows(1);
@@ -211,20 +212,30 @@ public class FacturaPdfGeneratorService {
         table.addCell(createHeaderCell("Total"));
 
         boolean alternar = false;
-        for (DetallePedido detalle : factura.getPedido().getDetalles()) {
+        for (DetalleFacturaRenderizadoDTO item : items) {
             Color bgColor = alternar ? COLOR_FILA_ALTERNADA : Color.WHITE;
-            table.addCell(createItemCell(detalle.getArticulo().getDenominacion(), Element.ALIGN_LEFT, bgColor));
-            table.addCell(createItemCell(String.valueOf(detalle.getCantidad()), Element.ALIGN_CENTER, bgColor));
-            table.addCell(createItemCell(formatCurrency(detalle.getArticulo().getPrecioVenta()), Element.ALIGN_RIGHT,
-                    bgColor));
-            table.addCell(createItemCell(formatCurrency(detalle.getSubtotal() != null ? detalle.getSubtotal() : 0.0),
-                    Element.ALIGN_RIGHT, bgColor));
+
+            table.addCell(createItemCell(item.getDescripcion(), Element.ALIGN_LEFT, bgColor));
+            table.addCell(createItemCell(String.valueOf(item.getCantidad()), Element.ALIGN_CENTER, bgColor));
+            table.addCell(createItemCell(" ", Element.ALIGN_CENTER, bgColor));
+            table.addCell(createItemCell(formatCurrency(item.getSubtotal()), Element.ALIGN_RIGHT, bgColor));
+
+            // Si es una promoción, agregar los artículos incluidos
+            if (item.isEsPromocion() && item.getArticulosIncluidos() != null) {
+                for (String art : item.getArticulosIncluidos()) {
+                    table.addCell(createItemCell("   " + art, Element.ALIGN_LEFT, Color.WHITE)); // Indentado
+                    table.addCell(createItemCell(" ", Element.ALIGN_CENTER, Color.WHITE));
+                    table.addCell(createItemCell(" ", Element.ALIGN_CENTER, Color.WHITE));
+                    table.addCell(createItemCell(" ", Element.ALIGN_CENTER, Color.WHITE));
+                }
+            }
+
             alternar = !alternar;
         }
         return table;
     }
 
-    private PdfPTable createFirmaYTotales(Factura factura) throws DocumentException {
+    private PdfPTable createFirmaYTotales(java.util.List<DetalleFacturaRenderizadoDTO> items) throws DocumentException {
         PdfPTable mainTable = new PdfPTable(2);
         mainTable.setWidthPercentage(100);
         mainTable.setWidths(new float[] { 1, 1 });
@@ -240,12 +251,11 @@ public class FacturaPdfGeneratorService {
         PdfPTable totalesTable = new PdfPTable(2);
         totalesTable.setWidthPercentage(100);
         totalesTable.setWidths(new float[] { 2, 1 });
-        BigDecimal subtotal = factura.getPedido().getDetalles().stream()
-                .map(d -> BigDecimal.valueOf(d.getSubtotal() != null ? d.getSubtotal() : 0.0))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        java.math.BigDecimal subtotal = items.stream()
+                .map(i -> java.math.BigDecimal.valueOf(i.getSubtotal()))
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
-        // Si no hay descuentos ni recargos, el total es igual al subtotal
-        BigDecimal total = subtotal;
+        java.math.BigDecimal total = subtotal;
 
         totalesTable.addCell(createTotalCell("Importe Total:", Element.ALIGN_RIGHT, FONT_TEXTO_CUERPO_BOLD));
         totalesTable.addCell(createTotalCell(formatCurrency(subtotal), Element.ALIGN_RIGHT, FONT_TEXTO_CUERPO_BOLD));
@@ -260,19 +270,12 @@ public class FacturaPdfGeneratorService {
         lineaDoble.setBorderWidthTop(2f);
         lineaDoble.setBorderWidthBottom(1f);
         lineaDoble.setColspan(2);
-        lineaDoble.setFixedHeight(8f);
         totalesTable.addCell(lineaDoble);
 
-        PdfPCell totalBox = new PdfPCell(new Phrase("TOTAL: " + formatCurrency(total), FONT_TOTAL_CAJA));
-        totalBox.setBackgroundColor(COLOR_ROSA_INTENSO);
-        totalBox.setBorder(Rectangle.NO_BORDER);
-        totalBox.setColspan(2);
-        totalBox.setFixedHeight(56.7f); // 20mm
-        totalBox.setHorizontalAlignment(Element.ALIGN_CENTER);
-        totalBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        totalesTable.addCell(totalBox);
+        PdfPCell totalesCell = new PdfPCell(totalesTable);
+        totalesCell.setBorder(Rectangle.NO_BORDER);
+        mainTable.addCell(totalesCell);
 
-        mainTable.addCell(totalesTable);
         return mainTable;
     }
 

@@ -1,10 +1,12 @@
 package utn.saborcito.El_saborcito_back.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = "detalles")
 public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +24,12 @@ public class Pedido {
     private Double total;
     private Double totalCosto;
     private LocalDate fechaPedido;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    @JsonIgnore // 🛠️ rompe ciclo infinito
+    private Cliente cliente;
+
 
     @ManyToOne
     @JoinColumn(name = "estado_id")
@@ -34,22 +43,19 @@ public class Pedido {
     @JoinColumn(name = "forma_pago_id")
     private FormaPago formaPago;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private Cliente cliente;
 
     @ManyToOne
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<DetallePedido> detalles;
+    private List<DetallePedido> detalles = new ArrayList<>();
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<DetallePedidoPromocion> promociones;
+    private List<DetallePedidoPromocion> promociones = new ArrayList<>();
 
     /**
      * Calcula el costo total del pedido (sumando el costo de cada detalle)
-     * 
+     *
      * @return el costo total calculado
      */
     @Transient
@@ -63,7 +69,7 @@ public class Pedido {
 
     /**
      * Calcula el total del pedido incluyendo promociones
-     * 
+     *
      * @return el total calculado
      */
     @Transient
@@ -88,7 +94,7 @@ public class Pedido {
 
     /**
      * Calcula el ahorro total por promociones
-     * 
+     *
      * @return el ahorro total
      */
     @Transient
