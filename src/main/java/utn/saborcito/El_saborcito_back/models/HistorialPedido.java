@@ -22,6 +22,7 @@ public class HistorialPedido {
 
     @ManyToOne
     @JoinColumn(name = "pedido_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore // Evita ciclo infinito al serializar
     private Pedido pedido;
 
     @Column(nullable = false)

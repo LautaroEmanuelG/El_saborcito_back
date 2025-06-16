@@ -57,6 +57,11 @@ public class CategoriaService {
         }
         Categoria categoria = categoriaMapper.toEntity(categoriaDTO);
 
+        // Validar que la sucursal no sea null
+        if (categoria.getSucursal() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La sucursal es obligatoria.");
+        }
+
         // Copiar tipo del padre si es subcategoría
         if (categoria.getTipoCategoria() != null) {
             Categoria padre = repo.findById(categoria.getTipoCategoria().getId())
@@ -94,6 +99,16 @@ public class CategoriaService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoría padre no encontrada"));
             categoriaExistente.setTipoCategoria(padre);
             categoriaExistente.setTipo(padre.getTipo());
+        }
+
+        // Actualizar sucursal si viene en el DTO
+        if (categoriaDTO.getSucursal() != null && categoriaDTO.getSucursal().getId() != null) {
+            // Si tienes un repositorio de sucursal, puedes validar que exista:
+            // Sucursal sucursal = sucursalRepository.findById(categoriaDTO.getSucursal().getId())
+            //     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sucursal no encontrada"));
+            // categoriaExistente.setSucursal(sucursal);
+            // Si no, simplemente asigna el id recibido:
+            categoriaExistente.getSucursal().setId(categoriaDTO.getSucursal().getId());
         }
 
         return categoriaMapper.toDTO(repo.save(categoriaExistente));
