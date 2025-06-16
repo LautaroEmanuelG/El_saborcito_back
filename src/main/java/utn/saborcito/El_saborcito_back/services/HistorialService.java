@@ -24,9 +24,22 @@ public class HistorialService {
     private final PedidoRepository pedidoRepository;
     private final PedidoMapper pedidoMapper;
 
+    // ✅ IDs de estados fijos
+    private static final Long ESTADO_LISTO_ID = 4L;
+    private static final Long ESTADO_DELIVERY_ID = 5L;
+    private static final Long ESTADO_ENTREGADO_ID = 6L;
+    private static final Long ESTADO_FACTURADO_ID = 7L; // Si existe
+
     public List<PedidoDTO> obtenerPedidosFinalizados() {
-        List<String> estados = List.of("LISTO", "FACTURADO");
-        return pedidoRepository.findByEstadoNombreIn(estados)
+        // 🔧 Usar IDs en lugar de nombres
+        List<Long> estadosFinalizados = List.of(
+                ESTADO_LISTO_ID,
+                ESTADO_DELIVERY_ID,
+                ESTADO_ENTREGADO_ID
+                // ESTADO_FACTURADO_ID // Agregar si existe
+        );
+
+        return pedidoRepository.findByEstado_IdIn(estadosFinalizados)
                 .stream()
                 .map(pedidoMapper::toDTO)
                 .collect(Collectors.toList());
