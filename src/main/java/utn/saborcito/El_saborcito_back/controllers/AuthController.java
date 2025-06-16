@@ -26,9 +26,17 @@ public class AuthController {
 
     // ✅ HU01 - Registro manual de cliente (o desde Auth0)
     @PostMapping("/clientes/registro")
-    public ResponseEntity<ClienteDTO> registrarCliente(@RequestBody RegistroClienteDTO dto) {
+    public ResponseEntity<AuthResponseDTO> registrarCliente(@RequestBody RegistroClienteDTO dto) {
         ClienteDTO cliente = clienteService.registrarClienteFlexible(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(cliente);
+        String token = jwtUtil.generateToken(cliente.getEmail(), cliente.getRol().name());
+
+        AuthResponseDTO response = AuthResponseDTO.builder()
+                .message("Registro exitoso")
+                .token(token)
+                .usuario(cliente)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // ✅ HU02 - Login cliente con Auth0 (solo valida que exista y esté activo)
@@ -65,9 +73,18 @@ public class AuthController {
 
     // ✅ HU04 - Registro manual de empleado (o desde Auth0)
     @PostMapping("/empleados/registro")
-    public ResponseEntity<EmpleadoDTO> registrarEmpleado(@RequestBody RegistroEmpleadoDTO dto) {
+    public ResponseEntity<AuthEmpleadoResponseDTO> registrarEmpleado(@RequestBody RegistroEmpleadoDTO dto) {
         EmpleadoDTO empleado = empleadoService.registrarEmpleadoFlexible(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(empleado);
+        String token = jwtUtil.generateToken(empleado.getEmail(), empleado.getRol().name());
+
+        AuthEmpleadoResponseDTO response = AuthEmpleadoResponseDTO.builder()
+                .mensaje("Registro exitoso")
+                .empleado(empleado)
+                .token(token)
+                .cambioRequerido(false) // o true si es contraseña provisoria
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // ✅ HU05 - Login empleado (solo valida que exista y esté activo)
