@@ -64,9 +64,11 @@ dependencies {
 
 	// Implementacion para Generara PDF del pedido
 	implementation 'com.github.librepdf:openpdf:1.3.30'
-
 	// Implementacion para enviar correos
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// Cloudinary para manejo de imágenes
+	implementation 'com.cloudinary:cloudinary-http5:2.0.0'
 
 
 }
