@@ -21,7 +21,10 @@ public class FacturaRenderService {
     private final DetallePedidoRepository detallePedidoRepository;
 
     public void cargarDetallesPedido(Pedido pedido) {
-        pedido.setDetalles(detallePedidoRepository.findByPedido(pedido));
+        // Solución: limpiar y agregar, no reemplazar la lista
+        List<DetallePedido> nuevosDetalles = detallePedidoRepository.findByPedido(pedido);
+        pedido.getDetalles().clear();
+        pedido.getDetalles().addAll(nuevosDetalles);
     }
 
     public List<DetalleFacturaRenderizadoDTO> construirDetalleFactura(Pedido pedido) {
@@ -29,9 +32,9 @@ public class FacturaRenderService {
         cargarDetallesPedido(pedido);
         List<DetalleFacturaRenderizadoDTO> items = new ArrayList<>();
 
-        // Artículos individuales
+        // Detalles individuales
         for (DetallePedido dp : pedido.getDetalles()) {
-            if (dp.getOrigen() == OrigenDetalle.INDIVIDUAL && dp.getCantidadSinPromocion() > 0) {
+            if (dp.getOrigen() == OrigenDetalle.INDIVIDUAL) {
                 items.add(DetalleFacturaRenderizadoDTO.builder()
                         .descripcion(dp.getArticulo().getDenominacion())
                         .cantidad(dp.getCantidadSinPromocion())
@@ -41,17 +44,18 @@ public class FacturaRenderService {
             }
         }
 
-        // Promociones aplicadas
+        // Detalles de promociones
         List<DetallePedidoPromocion> promociones = detallePedidoPromocionRepository.findByPedidoId(pedido.getId());
 
-        for (DetallePedidoPromocion promo : promociones) {
-            List<String> nombresArticulos = promo.getPromocion().getPromocionDetalles().stream()
-                .map(pd -> "- " + pd.getArticulo().getDenominacion() + " x" + pd.getCantidadRequerida())
-                .toList();
+        for (DetallePedidoPromocion dpp : promociones) {
+            List<String> nombresArticulos = dpp.getPromocion().getPromocionDetalles().stream()
+                    .map(pd -> "- " + pd.getArticulo().getDenominacion() + " x" + pd.getCantidadRequerida())
+                    .toList();
+
             items.add(DetalleFacturaRenderizadoDTO.builder()
-                    .descripcion("Promoción: " + promo.getPromocion().getDenominacion())
-                    .cantidad(promo.getCantidadPromocion())
-                    .subtotal(promo.getPrecioTotalPromocion())
+                    .descripcion("🎁 Promoción: " + dpp.getPromocion().getDenominacion())
+                    .cantidad(dpp.getCantidadPromocion())
+                    .subtotal(dpp.getPrecioTotalPromocion())
                     .esPromocion(true)
                     .articulosIncluidos(nombresArticulos)
                     .build());

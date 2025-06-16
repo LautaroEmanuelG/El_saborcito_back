@@ -1,7 +1,6 @@
 package utn.saborcito.El_saborcito_back.dto;
 
 import lombok.*;
-
 import java.util.List;
 
 @Data
@@ -16,4 +15,3 @@ public class DetalleFacturaRenderizadoDTO {
 
     private List<String> articulosIncluidos;
 }
-

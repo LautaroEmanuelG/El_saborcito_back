@@ -54,16 +54,16 @@ public class FacturaController {
     }
 
     // NUEVO: Reenviar factura por email
-    @PostMapping("/{id}/reenviar")
-    public ResponseEntity<String> reenviarFacturaPorEmail(@PathVariable Long id) {
-        try {
-            facturaService.reenviarFacturaPorEmail(id);
-            return ResponseEntity.ok("Factura reenviada exitosamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al reenviar factura: " + e.getMessage());
-        }
-    }
+//    @PostMapping("/{id}/reenviar")
+//    public ResponseEntity<String> reenviarFacturaPorEmail(@PathVariable Long id) {
+//        try {
+//            facturaService.reenviarFacturaPorEmail(id);
+//            return ResponseEntity.ok("Factura reenviada exitosamente");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Error al reenviar factura: " + e.getMessage());
+//        }
+//    }
 
     @PostMapping
     public ResponseEntity<FacturaDTO> create(@RequestBody FacturaDTO dto) throws IOException {

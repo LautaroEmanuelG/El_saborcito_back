@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.dto.*;
+import utn.saborcito.El_saborcito_back.enums.OrigenDetalle;
 import utn.saborcito.El_saborcito_back.mappers.PedidoMapper;
 import utn.saborcito.El_saborcito_back.models.*;
 import utn.saborcito.El_saborcito_back.repositories.*;
@@ -218,7 +219,17 @@ public class PedidoServiceMejorado {
                     pedido, detalles, promocionesSeleccionadas, pedido.getSucursal());
             pedido.setPromociones(promociones);
         }
-        pedido.setDetalles(detalles);
+        // Solución: limpiar y agregar detalles en vez de reemplazar la lista
+        if (pedido.getDetalles() == null) {
+            pedido.setDetalles(new ArrayList<>());
+        } else {
+            pedido.getDetalles().clear();
+        }
+        pedido.getDetalles().addAll(detalles);
+        // Asegurar la relación bidireccional
+        for (DetallePedido detalle : pedido.getDetalles()) {
+            detalle.setPedido(pedido);
+        }
     }
 
     private void calcularTiempoEstimado(Pedido pedido) {
@@ -233,7 +244,6 @@ public class PedidoServiceMejorado {
         pedido.setHorasEstimadaFinalizacion(horaEstimada);
     }
 
-    // MODIFICADO: Ahora retorna el ID de la factura generada
     private Long crearFacturaAutomatica(Pedido pedido) {
         try {
             if (pedido.getFormaPago() != null && pedido.getFormaPago().getId() != null) {
@@ -246,13 +256,74 @@ public class PedidoServiceMejorado {
                         .build();
 
                 FacturaDTO facturaGuardada = facturaService.save(facturaDTO);
-                return facturaGuardada.getId(); // Retornar el ID de la factura
+                return facturaGuardada.getId();
             }
         } catch (IOException e) {
             System.err.println("Error al generar factura: " + e.getMessage());
         }
-        return null; // Si no se pudo generar la factura
+        return null;
     }
+
+    public List<PedidoResumenPorClienteDTO> getPedidosPorCliente(Long clienteId, LocalDate desde, LocalDate hasta) {
+        List<Pedido> pedidos = pedidoRepository.findAllByCliente_IdAndFechaPedidoBetween(clienteId, desde, hasta);
+
+        return pedidos.stream().map(pedido -> {
+
+            List<DetallePedidoDTO> detallesDTO = new ArrayList<>();
+
+// Detalles individuales
+            for (DetallePedido dp : pedido.getDetalles()) {
+                if (dp.getOrigen() == OrigenDetalle.INDIVIDUAL) {
+                    detallesDTO.add(new DetallePedidoDTO(
+                            dp.getId(),
+                            dp.getCantidad(),
+                            dp.getCantidadConPromocion(),
+                            dp.getCantidadSinPromocion(),
+                            dp.getSubtotal(),
+                            dp.getOrigen(),
+                            dp.getPromocionOrigenId(),
+                            new ArticuloDTO(
+                                    dp.getArticulo().getId(),
+                                    dp.getArticulo().getDenominacion(),
+                                    dp.getArticulo().getPrecioVenta(),
+                                    null, null, false, null
+                            )
+                    ));
+                }
+            }
+
+            // Promociones aplicadas
+            List<DetallePedidoPromocion> promociones = pedido.getPromociones();
+            if (promociones != null) {
+                for (DetallePedidoPromocion dpp : promociones) {
+                    Promocion promo = dpp.getPromocion();
+                    detallesDTO.add(new DetallePedidoDTO(
+                            dpp.getId(),
+                            dpp.getCantidadPromocion(),
+                            null,
+                            null,
+                            dpp.getPrecioTotalPromocion(),
+                            OrigenDetalle.PROMOCION,
+                            promo.getId(),
+                            new ArticuloDTO(
+                                    promo.getId(),
+                                    "🎁 " + promo.getDenominacion(),
+                                    promo.getPrecioPromocional(),
+                                    null, null, false, null
+                            )
+                    ));
+                }
+            }
+
+            PedidoResumenPorClienteDTO dto = new PedidoResumenPorClienteDTO();
+            dto.setIdPedido(pedido.getId());
+            dto.setFechaPedido(pedido.getFechaPedido());
+            dto.setTotal(pedido.getTotal());
+            dto.setDetalles(detallesDTO);
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 
     private Map<String, Object> crearInfoValidacion(Promocion promocion) {
         LocalDate fechaActual = LocalDate.now();
@@ -278,3 +349,4 @@ public class PedidoServiceMejorado {
         return info;
     }
 }
+
