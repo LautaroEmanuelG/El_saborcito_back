@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.dto.*;
+import utn.saborcito.El_saborcito_back.enums.OrigenDetalle;
 import utn.saborcito.El_saborcito_back.mappers.PedidoMapper;
 import utn.saborcito.El_saborcito_back.models.*;
 import utn.saborcito.El_saborcito_back.repositories.*;
@@ -37,8 +38,26 @@ public class PedidoServiceMejorado {
     private final PromocionComboService promocionComboService;
     private final PedidoMapper pedidoMapper;
 
+    // NUEVO: DTO para respuesta que incluye pedido y factura
+    public static class PedidoConFacturaDTO {
+        private PedidoDTO pedido;
+        private Long facturaId;
+
+        public PedidoConFacturaDTO() {}
+
+        public PedidoConFacturaDTO(PedidoDTO pedido, Long facturaId) {
+            this.pedido = pedido;
+            this.facturaId = facturaId;
+        }
+
+        public PedidoDTO getPedido() { return pedido; }
+        public void setPedido(PedidoDTO pedido) { this.pedido = pedido; }
+        public Long getFacturaId() { return facturaId; }
+        public void setFacturaId(Long facturaId) { this.facturaId = facturaId; }
+    }
+
     @Transactional
-    public PedidoDTO crearPedidoCompleto(PedidoCreacionDTO dto) {
+    public PedidoConFacturaDTO crearPedidoCompleto(PedidoCreacionDTO dto) {
         try {
             validarDatosCreacion(dto);
 
@@ -52,9 +71,9 @@ public class PedidoServiceMejorado {
             calcularTiempoEstimado(pedido);
 
             Pedido pedidoGuardado = pedidoRepository.save(pedido);
-            crearFacturaAutomatica(pedidoGuardado);
+            Long facturaId = crearFacturaAutomatica(pedidoGuardado);
 
-            return pedidoMapper.toDTO(pedidoGuardado);
+            return new PedidoConFacturaDTO(pedidoMapper.toDTO(pedidoGuardado), facturaId);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al crear pedido: " + e.getMessage(), e);
         }
@@ -164,7 +183,7 @@ public class PedidoServiceMejorado {
     }
 
     private List<DetallePedido> crearDetallesPedido(Pedido pedido,
-            List<PedidoCreacionDTO.DetallePedidoCreacionDTO> detallesDTO) {
+                                                    List<PedidoCreacionDTO.DetallePedidoCreacionDTO> detallesDTO) {
         if (detallesDTO == null || detallesDTO.isEmpty()) {
             return new ArrayList<>();
         }
@@ -194,13 +213,23 @@ public class PedidoServiceMejorado {
     }
 
     private void aplicarPromociones(Pedido pedido, List<DetallePedido> detalles,
-            List<PromocionSeleccionadaDTO> promocionesSeleccionadas) {
+                                    List<PromocionSeleccionadaDTO> promocionesSeleccionadas) {
         if (promocionesSeleccionadas != null && !promocionesSeleccionadas.isEmpty()) {
             List<DetallePedidoPromocion> promociones = promocionComboService.aplicarPromocionesSeleccionadas(
                     pedido, detalles, promocionesSeleccionadas, pedido.getSucursal());
             pedido.setPromociones(promociones);
         }
-        pedido.setDetalles(detalles);
+        // Solución: limpiar y agregar detalles en vez de reemplazar la lista
+        if (pedido.getDetalles() == null) {
+            pedido.setDetalles(new ArrayList<>());
+        } else {
+            pedido.getDetalles().clear();
+        }
+        pedido.getDetalles().addAll(detalles);
+        // Asegurar la relación bidireccional
+        for (DetallePedido detalle : pedido.getDetalles()) {
+            detalle.setPedido(pedido);
+        }
     }
 
     private void calcularTiempoEstimado(Pedido pedido) {
@@ -215,26 +244,86 @@ public class PedidoServiceMejorado {
         pedido.setHorasEstimadaFinalizacion(horaEstimada);
     }
 
-    private void crearFacturaAutomatica(Pedido pedido) {
+    private Long crearFacturaAutomatica(Pedido pedido) {
         try {
-            FacturaDTO facturaDTO = new FacturaDTO();
-            facturaDTO.setTotalVenta(pedido.getTotal());
-            facturaDTO.setFechaFacturacion(LocalDate.now());
-            facturaDTO.setClienteEmail(pedido.getCliente().getEmail());
+            if (pedido.getFormaPago() != null && pedido.getFormaPago().getId() != null) {
+                FacturaDTO facturaDTO = FacturaDTO.builder()
+                        .pedido(pedidoMapper.toDTO(pedido))
+                        .formaPago(FormaPagoDTO.builder().id(pedido.getFormaPago().getId()).build())
+                        .totalVenta(pedido.getTotal())
+                        .fechaFacturacion(LocalDate.now())
+                        .clienteEmail(pedido.getCliente().getEmail())
+                        .build();
 
-            PedidoDTO pedidoRef = new PedidoDTO();
-            pedidoRef.setId(pedido.getId());
-            facturaDTO.setPedido(pedidoRef);
-
-            FormaPagoDTO formaPagoRef = new FormaPagoDTO();
-            formaPagoRef.setId(pedido.getFormaPago().getId());
-            facturaDTO.setFormaPago(formaPagoRef);
-
-            facturaService.save(facturaDTO);
+                FacturaDTO facturaGuardada = facturaService.save(facturaDTO);
+                return facturaGuardada.getId();
+            }
         } catch (IOException e) {
             System.err.println("Error al generar factura: " + e.getMessage());
         }
+        return null;
     }
+
+    public List<PedidoResumenPorClienteDTO> getPedidosPorCliente(Long clienteId, LocalDate desde, LocalDate hasta) {
+        List<Pedido> pedidos = pedidoRepository.findAllByCliente_IdAndFechaPedidoBetween(clienteId, desde, hasta);
+
+        return pedidos.stream().map(pedido -> {
+
+            List<DetallePedidoDTO> detallesDTO = new ArrayList<>();
+
+// Detalles individuales
+            for (DetallePedido dp : pedido.getDetalles()) {
+                if (dp.getOrigen() == OrigenDetalle.INDIVIDUAL) {
+                    detallesDTO.add(new DetallePedidoDTO(
+                            dp.getId(),
+                            dp.getCantidad(),
+                            dp.getCantidadConPromocion(),
+                            dp.getCantidadSinPromocion(),
+                            dp.getSubtotal(),
+                            dp.getOrigen(),
+                            dp.getPromocionOrigenId(),
+                            new ArticuloDTO(
+                                    dp.getArticulo().getId(),
+                                    dp.getArticulo().getDenominacion(),
+                                    dp.getArticulo().getPrecioVenta(),
+                                    null, null, false, null
+                            )
+                    ));
+                }
+            }
+
+            // Promociones aplicadas
+            List<DetallePedidoPromocion> promociones = pedido.getPromociones();
+            if (promociones != null) {
+                for (DetallePedidoPromocion dpp : promociones) {
+                    Promocion promo = dpp.getPromocion();
+                    detallesDTO.add(new DetallePedidoDTO(
+                            dpp.getId(),
+                            dpp.getCantidadPromocion(),
+                            null,
+                            null,
+                            dpp.getPrecioTotalPromocion(),
+                            OrigenDetalle.PROMOCION,
+                            promo.getId(),
+                            new ArticuloDTO(
+                                    promo.getId(),
+                                    "🎁 " + promo.getDenominacion(),
+                                    promo.getPrecioPromocional(),
+                                    null, null, false, null
+                            )
+                    ));
+                }
+            }
+
+            PedidoResumenPorClienteDTO dto = new PedidoResumenPorClienteDTO();
+            dto.setIdPedido(pedido.getId());
+            dto.setFechaPedido(pedido.getFechaPedido());
+            dto.setTotal(pedido.getTotal());
+            dto.setDetalles(detallesDTO);
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 
     private Map<String, Object> crearInfoValidacion(Promocion promocion) {
         LocalDate fechaActual = LocalDate.now();
@@ -260,3 +349,4 @@ public class PedidoServiceMejorado {
         return info;
     }
 }
+

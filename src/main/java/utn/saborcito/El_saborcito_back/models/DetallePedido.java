@@ -9,6 +9,7 @@ import utn.saborcito.El_saborcito_back.enums.OrigenDetalle;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = "pedido")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "pedido_id", "articulo_id" }, name = "UK_pedido_articulo"))
 public class DetallePedido {
     @Id
