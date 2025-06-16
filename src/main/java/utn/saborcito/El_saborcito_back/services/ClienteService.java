@@ -33,6 +33,7 @@ public class ClienteService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final UsuarioService usuarioService;
+    private final DomicilioService domicilioService;
 
     // --- HU06: Obtener todos los clientes (administrador) ---
     public List<Cliente> findAll() {
@@ -98,6 +99,13 @@ public class ClienteService {
         cliente.setFechaUltimaModificacion(LocalDateTime.now());
         cliente.setDomicilios(new ArrayList<>());
         cliente = repo.save(cliente);
+
+        //Guardar domicilios si existen
+        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
+            for (DomicilioDTO domicilioDTO : dto.getDomicilios()) {
+                domicilioService.crearDomicilio(cliente.getId(), domicilioDTO);
+            }
+        }
         return clienteMapper.toDTO(cliente);
     }
 
@@ -197,11 +205,14 @@ public class ClienteService {
 //        return usuario;
 //    }
     public UsuarioDTO loginClienteManual(LoginRequest dto) {
-        return usuarioService.loginClienteManual(dto);
+        return usuarioService.loginManual(dto);
     }
 
     public UsuarioDTO loginClienteAuth0(LoginRequest dto) {
-        return usuarioService.loginClienteAuth0(dto.getEmail());
+        if (dto.getAuth0Id() == null || dto.getAuth0Id().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Auth0 ID es requerido");
+        }
+        return usuarioService.loginAuth0(dto.getEmail(), dto.getAuth0Id());
     }
     // --- HU07: Baja lógica del cliente ---
     public void bajaLogicaCliente(Long id) {
@@ -230,6 +241,27 @@ public class ClienteService {
         if (clienteExistente.isPresent()) {
             return actualizarDatosAuth0(clienteExistente.get(), auth0User);
         } else {
+            Optional<UsuarioDTO> emailExistente = usuarioService.findByEmail(auth0User.getEmail());
+
+            if (emailExistente.isPresent()) {
+                // Si el usuario ya tiene un Auth0Id distinto, error
+                if (emailExistente.get().getAuth0Id() != null
+                        && !emailExistente.get().getAuth0Id().equals(auth0User.getSub())) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Email ya registrado con otro método");
+                }
+                // Si el usuario existe pero NO tiene Auth0Id, lo vinculamos
+                if (emailExistente.get().getAuth0Id() == null) {
+                    usuarioService.vincularAuth0Id(emailExistente.get().getId(), auth0User.getSub());
+                    // Ahora busca el cliente y actualiza datos
+                    UsuarioDTO usuarioDTO = usuarioService.findByEmail(auth0User.getEmail())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                    Cliente cliente = repo.findById(usuarioDTO.getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
+                    ClienteDTO clienteDTO = clienteMapper.toDTO(cliente);
+                    return actualizarDatosAuth0(clienteDTO, auth0User);
+                }
+            }
+            // Si no existe, lo creas normalmente
             RegistroClienteDTO dto = new RegistroClienteDTO();
             dto.setNombre(auth0User.getGivenName());
             dto.setApellido(auth0User.getFamilyName());

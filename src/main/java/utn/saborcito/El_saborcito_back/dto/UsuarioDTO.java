@@ -21,6 +21,7 @@ import java.util.List;
 @SuperBuilder(toBuilder = true) // Cambiar a SuperBuilder para herencia
 public class UsuarioDTO {
     private Long id;
+    private String auth0Id; // ID único de Auth0
     @Email
     @NotBlank
     private String email;

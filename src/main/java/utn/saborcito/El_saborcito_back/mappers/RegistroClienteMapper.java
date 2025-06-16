@@ -20,5 +20,4 @@ public interface RegistroClienteMapper {
     @Mapping(target = "historialPedidos", ignore = true)
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "domicilios", source = "domicilios")
-    Cliente toEntity(RegistroClienteDTO dto);
-}
+    Cliente toEntity(RegistroClienteDTO dto);}

@@ -47,6 +47,12 @@ public class UsuarioService {
         return repo.findByAuth0Id(auth0Id)
                 .map(usuarioMapper::toDTO);
     }
+    public void vincularAuth0Id(Long usuarioId, String auth0Id) {
+        Usuario usuario = repo.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        usuario.setAuth0Id(auth0Id);
+        repo.save(usuario);
+    }
 
     // ✅ NUEVO: Buscar por email
     public Optional<UsuarioDTO> findByEmail(String email) {
@@ -115,7 +121,7 @@ public class UsuarioService {
 //    }
 
     // ✅ NUEVO: Login Auth0 (HU1 y HU2)
-    public UsuarioDTO loginClienteManual(LoginRequest dto) {
+    public UsuarioDTO loginManual(LoginRequest dto) {
         Usuario usuario = repo.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos"));
 
@@ -130,7 +136,7 @@ public class UsuarioService {
         return usuarioMapper.toDTO(usuario);
     }
 
-    public UsuarioDTO loginClienteAuth0(String email) {
+    public UsuarioDTO loginAuth0(String email, String auth0Id) {
         Usuario usuario = repo.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no registrado"));
 
@@ -139,7 +145,12 @@ public class UsuarioService {
         }
 
         if (usuario.getAuth0Id() == null || usuario.getAuth0Id().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este usuario no se autentica con Auth0");
+            // Si el usuario no tiene auth0Id, lo vinculamos
+            usuario.setAuth0Id(auth0Id);
+            repo.save(usuario);
+        } else if (!usuario.getAuth0Id().equals(auth0Id)) {
+            // Conflicto: mismo email, diferente Auth0 ID
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email ya registrado con otro método");
         }
 
         return usuarioMapper.toDTO(usuario);
