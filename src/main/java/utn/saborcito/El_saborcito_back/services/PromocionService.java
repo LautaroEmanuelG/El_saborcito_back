@@ -58,7 +58,8 @@ public class PromocionService {
                 var detalleDTO = promocionDTO.getPromocionDetalles().get(i);
                 if (detalleDTO.getArticulo() != null && detalleDTO.getArticulo().getId() != null) {
                     Articulo articulo = articuloRepository.findById(detalleDTO.getArticulo().getId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId()));
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId()));
                     detalle.setArticulo(articulo);
                 }
                 detalle.setPromocion(promocion);
@@ -99,7 +100,8 @@ public class PromocionService {
                 var detalleDTO = promocionDTO.getPromocionDetalles().get(i);
                 if (detalleDTO.getArticulo() != null && detalleDTO.getArticulo().getId() != null) {
                     Articulo articulo = articuloRepository.findById(detalleDTO.getArticulo().getId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId()));
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Artículo no encontrado con ID: " + detalleDTO.getArticulo().getId()));
                     detalle.setArticulo(articulo);
                 }
                 detalle.setPromocion(existingPromocion);
@@ -116,20 +118,23 @@ public class PromocionService {
 
     public void delete(Long id) {
         Promocion promocion = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Promoción no encontrada con id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Promoción no encontrada con id: " + id));
         promocion.setEliminado(true);
         repo.save(promocion);
     }
 
     public void restore(Long id) {
         Promocion promocion = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Promoción no encontrada con id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Promoción no encontrada con id: " + id));
         promocion.setEliminado(false);
         repo.save(promocion);
     }
 
     private Double calcularDescuento(Promocion promocion) {
-        if (promocion.getPromocionDetalles() == null || promocion.getPromocionDetalles().isEmpty()) return null;
+        if (promocion.getPromocionDetalles() == null || promocion.getPromocionDetalles().isEmpty())
+            return null;
         double sumaArticulos = promocion.getPromocionDetalles().stream()
                 .mapToDouble(detalle -> {
                     Double precio = detalle.getArticulo() != null && detalle.getArticulo().getPrecioVenta() != null
@@ -138,7 +143,8 @@ public class PromocionService {
                     return precio * (detalle.getCantidadRequerida() != null ? detalle.getCantidadRequerida() : 1);
                 })
                 .sum();
-        if (sumaArticulos == 0 || promocion.getPrecioPromocional() == null) return null;
+        if (sumaArticulos == 0 || promocion.getPrecioPromocional() == null)
+            return null;
         double descuento = 100 - (promocion.getPrecioPromocional() / sumaArticulos) * 100;
         // Redondear a 2 decimales
         return descuento > 0 ? Math.round(descuento * 100.0) / 100.0 : 0.0;
@@ -209,6 +215,24 @@ public class PromocionService {
         } else {
             p.setImagen(null);
         }
+    }
+
+    /**
+     * 📸 Actualiza la imagen asociada a una promoción
+     */
+    public PromocionDTO updateImagenPromocion(Long promocionId, Long imagenId) {
+        Promocion promocion = repo.findById(promocionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Promoción no encontrada con ID: " + promocionId));
+
+        Imagen imagen = imagenRepository.findById(imagenId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Imagen no encontrada con ID: " + imagenId));
+
+        promocion.setImagen(imagen);
+        Promocion promocionActualizada = repo.save(promocion);
+
+        return promocionMapper.toDTO(promocionActualizada);
     }
 
     /**

@@ -1,5 +1,6 @@
 package utn.saborcito.El_saborcito_back.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -18,5 +19,6 @@ public class Cliente extends Usuario {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore // 🛠️ Evita ciclo infinito en serialización JSON
     private List<HistorialPedido> historialPedidos = new ArrayList<>();
 }

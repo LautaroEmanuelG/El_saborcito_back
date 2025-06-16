@@ -38,6 +38,9 @@ public class ArticuloInsumoService {
     @Autowired
     private UnidadMedidaRepository unidadMedidaRepository;
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
     // Métodos principales con delete lógico
     @Transactional
     public List<ArticuloInsumoDTO> findAll() {
@@ -260,7 +263,65 @@ public class ArticuloInsumoService {
      */
     private ArticuloInsumoDTO toDtoWithDeletedFields(ArticuloInsumo entity) {
         ArticuloInsumoDTO dto = articuloInsumoMapper.toDTO(entity);
-        // Los campos eliminado y fechaEliminacion se incluirán si el DTO los tiene definidos
+        // Los campos eliminado y fechaEliminacion se incluirán si el DTO los tiene
+        // definidos
         return dto;
+    }
+
+    /**
+     * Asocia una imagen a un artículo insumo
+     */
+    @Transactional
+    public void updateImagenArticuloInsumo(Long articuloId, Long imagenId) throws Exception {
+        ArticuloInsumo articulo = articuloInsumoRepository.findByIdNotDeleted(articuloId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Artículo insumo no encontrado con ID: " + articuloId));
+
+        Imagen imagen = imagenRepository.findById(imagenId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Imagen no encontrada con ID: " + imagenId));
+
+        articulo.setImagen(imagen);
+        articuloInsumoRepository.save(articulo);
+    }
+
+    /**
+     * Sube imagen a Cloudinary y la asocia al artículo insumo
+     */
+    @Transactional
+    public utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto uploadAndAssignImagen(Long articuloId,
+            org.springframework.web.multipart.MultipartFile file) throws Exception {
+        try {
+            // Verificar que el artículo existe
+            ArticuloInsumo articulo = articuloInsumoRepository.findByIdNotDeleted(articuloId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Artículo insumo no encontrado con ID: " + articuloId));
+
+            // Subir imagen a Cloudinary
+            utn.saborcito.El_saborcito_back.dto.CloudinaryResponseDto cloudinaryResponse = cloudinaryService
+                    .uploadImage(file);
+
+            // Crear entidad Imagen
+            Imagen imagen = Imagen.builder()
+                    .url(cloudinaryResponse.getSecureUrl())
+                    .build();
+
+            Imagen imagenGuardada = imagenRepository.save(imagen);
+
+            // Asociar imagen al artículo
+            articulo.setImagen(imagenGuardada);
+            articuloInsumoRepository.save(articulo);
+
+            return utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto.builder()
+                    .imagenId(imagenGuardada.getId())
+                    .url(imagenGuardada.getUrl())
+                    .publicId(cloudinaryResponse.getPublicId())
+                    .message("Imagen asociada exitosamente al artículo insumo")
+                    .success(true)
+                    .build();
+
+        } catch (Exception e) {
+            throw new Exception("Error al procesar imagen: " + e.getMessage());
+        }
     }
 }

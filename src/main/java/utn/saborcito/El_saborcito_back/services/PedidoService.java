@@ -37,6 +37,12 @@ public class PedidoService {
                 .collect(Collectors.toList());
     }
 
+    public List<PedidoDTO> findByClienteId(Long clienteId) {
+        return repo.findByClienteId(clienteId).stream()
+                .map(pedidoMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public PedidoDTO findById(Long id) {
         Pedido pedido = repo.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado con ID: " + id));

@@ -2,6 +2,7 @@ package utn.saborcito.El_saborcito_back.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import utn.saborcito.El_saborcito_back.dto.HistorialPedidoDTO;
 import utn.saborcito.El_saborcito_back.models.HistorialPedido;
 import utn.saborcito.El_saborcito_back.services.HistorialPedidoService;
 
@@ -14,9 +15,13 @@ public class HistorialPedidoController {
 
     private final HistorialPedidoService service;
 
+    /**
+     * 📋 Obtiene el historial de pedidos de un cliente (optimizado)
+     * Evita referencias circulares usando DTOs
+     */
     @GetMapping("/cliente/{clienteId}")
-    public List<HistorialPedido> getByCliente(@PathVariable Long clienteId) {
-        return service.findByCliente(clienteId);
+    public List<HistorialPedidoDTO> getByCliente(@PathVariable Long clienteId) {
+        return service.findByClienteOptimized(clienteId);
     }
 
     @GetMapping("/pedido/{pedidoId}")

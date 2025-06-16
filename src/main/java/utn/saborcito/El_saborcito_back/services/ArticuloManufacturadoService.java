@@ -38,6 +38,7 @@ public class ArticuloManufacturadoService {
     private final ImagenRepository imagenRepository;
     private final CategoriaRepository categoriaRepository;
     private final ArticuloInsumoRepository articuloInsumoRepository;
+    private final CloudinaryService cloudinaryService;
 
     // Métodos principales con delete lógico
     public List<ArticuloManufacturadoDTO> findAll() {
@@ -329,5 +330,65 @@ public class ArticuloManufacturadoService {
             dto.setArticuloManufacturadoDetalles(detallesDTO);
         }
         return dto;
+    }
+
+    /**
+     * Asocia una imagen a un artículo manufacturado
+     */
+    @Transactional
+    public void updateImagenArticuloManufacturado(Long articuloId, Long imagenId) {
+        ArticuloManufacturado articulo = repo.findByIdNotDeleted(articuloId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Artículo manufacturado no encontrado con ID: " + articuloId));
+
+        Imagen imagen = imagenRepository.findById(imagenId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Imagen no encontrada con ID: " + imagenId));
+
+        articulo.setImagen(imagen);
+        repo.save(articulo);
+    }
+
+    /**
+     * Sube imagen a Cloudinary y la asocia al artículo manufacturado
+     */
+    @Transactional
+    public utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto uploadAndAssignImagen(Long articuloId,
+            org.springframework.web.multipart.MultipartFile file) {
+        try {
+            // Verificar que el artículo existe
+            ArticuloManufacturado articulo = repo.findByIdNotDeleted(articuloId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Artículo manufacturado no encontrado con ID: " + articuloId));
+
+            // Subir imagen a Cloudinary
+            utn.saborcito.El_saborcito_back.dto.CloudinaryResponseDto cloudinaryResponse = cloudinaryService
+                    .uploadImage(file);
+
+            // Crear entidad Imagen
+            Imagen imagen = Imagen.builder()
+                    .url(cloudinaryResponse.getSecureUrl())
+                    .build();
+
+            Imagen imagenGuardada = imagenRepository.save(imagen);
+
+            // Asociar imagen al artículo
+            articulo.setImagen(imagenGuardada);
+            repo.save(articulo);
+
+            return utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto.builder()
+                    .imagenId(imagenGuardada.getId())
+                    .url(imagenGuardada.getUrl())
+                    .publicId(cloudinaryResponse.getPublicId())
+                    .message("Imagen asociada exitosamente al artículo manufacturado")
+                    .success(true)
+                    .build();
+
+        } catch (Exception e) {
+            return utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto.builder()
+                    .message("Error al procesar imagen: " + e.getMessage())
+                    .success(false)
+                    .build();
+        }
     }
 }
