@@ -15,6 +15,6 @@ public class ArticuloInsumo extends Articulo {
 
     private Double precioCompra;
     private Integer stockActual;
-    private Integer stockMaximo;
+    private Integer stockMinimo; // Cambiado aquí
     private Boolean esParaElaborar;
 }
