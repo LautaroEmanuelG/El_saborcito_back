@@ -33,6 +33,7 @@ public class ClienteService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final UsuarioService usuarioService;
+    private final DomicilioService domicilioService;
 
     // --- HU06: Obtener todos los clientes (administrador) ---
     public List<Cliente> findAll() {
@@ -98,6 +99,13 @@ public class ClienteService {
         cliente.setFechaUltimaModificacion(LocalDateTime.now());
         cliente.setDomicilios(new ArrayList<>());
         cliente = repo.save(cliente);
+
+        //Guardar domicilios si existen
+        if (dto.getDomicilios() != null && !dto.getDomicilios().isEmpty()) {
+            for (DomicilioDTO domicilioDTO : dto.getDomicilios()) {
+                domicilioService.crearDomicilio(cliente.getId(), domicilioDTO);
+            }
+        }
         return clienteMapper.toDTO(cliente);
     }
 

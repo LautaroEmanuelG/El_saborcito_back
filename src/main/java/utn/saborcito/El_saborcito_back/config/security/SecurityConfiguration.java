@@ -72,9 +72,9 @@ public class SecurityConfiguration {
                                // .requestMatchers("/api/clientes/login/manual", "/api/clientes/login/auth0").permitAll()
                                // .anyRequest().authenticated() //todo lo demás requiere autenticación
                                 .anyRequest().permitAll()
-                );
-                //.oauth2ResourceServer(oauth2 -> oauth2
-                  //      .jwt(jwt -> jwt.decoder(jwtDecoder())))
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(jwtDecoder())));
         return http.build();}
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
