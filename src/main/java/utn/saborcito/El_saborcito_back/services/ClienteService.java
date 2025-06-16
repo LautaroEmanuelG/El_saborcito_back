@@ -131,17 +131,47 @@ public class ClienteService {
             usuario.setEmail(dto.getEmail());
         }
 
-        // 4. Si hay nueva contraseña, validar y cambiarla
+        // 3. Si hay nueva contraseña, validar y cambiarla
         if (dto.getNuevaContraseña() != null && !dto.getNuevaContraseña().isBlank()) {
             validarCambioContrasena(usuario.getId(), dto);
             usuarioService.cambiarContrasena(usuario.getId(), dto.getNuevaContraseña());
         }
 
-        // 5. Si no hay cambio de contraseña, actualizamos la fecha de modificación
-        usuario.setFechaUltimaModificacion(LocalDateTime.now());
-        usuarioRepository.save(usuario);
+        // 4. Actualizar domicilios si se proporcionan
+        if (dto.getDomicilios() != null) {
+            // Limpiar la colección existente
+            usuario.getDomicilios().clear();
 
-        return clienteMapper.toDTO(clienteExistente);
+            // Si hay nuevos domicilios, crearlos
+            if (!dto.getDomicilios().isEmpty()) {
+                for (DomicilioDTO domicilioDTO : dto.getDomicilios()) {
+                    Domicilio domicilio = new Domicilio();
+                    domicilio.setCalle(domicilioDTO.getCalle());
+                    domicilio.setNumero(domicilioDTO.getNumero());
+                    domicilio.setCp(domicilioDTO.getCp());
+                    domicilio.setLatitud(domicilioDTO.getLatitud());
+                    domicilio.setLongitud(domicilioDTO.getLongitud());
+                    domicilio.setUsuario(usuario);
+
+                    // Si el DTO incluye localidad, establecerla
+                    if (domicilioDTO.getLocalidad() != null) {
+                        Localidad localidad = new Localidad();
+                        localidad.setId(domicilioDTO.getLocalidad().getId());
+                        domicilio.setLocalidad(localidad);
+                    }
+
+                    usuario.getDomicilios().add(domicilio);
+                }
+            }
+        }
+
+        // 5. Actualizar la fecha de modificación
+        usuario.setFechaUltimaModificacion(LocalDateTime.now());
+
+        // 6. Guardar los cambios
+        Cliente clienteActualizado = repo.save(clienteExistente);
+
+        return clienteMapper.toDTO(clienteActualizado);
     }
 
     public ClienteDTO updateClienteAdmin(Long clienteId, ActualizarClienteAdminDTO dto) {
