@@ -51,14 +51,14 @@ public class PedidoController {
     /**
      * Endpoint para cancelar un pedido
      * 
-     * @param id     ID del pedido a cancelar
-     * @param motivo Razón de la cancelación (opcional)
-     * @return El pedido cancelado como DTO
+     //* @param id     ID del pedido a cancelar
+     //* @param motivo Razón de la cancelación (opcional)
+   //  * @return El pedido cancelado como DTO
      */
-    @PutMapping("/{id}/cancelar")
-    public PedidoDTO cancelarPedido(@PathVariable Long id, @RequestParam(required = false) String motivo) {
-        return service.cancelarPedido(id, motivo);
-    }
+    // @PutMapping("/{id}/cancelar")
+    // public PedidoDTO cancelarPedido(@PathVariable Long id, @RequestParam(required = false) String motivo) {
+    //     return service.cancelarPedido(id, motivo);
+    // }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {

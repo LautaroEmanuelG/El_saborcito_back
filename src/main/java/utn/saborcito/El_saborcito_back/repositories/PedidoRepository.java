@@ -17,6 +17,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findAllByCliente_IdAndFechaPedidoBetween(Long clienteId, LocalDate desde, LocalDate hasta);
 
     List<Pedido> findByEstadoNombreIn(List<String> nombres);
+    List<Pedido> findByEstado_IdIn(List<Long> ids);
+
 
     List<Pedido> findByClienteId(Long clienteId);
 
