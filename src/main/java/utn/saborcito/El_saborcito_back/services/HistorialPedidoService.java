@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.dto.HistorialPedidoDTO;
+import utn.saborcito.El_saborcito_back.mappers.HistorialPedidoMapper;
 import utn.saborcito.El_saborcito_back.models.Cliente;
 import utn.saborcito.El_saborcito_back.models.HistorialPedido;
 import utn.saborcito.El_saborcito_back.models.Pedido;
@@ -20,6 +22,25 @@ public class HistorialPedidoService {
     private final HistorialPedidoRepository repo;
     private final ClienteService clienteService;
     private final PedidoService pedidoService;
+    private final HistorialPedidoMapper mapper;
+
+    /**
+     * 📊 Obtiene el historial de pedidos de un cliente optimizado (DTO)
+     * Evita referencias circulares y consultas N+1
+     * 
+     * @param clienteId ID del cliente
+     * @return Lista de DTOs de historial de pedidos
+     */
+    public List<HistorialPedidoDTO> findByClienteOptimized(Long clienteId) {
+        // Verificar que el cliente existe
+        clienteService.findById(clienteId);
+
+        // Obtener historial con consulta optimizada
+        List<HistorialPedido> historial = repo.findByClienteIdWithDetailsOptimized(clienteId);
+
+        // Convertir a DTOs para evitar referencias circulares
+        return mapper.toDTOList(historial);
+    }
 
     /**
      * Obtiene el historial de pedidos de un cliente
