@@ -209,7 +209,10 @@ public class ClienteService {
     }
 
     public UsuarioDTO loginClienteAuth0(LoginRequest dto) {
-        return usuarioService.loginAuth0(dto.getEmail());
+        if (dto.getAuth0Id() == null || dto.getAuth0Id().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Auth0 ID es requerido");
+        }
+        return usuarioService.loginAuth0(dto.getEmail(), dto.getAuth0Id());
     }
     // --- HU07: Baja lógica del cliente ---
     public void bajaLogicaCliente(Long id) {
@@ -240,10 +243,25 @@ public class ClienteService {
         } else {
             Optional<UsuarioDTO> emailExistente = usuarioService.findByEmail(auth0User.getEmail());
 
-            if (emailExistente.isPresent() && emailExistente.get().getAuth0Id() != null
-                    && !emailExistente.get().getAuth0Id().equals(auth0User.getSub())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email ya registrado con otro método");
+            if (emailExistente.isPresent()) {
+                // Si el usuario ya tiene un Auth0Id distinto, error
+                if (emailExistente.get().getAuth0Id() != null
+                        && !emailExistente.get().getAuth0Id().equals(auth0User.getSub())) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Email ya registrado con otro método");
+                }
+                // Si el usuario existe pero NO tiene Auth0Id, lo vinculamos
+                if (emailExistente.get().getAuth0Id() == null) {
+                    usuarioService.vincularAuth0Id(emailExistente.get().getId(), auth0User.getSub());
+                    // Ahora busca el cliente y actualiza datos
+                    UsuarioDTO usuarioDTO = usuarioService.findByEmail(auth0User.getEmail())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                    Cliente cliente = repo.findById(usuarioDTO.getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
+                    ClienteDTO clienteDTO = clienteMapper.toDTO(cliente);
+                    return actualizarDatosAuth0(clienteDTO, auth0User);
+                }
             }
+            // Si no existe, lo creas normalmente
             RegistroClienteDTO dto = new RegistroClienteDTO();
             dto.setNombre(auth0User.getGivenName());
             dto.setApellido(auth0User.getFamilyName());
