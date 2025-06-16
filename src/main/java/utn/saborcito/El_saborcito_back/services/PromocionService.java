@@ -65,6 +65,9 @@ public class PromocionService {
             }
         }
 
+        // Calcular y asignar descuento antes de guardar
+        promocion.setDescuento(calcularDescuento(promocion));
+
         Promocion savedPromocion = repo.save(promocion);
         return promocionMapper.toDTO(savedPromocion);
     }
@@ -83,7 +86,6 @@ public class PromocionService {
         existingPromocion.setFechaHasta(promocionActualizada.getFechaHasta());
         existingPromocion.setHoraDesde(promocionActualizada.getHoraDesde());
         existingPromocion.setHoraHasta(promocionActualizada.getHoraHasta());
-        existingPromocion.setDescuento(promocionActualizada.getDescuento());
         existingPromocion.setPrecioPromocional(promocionActualizada.getPrecioPromocional());
         existingPromocion.setSucursal(promocionActualizada.getSucursal());
         existingPromocion.setImagen(promocionActualizada.getImagen());
@@ -105,6 +107,9 @@ public class PromocionService {
             }
         }
 
+        // Calcular y asignar descuento antes de guardar
+        existingPromocion.setDescuento(calcularDescuento(existingPromocion));
+
         Promocion savedPromocion = repo.save(existingPromocion);
         return promocionMapper.toDTO(savedPromocion);
     }
@@ -121,6 +126,22 @@ public class PromocionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Promoción no encontrada con id: " + id));
         promocion.setEliminado(false);
         repo.save(promocion);
+    }
+
+    private Double calcularDescuento(Promocion promocion) {
+        if (promocion.getPromocionDetalles() == null || promocion.getPromocionDetalles().isEmpty()) return null;
+        double sumaArticulos = promocion.getPromocionDetalles().stream()
+                .mapToDouble(detalle -> {
+                    Double precio = detalle.getArticulo() != null && detalle.getArticulo().getPrecioVenta() != null
+                            ? detalle.getArticulo().getPrecioVenta()
+                            : 0.0;
+                    return precio * (detalle.getCantidadRequerida() != null ? detalle.getCantidadRequerida() : 1);
+                })
+                .sum();
+        if (sumaArticulos == 0 || promocion.getPrecioPromocional() == null) return null;
+        double descuento = 100 - (promocion.getPrecioPromocional() / sumaArticulos) * 100;
+        // Redondear a 2 decimales
+        return descuento > 0 ? Math.round(descuento * 100.0) / 100.0 : 0.0;
     }
 
     private void validarPromocion(Promocion p, boolean isUpdate, PromocionDTO dto) {
