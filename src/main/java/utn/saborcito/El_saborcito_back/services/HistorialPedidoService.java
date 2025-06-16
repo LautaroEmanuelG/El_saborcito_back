@@ -76,21 +76,12 @@ public class HistorialPedidoService {
         Cliente cliente = clienteService.findById(clienteId);
         Pedido pedido = pedidoService.findEntityById(pedidoId);
 
-        // Verificar si ya existe un registro para este cliente y pedido
-        Optional<HistorialPedido> existente = repo.findByClienteAndPedido(cliente, pedido);
-        if (existente.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Ya existe un registro en el historial para el cliente " + clienteId +
-                            " y el pedido " + pedidoId);
-        }
-
-        HistorialPedido historial = HistorialPedido.builder()
-                .cliente(cliente)
-                .pedido(pedido)
-                .fechaRegistro(LocalDateTime.now())
-                .observacion(observacion)
-                .build();
-
+        // Permitir múltiples registros de historial para el mismo cliente y pedido
+        HistorialPedido historial = new HistorialPedido();
+        historial.setCliente(cliente);
+        historial.setPedido(pedido);
+        historial.setObservacion(observacion);
+        historial.setFechaRegistro(LocalDateTime.now());
         return repo.save(historial);
     }
 
