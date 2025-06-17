@@ -63,19 +63,54 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .cors(withDefaults()) //por defecto spring va a buscar un bean con el nombre "corsConfigurationSource".
-                .addFilterBefore(inactivityTimeoutFilter(usuarioRepository,horarioService), BearerTokenAuthenticationFilter.class)
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests                 //falta configurar bien los roles
-                                // Auth endpoints (públicos o semi-públicos)
-                               .requestMatchers("/api/**").permitAll()
-                               // .requestMatchers("/api/clientes/login/manual", "/api/clientes/login/auth0").permitAll()
-                               // .anyRequest().authenticated() //todo lo demás requiere autenticación
-                                .anyRequest().permitAll()
+                .cors(withDefaults())
+                .addFilterBefore(inactivityTimeoutFilter(usuarioRepository, horarioService), BearerTokenAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos
+                        .requestMatchers("/api/clientes/registro", "/api/auth/**", "/api/articulos/**", "/api/insumos/**").permitAll()
+
+                        // Endpoints de autenticación
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // Endpoints de cliente (solo para clientes autenticados)
+                        .requestMatchers(
+                                "/api/pedidos/**",
+                                "/api/clientes/{id}/**"
+                        ).hasRole("CLIENTE")
+
+                        // Endpoints de cocinero
+                        .requestMatchers(
+                                "/api/pedidos/cocina/**",
+                                "/api/articulos/manufacturados/**"
+                        ).hasRole("COCINERO")
+
+                        // Endpoints de delivery
+                        .requestMatchers(
+                                "/api/pedidos/entrega/**"
+                        ).hasRole("DELIVERY")
+
+                        // Endpoints de cajero
+                        .requestMatchers(
+                                "/api/pagos/**",
+                                "/api/facturas/**"
+                        ).hasRole("CAJERO")
+
+                        // Endpoints de administrador
+                        .requestMatchers(
+                                "/api/empleados/**",
+                                "/api/clientes/admin/**",
+                                "/api/insumos/admin/**",
+                                "/api/articulos/admin/**"
+                        ).hasRole("ADMIN")
+
+                        // Cualquier otra petición requiere autenticación
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.decoder(jwtDecoder())));
-        return http.build();}
+                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
+                );
+        return http.build();
+    }
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
