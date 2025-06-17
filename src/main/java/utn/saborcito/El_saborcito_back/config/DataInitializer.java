@@ -1538,7 +1538,7 @@
 //                     .sucursal(sucursal)
 //                     .estado(estadoPendiente)
 //                     .tipoEnvio(tipoDelivery)
-//                     .formaPago(formaPagoTarjeta)
+//                     .formaPago(formaPagoMercadoPago)
 //                     .build());
 //             detallePedidoRepo.save(DetallePedido.builder()
 //                     .pedido(p6_4).cantidad(2).articulo(pizzaMozzarella).build());
@@ -1622,7 +1622,7 @@
 //                     .sucursal(sucursal)
 //                     .estado(estadoPendiente)
 //                     .tipoEnvio(tipoTakeAway)
-//                     .formaPago(formaPagoTarjeta)
+//                     .formaPago(formaPagoMercadoPago)//antes formaPagoTarjeta
 //                     .build());
 //             detallePedidoRepo.save(DetallePedido.builder()
 //                     .pedido(p7_3).cantidad(1).articulo(insumoCocaCola).build()); // NOTA: Descomenta las siguientes
@@ -1885,7 +1885,7 @@
 //                         .fechaPedido(LocalDate.now())
 //                         .horasEstimadaFinalizacion(LocalTime.now().plusMinutes(80 + i * 5))
 //                         .tipoEnvio(tipoLocal)
-//                         .formaPago(formaPagoTarjeta)
+//                         .formaPago(formaPagoEfectivo)
 //                         .build());
 //                 detallePedidoRepo.save(DetallePedido.builder()
 //                         .pedido(pedidoListo)

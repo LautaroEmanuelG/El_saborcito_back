@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
+@DiscriminatorValue("INSUMO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
