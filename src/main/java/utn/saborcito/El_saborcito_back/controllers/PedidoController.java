@@ -51,13 +51,14 @@ public class PedidoController {
     /**
      * Endpoint para cancelar un pedido
      * 
-     //* @param id     ID del pedido a cancelar
-     //* @param motivo Razón de la cancelación (opcional)
-   //  * @return El pedido cancelado como DTO
+     * //* @param id ID del pedido a cancelar
+     * //* @param motivo Razón de la cancelación (opcional)
+     * // * @return El pedido cancelado como DTO
      */
     // @PutMapping("/{id}/cancelar")
-    // public PedidoDTO cancelarPedido(@PathVariable Long id, @RequestParam(required = false) String motivo) {
-    //     return service.cancelarPedido(id, motivo);
+    // public PedidoDTO cancelarPedido(@PathVariable Long id, @RequestParam(required
+    // = false) String motivo) {
+    // return service.cancelarPedido(id, motivo);
     // }
 
     @DeleteMapping("/{id}")
@@ -77,6 +78,22 @@ public class PedidoController {
             return ResponseEntity.ok(serviceMejorado.validarPromociones(promocionIds));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error validando promociones: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 🆕 Endpoint para consultar si un pedido contiene solo artículos insumo
+     * 
+     * @param id ID del pedido a verificar
+     * @return Boolean indicando si el pedido contiene solo insumos
+     */
+    @GetMapping("/{id}/solo-insumos")
+    public ResponseEntity<Boolean> esPedidoSoloInsumos(@PathVariable Long id) {
+        try {
+            Pedido pedido = service.findEntityById(id);
+            return ResponseEntity.ok(serviceMejorado.esPedidoSoloInsumos(pedido));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(false);
         }
     }
 }

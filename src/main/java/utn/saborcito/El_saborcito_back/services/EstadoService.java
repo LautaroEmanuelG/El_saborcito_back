@@ -25,7 +25,8 @@ public class EstadoService {
     public void init() {
         // Solo inicializar si la tabla está vacía
         if (repo.count() == 0) {
-            List<String> nombresEstados = Arrays.asList("PENDIENTE", "CONFIRMADO", "EN_PREPARACION", "LISTO","EN_DELIVERY","ENTREGADO","CANCELADO"); // Agrega los nombres que correspondan
+            List<String> nombresEstados = Arrays.asList("A_CONFIRMAR", "EN_PREPARACION", "DEMORADO", "LISTO",
+                    "EN_DELIVERY", "ENTREGADO", "CANCELADO"); // Agrega los nombres que correspondan
             nombresEstados.forEach(nombre -> {
                 Estado estado = new Estado(nombre);
                 repo.save(estado);
