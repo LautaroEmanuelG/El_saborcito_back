@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.List;
 
 @Entity
+@DiscriminatorValue("MANUFACTURADO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
