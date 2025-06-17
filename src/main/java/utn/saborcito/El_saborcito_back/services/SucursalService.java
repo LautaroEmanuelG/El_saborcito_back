@@ -33,6 +33,9 @@ public class SucursalService {
     private final PedidoRepository pedidoRepository;
     private final DetallePedidoPromocionRepository detallePromocionRepo;
     
+    private final PedidoRepository pedidoRepo;
+    private final CompraInsumoRepository compraRepo;
+    
 
 
     //RANKING DE PRODUCTOS
@@ -451,21 +454,22 @@ public class SucursalService {
     // MOVIMIENTOS MONETARIOS
 
     public MovimientoMonetarioDTO getMovimientos(LocalDate desde, LocalDate hasta) {
-        List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
-
+        // ingresos siguen saliendo de pedidos
+        List<Pedido> pedidos = pedidoRepo.findAllByFechaPedidoBetween(desde, hasta);
         double ingresos = pedidos.stream()
-                .mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0)
-                .sum();
+            .mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0)
+            .sum();
 
-        // Cambiar esta línea para usar directamente el campo total_costo de la BD
-        double costos = pedidos.stream()
-                .mapToDouble(p -> p.getTotalCosto() != null && p.getTotalCosto() > 0 ? p.getTotalCosto() : 0.0)
-                .sum();
+        // costos ahora se suman de CompraInsumo.totalCompra
+        List<CompraInsumo> compras = compraRepo.findAllByFechaCompraBetween(desde, hasta);
+        double costos = compras.stream()
+            .mapToDouble(c -> c.getTotalCompra() != null ? c.getTotalCompra() : 0.0)
+            .sum();
 
         double ganancias = ingresos - costos;
-
         return new MovimientoMonetarioDTO(ingresos, costos, ganancias);
     }
+
 
     public List<PedidoGananciaDetalleDTO> getDetalleGanancias(LocalDate desde, LocalDate hasta) {
         List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
@@ -480,16 +484,13 @@ public class SucursalService {
     }
 
     public List<PedidoCostoDetalleDTO> getDetalleCostos(LocalDate desde, LocalDate hasta) {
-        List<Pedido> pedidos = pedidoRepository.findAllByFechaPedidoBetween(desde, hasta);
-
-        return pedidos.stream()
-                .filter(pedido -> pedido.getTotalCosto() != null && pedido.getTotalCosto() > 0) // Filtrar primero
-                .map(pedido -> new PedidoCostoDetalleDTO(
-                        pedido.getId(),
-                        pedido.getFechaPedido(),
-                        pedido.getTotalCosto() // ← CAMBIAR AQUÍ: usar getTotalCosto() en lugar de calcularCostoTotal()
-                ))
-                .collect(Collectors.toList());
+        // Leer desde compra_insumo en lugar de pedidos
+        return compraRepo.findAllByFechaCompraBetween(desde, hasta).stream()
+            .filter(c -> c.getTotalCompra() != null && c.getTotalCompra() > 0)
+            .map(c -> new PedidoCostoDetalleDTO(
+                c.getId(), c.getFechaCompra(), c.getTotalCompra()
+            ))
+            .collect(Collectors.toList());
     }
 
     public void exportarDetalleGananciasExcel(LocalDate desde, LocalDate hasta, HttpServletResponse response)
@@ -528,38 +529,37 @@ public class SucursalService {
         }
     }
 
-    public void exportarDetalleCostosExcel(LocalDate desde, LocalDate hasta, HttpServletResponse response)
-            throws IOException {
+    public void exportarDetalleCostosExcel(LocalDate desde, LocalDate hasta,
+                                           HttpServletResponse response) throws IOException {
         List<PedidoCostoDetalleDTO> costos = getDetalleCostos(desde, hasta);
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Detalle Costos");
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("ID Compra");
+            header.createCell(1).setCellValue("Fecha Compra");
+            header.createCell(2).setCellValue("Total Costo");
 
-            // Cabecera
-            Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("ID Pedido");
-            headerRow.createCell(1).setCellValue("Fecha Pedido");
-            headerRow.createCell(2).setCellValue("Total Costo");
-
-            // Datos
             int rowNum = 1;
             double totalCostos = 0;
-            for (PedidoCostoDetalleDTO costo : costos) {
+            for (PedidoCostoDetalleDTO dto : costos) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(costo.getIdPedido());
-                row.createCell(1).setCellValue(costo.getFechaPedido().toString());
-                row.createCell(2).setCellValue(costo.getTotalCosto());
-                totalCostos += costo.getTotalCosto();
+                row.createCell(0).setCellValue(dto.getIdPedido());
+                row.createCell(1).setCellValue(dto.getFechaPedido().toString());
+                row.createCell(2).setCellValue(dto.getTotalCosto());
+                totalCostos += dto.getTotalCosto();
             }
 
-            // Fila de total
+            // fila de suma
             Row totalRow = sheet.createRow(rowNum + 1);
             totalRow.createCell(1).setCellValue("TOTAL:");
             totalRow.createCell(2).setCellValue(totalCostos);
 
-            // Configurar respuesta
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=detalle-costos.xlsx");
+            // respuesta HTTP
+            response.setContentType(
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader(
+              "Content-Disposition", "attachment; filename=detalle-costos.xlsx");
             workbook.write(response.getOutputStream());
         }
     }
