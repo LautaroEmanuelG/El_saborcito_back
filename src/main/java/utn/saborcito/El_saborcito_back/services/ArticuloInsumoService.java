@@ -292,7 +292,7 @@ public class ArticuloInsumoService {
      */
     @Transactional
     public utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto uploadAndAssignImagen(Long articuloId,
-            org.springframework.web.multipart.MultipartFile file) throws Exception {
+                                                                                             org.springframework.web.multipart.MultipartFile file) throws Exception {
         try {
             // Verificar que el artículo existe
             ArticuloInsumo articulo = articuloInsumoRepository.findByIdNotDeleted(articuloId)
@@ -325,5 +325,12 @@ public class ArticuloInsumoService {
         } catch (Exception e) {
             throw new Exception("Error al procesar imagen: " + e.getMessage());
         }
+    }
+
+    // MÉTODO NUEVO: Consulta si el insumo puede venderse (tiene stock)
+    public boolean puedeVenderse(Long id) throws Exception {
+        ArticuloInsumo insumo = findEntityById(id);
+        // Considera sin stock si el stock actual es 0 o menor al mínimo
+        return insumo.getStockActual() != null && insumo.getStockActual() > 0;
     }
 }
