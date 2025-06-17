@@ -27,10 +27,16 @@ public class ClienteController {
 
     // --- HU6: Obtener todos los clientes (administrador) ---
     @GetMapping
-    public List<ClienteDTO> getAll() {
-        return service.findAll().stream()
-                .map(clienteMapper::toDTO)
-                .toList();
+    public ResponseEntity<List<ClienteDTO>> getAll() {
+        List<Cliente> clientes = service.findAll();
+        if (!clientes.isEmpty()) {
+            List<ClienteDTO> clientesDTO = clientes.stream()
+                    .map(clienteMapper::toDTO)
+                    .toList();
+            return ResponseEntity.ok(clientesDTO);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     // --- HU6: Obtener cliente por ID (administrador o detalle) ---
