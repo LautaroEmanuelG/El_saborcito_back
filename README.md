@@ -27,13 +27,40 @@ JPA_DIALECT=org.hibernate.dialect.MySQLDialect
 SERVER_PORT=5252
 ```
 
-## 🛠️ Tecnologías Utilizadas
+## 📦 Tecnologías y Dependencias
 
-- Java
-- Spring Boot
-- Gradle
-- MySQL
-- Swagger
+- **Java 17**  
+- **Spring Boot 3.3.4**  
+  - spring-boot-starter-web  
+  - spring-boot-starter-data-jpa  
+  - spring-boot-starter-security  
+  - spring-boot-starter-oauth2-resource-server  
+  - spring-boot-starter-mail  
+  - spring-boot-starter-validation  
+- **Seguridad & JWT**  
+  - com.auth0:java-jwt (4.4.0)  
+  - io.jsonwebtoken:jjwt-api / jjwt-impl / jjwt-jackson (0.11.5)  
+- **Bases de datos**  
+  - MySQL Connector/J (8.0.33)  
+  - PostgreSQL Driver  
+- **Mapeo y generación de código**  
+  - Lombok  
+  - MapStruct (+ lombok-mapstruct-binding)  
+- **Documentación OpenAPI**  
+  - springdoc-openapi-starter-webmvc-ui (Swagger UI)  
+- **Procesamiento de documentos**  
+  - Apache POI (poi & poi-ooxml) → Excel  
+  - OpenPDF → PDF  
+- **Cloudinary**  
+  - cloudinary-http5 (2.0.0) → gestión de imágenes  
+- **Configuración / Env Vars**  
+  - spring-dotenv (me.paulschwarz:spring-dotenv)  
+- **Desarrollo & Tests**  
+  - spring-boot-devtools  
+  - spring-boot-starter-test + JUnit Platform  
+- **Build & Tooling**  
+  - Gradle  
+  - Java toolchain (Java 17)
 
 ## 🚀 Configuración del Entorno
 
