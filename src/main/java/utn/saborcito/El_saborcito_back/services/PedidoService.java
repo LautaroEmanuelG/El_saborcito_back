@@ -3,18 +3,13 @@ package utn.saborcito.El_saborcito_back.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import utn.saborcito.El_saborcito_back.dto.FacturaDTO;
 import utn.saborcito.El_saborcito_back.dto.PedidoDTO;
-import utn.saborcito.El_saborcito_back.dto.PedidoCreacionDTO;
 import utn.saborcito.El_saborcito_back.mappers.PedidoMapper;
 import utn.saborcito.El_saborcito_back.models.*;
 import utn.saborcito.El_saborcito_back.repositories.PedidoRepository;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +25,7 @@ public class PedidoService {
 
     // Estados constantes para evitar hardcoding
     private static final String ESTADO_CANCELADO = "CANCELADO";
+    private static final String ESTADO_LISTO = "LISTO";
 
     public List<PedidoDTO> findAll() {
         return repo.findAll().stream()
@@ -58,15 +54,15 @@ public class PedidoService {
     public PedidoDTO save(Pedido pedido) {
         if (pedido.getFechaPedido() == null) {
             pedido.setFechaPedido(LocalDate.now());
-        }
-
-        // Asegurar que los estados, tipos de envío y formas de pago existan
+        } // Asegurar que los estados, tipos de envío y formas de pago existan
         validarReferencias(pedido);
 
+        // 🆕 Establecer estado automático si todos los artículos son insumos
+        establecerEstadoAutomatico(pedido);
+
         // Usar el servicio de calculadora para actualizar los totales (incluye
-        // promociones)
+        // promociones, descuentos y hora estimada)
         calculadoraService.actualizarTotalesPedido(pedido);
-        calcularHoraEstimada(pedido);
         return pedidoMapper.toDTO(repo.save(pedido));
     }
 
@@ -89,15 +85,19 @@ public class PedidoService {
 
         // Asegurar que los estados, tipos de envío y formas de pago existan
         validarReferencias(pedido);
-
         existing.setTipoEnvio(pedido.getTipoEnvio());
         existing.setFormaPago(pedido.getFormaPago());
         existing.setSucursal(pedido.getSucursal());
         existing.setCliente(pedido.getCliente());
-        existing.setEstado(pedido.getEstado()); // Usar el servicio de calculadora para actualizar los totales (incluye
-                                                // promociones)
+        existing.setEstado(pedido.getEstado());
+
+        // 🆕 Establecer estado automático si todos los artículos son insumos y no tiene
+        // estado
+        establecerEstadoAutomatico(existing);
+
+        // Usar el servicio de calculadora para actualizar los totales (incluye
+        // promociones, descuentos y hora estimada)
         calculadoraService.actualizarTotalesPedido(existing);
-        calcularHoraEstimada(existing);
 
         return pedidoMapper.toDTO(repo.save(existing));
     }
@@ -131,24 +131,29 @@ public class PedidoService {
             // Verificar que exista el tipo de envío
             tipoEnvioService.findById(pedido.getTipoEnvio().getId());
         }
-
         if (pedido.getFormaPago() != null && pedido.getFormaPago().getId() != null) {
             // Verificar que exista la forma de pago
             formaPagoService.findById(pedido.getFormaPago().getId());
         }
     }
 
-    private void calcularHoraEstimada(Pedido pedido) {
-        int minutosCocina = pedido.getDetalles().stream()
-                .filter(det -> det.getArticulo() instanceof ArticuloManufacturado)
-                .map(det -> ((ArticuloManufacturado) det.getArticulo()).getTiempoEstimadoMinutos() * det.getCantidad())
-                .reduce(0, Integer::sum);
-
-        int minutosDelivery = pedido.getTipoEnvio() != null &&
-                "DELIVERY".equals(pedido.getTipoEnvio().getNombre()) ? 30 : 0;
-
-        LocalTime horaEstimada = LocalTime.now().plusMinutes(minutosCocina + minutosDelivery);
-        pedido.setHorasEstimadaFinalizacion(horaEstimada);
+    /**
+     * 🆕 Establece automáticamente el estado del pedido basado en sus artículos
+     */
+    private void establecerEstadoAutomatico(Pedido pedido) {
+        // Solo aplicar si no tiene estado definido
+        if (pedido.getEstado() == null) {
+            // Si todos los artículos son insumos, establecer estado LISTO
+            if (calculadoraService.esPedidoSoloInsumos(pedido)) {
+                try {
+                    Estado estadoListo = estadoService.findByNombre(ESTADO_LISTO);
+                    pedido.setEstado(estadoListo);
+                } catch (ResponseStatusException e) {
+                    // Si no existe el estado LISTO, continuar sin establecer estado
+                    System.err.println("Estado LISTO no encontrado: " + e.getMessage());
+                }
+            }
+        }
     }
 
     public void delete(Long id) {

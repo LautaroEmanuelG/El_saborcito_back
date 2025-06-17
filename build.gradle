@@ -70,6 +70,10 @@ dependencies {
 	// Cloudinary para manejo de imágenes
 	implementation 'com.cloudinary:cloudinary-http5:2.0.0'
 
+	// Implementacion de MercadoPago
+	implementation("com.mercadopago:sdk-java:2.4.0")
+
+
 
 }
 

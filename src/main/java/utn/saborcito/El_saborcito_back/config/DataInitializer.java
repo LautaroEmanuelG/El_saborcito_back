@@ -198,15 +198,9 @@
 //             FormaPago formaPagoEfectivo = formaPagoRepo.findByNombre("EFECTIVO")
 //                     .orElseGet(() -> formaPagoRepo
 //                             .save(FormaPago.builder().nombre("EFECTIVO").build()));
-//             FormaPago formaPagoTarjeta = formaPagoRepo.findByNombre("TARJETA")
-//                     .orElseGet(() -> formaPagoRepo
-//                             .save(FormaPago.builder().nombre("TARJETA").build()));
 //             FormaPago formaPagoMercadoPago = formaPagoRepo.findByNombre("MERCADO_PAGO")
 //                     .orElseGet(() -> formaPagoRepo
 //                             .save(FormaPago.builder().nombre("MERCADO_PAGO").build()));
-//             formaPagoRepo.findByNombre("TRANSFERENCIA")
-//                     .orElseGet(() -> formaPagoRepo
-//                             .save(FormaPago.builder().nombre("TRANSFERENCIA").build()));
 //             // 4. Catálogo de productos - Creamos las categorías principales y subcategorías
 
 //             // -- Categorías principales
@@ -1358,7 +1352,7 @@
 //                     .sucursal(sucursal)
 //                     .estado(estadoEnPreparacion)
 //                     .tipoEnvio(tipoDelivery)
-//                     .formaPago(formaPagoTarjeta)
+//                     .formaPago(formaPagoEfectivo)
 //                     .build());
 //             detallePedidoRepo.save(DetallePedido.builder()
 //                     .pedido(p4_2).cantidad(2).articulo(hamburguesaClasica).build());
@@ -1502,7 +1496,7 @@
 //                     .sucursal(sucursal)
 //                     .estado(estadoConfirmado)
 //                     .tipoEnvio(tipoDelivery)
-//                     .formaPago(formaPagoTarjeta)
+//                     .formaPago(formaPagoEfectivo)
 //                     .build());
 //             detallePedidoRepo.save(DetallePedido.builder()
 //                     .pedido(p6_1).cantidad(1).articulo(pizzaMozzarella).build());

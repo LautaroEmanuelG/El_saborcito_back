@@ -11,6 +11,8 @@ import utn.saborcito.El_saborcito_back.models.ArticuloManufacturadoDetalle;
 import utn.saborcito.El_saborcito_back.models.DetallePedido;
 import utn.saborcito.El_saborcito_back.models.Pedido;
 
+import java.time.LocalTime;
+
 /**
  * Servicio dedicado al cálculo de valores en pedidos.
  * Este servicio centraliza la lógica de cálculo para los pedidos y sus
@@ -19,6 +21,13 @@ import utn.saborcito.El_saborcito_back.models.Pedido;
 @Service
 @RequiredArgsConstructor
 public class CalculadoraPedidoService {
+
+    // Constantes para lógicas de negocio
+    private static final String TIPO_ENVIO_TAKE_AWAY = "TAKE_AWAY";
+    private static final Long TIPO_ENVIO_TAKE_AWAY_ID = 2L;
+    private static final Double DESCUENTO_TAKE_AWAY = 0.10; // 10%
+    private static final String TIPO_ENVIO_DELIVERY = "DELIVERY";
+    private static final Integer MINUTOS_DELIVERY = 30;
 
     /**
      * Calcula el subtotal para un detalle de pedido.
@@ -114,13 +123,20 @@ public class CalculadoraPedidoService {
     }
 
     /**
-     * Actualiza los totales de un pedido incluyendo promociones.
+     * Actualiza los totales de un pedido incluyendo promociones y descuentos.
+     * 🆕 Incluye descuento del 10% para TAKE_AWAY
      * 
      * @param pedido El pedido a actualizar
      */
     public void actualizarTotalesPedido(Pedido pedido) {
-        pedido.setTotal(calcularTotalPedidoConPromociones(pedido));
+        Double totalSinDescuento = calcularTotalPedidoConPromociones(pedido);
+        Double totalConDescuento = aplicarDescuentoTakeAway(totalSinDescuento, pedido);
+
+        pedido.setTotal(totalConDescuento);
         pedido.setTotalCosto(calcularTotalCostoPedido(pedido));
+
+        // 🆕 Actualizar hora estimada con nueva lógica
+        pedido.setHorasEstimadaFinalizacion(calcularHoraEstimadaFinalizacion(pedido));
     }
 
     /**
@@ -149,4 +165,69 @@ public class CalculadoraPedidoService {
 
         return totalDetallesIndividuales + totalPromociones;
     }
+
+    /**
+     * 🆕 Verifica si un pedido contiene solo artículos insumo
+     */
+    public Boolean esPedidoSoloInsumos(Pedido pedido) {
+        if (pedido == null || pedido.getDetalles() == null || pedido.getDetalles().isEmpty()) {
+            return false;
+        }
+
+        return pedido.getDetalles().stream()
+                .allMatch(detalle -> detalle.getArticulo() instanceof ArticuloInsumo);
+    }
+
+    /**
+     * 🆕 Calcula la hora estimada de finalización mejorada según las nuevas reglas
+     * de negocio
+     */
+    public LocalTime calcularHoraEstimadaFinalizacion(Pedido pedido) {
+        if (pedido == null || pedido.getDetalles() == null || pedido.getDetalles().isEmpty()) {
+            return LocalTime.now();
+        }
+
+        // Si todos son insumos, hora actual (sin preparación)
+        if (esPedidoSoloInsumos(pedido)) {
+            return LocalTime.now();
+        }
+
+        // Buscar el tiempo máximo de preparación entre ArticuloManufacturado
+        Integer maxTiempoPreparacion = pedido.getDetalles().stream()
+                .filter(detalle -> detalle.getArticulo() instanceof ArticuloManufacturado)
+                .map(detalle -> (ArticuloManufacturado) detalle.getArticulo())
+                .filter(manufacturado -> manufacturado.getTiempoEstimadoMinutos() != null)
+                .mapToInt(ArticuloManufacturado::getTiempoEstimadoMinutos)
+                .max()
+                .orElse(0);
+
+        // Agregar tiempo de delivery si corresponde
+        Integer minutosDelivery = 0;
+        if (pedido.getTipoEnvio() != null && TIPO_ENVIO_DELIVERY.equals(pedido.getTipoEnvio().getNombre())) {
+            minutosDelivery = MINUTOS_DELIVERY;
+        }
+
+        return LocalTime.now().plusMinutes(maxTiempoPreparacion + minutosDelivery);
+    }
+
+    /**
+     * 🆕 Aplica descuento del 10% para pedidos TAKE_AWAY
+     */
+    public Double aplicarDescuentoTakeAway(Double total, Pedido pedido) {
+        if (total == null || pedido == null || pedido.getTipoEnvio() == null) {
+            return total != null ? total : 0.0;
+        }
+
+        // Verificar si es TAKE_AWAY por ID o nombre
+        boolean esTakeAway = TIPO_ENVIO_TAKE_AWAY_ID.equals(pedido.getTipoEnvio().getId()) ||
+                TIPO_ENVIO_TAKE_AWAY.equals(pedido.getTipoEnvio().getNombre());
+
+        if (esTakeAway) {
+            return total * (1.0 - DESCUENTO_TAKE_AWAY);
+        }
+
+        return total;
+    }
+
+    // ...existing code...
 }
