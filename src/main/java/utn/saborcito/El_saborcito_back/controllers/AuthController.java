@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.config.security.JwtUtil;
 import utn.saborcito.El_saborcito_back.dto.*;
+import utn.saborcito.El_saborcito_back.enums.Rol;
 import utn.saborcito.El_saborcito_back.services.ClienteService;
 import utn.saborcito.El_saborcito_back.services.EmpleadoService;
 import utn.saborcito.El_saborcito_back.services.HorarioAtencionService;
@@ -56,7 +58,9 @@ public class AuthController {
     public ResponseEntity<AuthResponseDTO> loginClienteManual(@RequestBody LoginRequest dto) {
         UsuarioDTO usuario = clienteService.loginClienteManual(dto);
         String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().name());
-
+        if (!usuario.getRol().equals(Rol.CLIENTE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado");
+        }
         return ResponseEntity.ok(AuthResponseDTO.builder()
                 .message("Login manual exitoso")
                 .token(token)
@@ -92,6 +96,13 @@ public class AuthController {
     @PostMapping("/empleados/login/manual")
     public ResponseEntity<AuthEmpleadoResponseDTO> loginEmpleadoManual(@RequestBody LoginRequest dto) {
         AuthEmpleadoResponseDTO response = empleadoService.loginEmpleadoManual(dto);
+
+        // Validar que el rol del empleado sea uno de los permitidos
+        Rol rol = response.getEmpleado().getRol();
+        if (rol != Rol.COCINERO && rol != Rol.CAJERO && rol != Rol.DELIVERY && rol != Rol.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Rol de empleado no válido");
+        }
+
         return ResponseEntity.ok(response);
     }
 
