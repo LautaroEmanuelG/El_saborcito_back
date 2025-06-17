@@ -11,6 +11,7 @@ import utn.saborcito.El_saborcito_back.enums.Rol;
 import utn.saborcito.El_saborcito_back.services.ClienteService;
 import utn.saborcito.El_saborcito_back.services.EmpleadoService;
 import utn.saborcito.El_saborcito_back.services.HorarioAtencionService;
+import utn.saborcito.El_saborcito_back.services.UsuarioService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,6 +24,7 @@ public class AuthController {
 
     private final ClienteService clienteService;
     private final EmpleadoService empleadoService;
+    private final UsuarioService usuarioService;
     private final HorarioAtencionService horarioAtencionService;
     private final JwtUtil jwtUtil;
 
@@ -103,6 +105,11 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Rol de empleado no válido");
         }
 
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/admin/login")
+    public ResponseEntity<AuthResponseDTO> loginAdmin(@RequestBody LoginRequest dto) {
+        AuthResponseDTO response = usuarioService.loginAdmin(dto);
         return ResponseEntity.ok(response);
     }
 

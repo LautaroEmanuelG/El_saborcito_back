@@ -1,13 +1,18 @@
 package utn.saborcito.El_saborcito_back.services;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import utn.saborcito.El_saborcito_back.config.security.JwtUtil;
+import utn.saborcito.El_saborcito_back.dto.AuthResponseDTO;
 import utn.saborcito.El_saborcito_back.dto.DomicilioDTO;
 import utn.saborcito.El_saborcito_back.dto.LoginRequest;
 import utn.saborcito.El_saborcito_back.dto.UsuarioDTO;
+import utn.saborcito.El_saborcito_back.enums.Rol;
 import utn.saborcito.El_saborcito_back.mappers.UsuarioMapper;
 import utn.saborcito.El_saborcito_back.models.Domicilio;
 import utn.saborcito.El_saborcito_back.models.Empleado;
@@ -20,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
@@ -28,6 +33,7 @@ public class UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final LocalidadRepository localidadRepository;
+    private final JwtUtil jwtUtil;
 
     public List<UsuarioDTO> findAll() {
         return repo.findAll().stream()
@@ -154,6 +160,42 @@ public class UsuarioService {
         }
 
         return usuarioMapper.toDTO(usuario);
+    }
+
+    public AuthResponseDTO loginAdmin(LoginRequest dto) {
+        log.info("Admin", dto.getEmail());
+        // 1. Buscar al usuario por email
+        Usuario usuario = repo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos"));
+        log.info("Usuario encontrado - ID: {}, Rol: {}, Estado: {}",
+                usuario.getId(), usuario.getRol(), usuario.getEstado());
+        // 2. Validar que sea ADMIN
+        if (usuario.getRol() != Rol.ADMIN) {
+            log.error("Intento de login como admin fallido - Rol incorrecto: {}", usuario.getRol());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado");
+        }
+
+        // 3. Validar estado
+        if (!usuario.getEstado()) {
+            log.error("Intento de login como admin fallido - Usuario inactivo");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario deshabilitado");
+        }
+
+        // 4. Validar contraseña
+        if (!passwordEncoder.matches(dto.getPassword(), usuario.getPassword())) {
+           log.info("Intento de login como admin fallido - Contraseña incorrecta", dto.getPassword());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
+        }
+
+        // 5. Generar token JWT
+        String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().name());
+        log.info("Token generado exitosamente para usuario: {}", usuario.getEmail());
+
+        return AuthResponseDTO.builder()
+                .message("Inicio de sesión exitoso")
+                .token(token)
+                .usuario(usuarioMapper.toDTO(usuario))
+                .build();
     }
 
     // ✅ NUEVO: Validar contraseña (para HU3 y HU6)
