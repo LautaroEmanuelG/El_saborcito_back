@@ -38,22 +38,37 @@ public class PedidoServiceMejorado {
     private final PromocionComboService promocionComboService;
     private final PedidoMapper pedidoMapper;
 
+    // Constantes para lógicas de negocio
+    private static final String ESTADO_LISTO = "LISTO";
+
     // NUEVO: DTO para respuesta que incluye pedido y factura
     public static class PedidoConFacturaDTO {
         private PedidoDTO pedido;
         private Long facturaId;
 
-        public PedidoConFacturaDTO() {}
+        public PedidoConFacturaDTO() {
+        }
 
         public PedidoConFacturaDTO(PedidoDTO pedido, Long facturaId) {
             this.pedido = pedido;
             this.facturaId = facturaId;
         }
 
-        public PedidoDTO getPedido() { return pedido; }
-        public void setPedido(PedidoDTO pedido) { this.pedido = pedido; }
-        public Long getFacturaId() { return facturaId; }
-        public void setFacturaId(Long facturaId) { this.facturaId = facturaId; }
+        public PedidoDTO getPedido() {
+            return pedido;
+        }
+
+        public void setPedido(PedidoDTO pedido) {
+            this.pedido = pedido;
+        }
+
+        public Long getFacturaId() {
+            return facturaId;
+        }
+
+        public void setFacturaId(Long facturaId) {
+            this.facturaId = facturaId;
+        }
     }
 
     @Transactional
@@ -63,12 +78,13 @@ public class PedidoServiceMejorado {
 
             Pedido pedido = crearPedidoBase(dto);
             List<DetallePedido> detalles = crearDetallesPedido(pedido, dto.getDetalles());
-
             aplicarPromociones(pedido, detalles, dto.getPromocionesSeleccionadas());
 
+            // 🆕 Establecer estado automático si todos los artículos son insumos
+            establecerEstadoAutomatico(pedido);
             stockService.descontarStockPorPedido(pedido);
             calculadoraService.actualizarTotalesPedido(pedido);
-            calcularTiempoEstimado(pedido);
+            // Tiempo estimado y descuentos ya se calculan en actualizarTotalesPedido
 
             Pedido pedidoGuardado = pedidoRepository.save(pedido);
             Long facturaId = crearFacturaAutomatica(pedidoGuardado);
@@ -96,6 +112,34 @@ public class PedidoServiceMejorado {
         }
 
         return resultado;
+    }
+
+    /**
+     * 🆕 Método público para verificar si un pedido contiene solo artículos insumo
+     */
+    public Boolean esPedidoSoloInsumos(Pedido pedido) {
+        return calculadoraService.esPedidoSoloInsumos(pedido);
+    }
+
+    /**
+     * 🆕 Establece automáticamente el estado del pedido basado en sus artículos
+     */
+    private void establecerEstadoAutomatico(Pedido pedido) {
+        // Solo aplicar si no tiene estado definido
+        if (pedido.getEstado() == null) {
+            // Si todos los artículos son insumos, establecer estado LISTO
+            if (calculadoraService.esPedidoSoloInsumos(pedido)) {
+                try {
+                    Optional<Estado> estadoListoOpt = estadoRepository.findByNombre(ESTADO_LISTO);
+                    if (estadoListoOpt.isPresent()) {
+                        pedido.setEstado(estadoListoOpt.get());
+                    }
+                } catch (Exception e) {
+                    // Si no existe el estado LISTO, continuar sin establecer estado
+                    System.err.println("Estado LISTO no encontrado: " + e.getMessage());
+                }
+            }
+        }
     }
 
     private void validarDatosCreacion(PedidoCreacionDTO dto) {
@@ -183,7 +227,7 @@ public class PedidoServiceMejorado {
     }
 
     private List<DetallePedido> crearDetallesPedido(Pedido pedido,
-                                                    List<PedidoCreacionDTO.DetallePedidoCreacionDTO> detallesDTO) {
+            List<PedidoCreacionDTO.DetallePedidoCreacionDTO> detallesDTO) {
         if (detallesDTO == null || detallesDTO.isEmpty()) {
             return new ArrayList<>();
         }
@@ -213,7 +257,7 @@ public class PedidoServiceMejorado {
     }
 
     private void aplicarPromociones(Pedido pedido, List<DetallePedido> detalles,
-                                    List<PromocionSeleccionadaDTO> promocionesSeleccionadas) {
+            List<PromocionSeleccionadaDTO> promocionesSeleccionadas) {
         if (promocionesSeleccionadas != null && !promocionesSeleccionadas.isEmpty()) {
             List<DetallePedidoPromocion> promociones = promocionComboService.aplicarPromocionesSeleccionadas(
                     pedido, detalles, promocionesSeleccionadas, pedido.getSucursal());
@@ -230,18 +274,6 @@ public class PedidoServiceMejorado {
         for (DetallePedido detalle : pedido.getDetalles()) {
             detalle.setPedido(pedido);
         }
-    }
-
-    private void calcularTiempoEstimado(Pedido pedido) {
-        int maxMinutosCocina = pedido.getDetalles().stream()
-                .filter(det -> det.getArticulo() instanceof ArticuloManufacturado)
-                .mapToInt(det -> ((ArticuloManufacturado) det.getArticulo()).getTiempoEstimadoMinutos())
-                .max()
-                .orElse(15);
-
-        int minutosDelivery = "DELIVERY".equals(pedido.getTipoEnvio().getNombre()) ? 30 : 0;
-        LocalTime horaEstimada = LocalTime.now().plusMinutes(maxMinutosCocina + minutosDelivery);
-        pedido.setHorasEstimadaFinalizacion(horaEstimada);
     }
 
     private Long crearFacturaAutomatica(Pedido pedido) {
@@ -271,7 +303,7 @@ public class PedidoServiceMejorado {
 
             List<DetallePedidoDTO> detallesDTO = new ArrayList<>();
 
-// Detalles individuales
+            // Detalles individuales
             for (DetallePedido dp : pedido.getDetalles()) {
                 if (dp.getOrigen() == OrigenDetalle.INDIVIDUAL) {
                     detallesDTO.add(new DetallePedidoDTO(
@@ -286,9 +318,7 @@ public class PedidoServiceMejorado {
                                     dp.getArticulo().getId(),
                                     dp.getArticulo().getDenominacion(),
                                     dp.getArticulo().getPrecioVenta(),
-                                    null, null, false, null
-                            )
-                    ));
+                                    null, null, false, null)));
                 }
             }
 
@@ -309,9 +339,7 @@ public class PedidoServiceMejorado {
                                     promo.getId(),
                                     "🎁 " + promo.getDenominacion(),
                                     promo.getPrecioPromocional(),
-                                    null, null, false, null
-                            )
-                    ));
+                                    null, null, false, null)));
                 }
             }
 
@@ -323,7 +351,6 @@ public class PedidoServiceMejorado {
             return dto;
         }).collect(Collectors.toList());
     }
-
 
     private Map<String, Object> crearInfoValidacion(Promocion promocion) {
         LocalDate fechaActual = LocalDate.now();
@@ -349,4 +376,3 @@ public class PedidoServiceMejorado {
         return info;
     }
 }
-
