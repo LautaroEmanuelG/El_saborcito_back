@@ -92,6 +92,16 @@ public class ArticuloInsumoController {
         }
     }
 
+    @GetMapping("/{id}/can-be-sold")
+    public ResponseEntity<Boolean> canBeSold(@PathVariable Long id) {
+        try {
+            boolean puedeVenderse = articuloInsumoService.puedeVenderse(id);
+            return ResponseEntity.ok(puedeVenderse);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
+
     @PostMapping("/deleted/{id}/restore")
     public ResponseEntity<ArticuloInsumoDTO> restore(@PathVariable Long id) {
         try {
