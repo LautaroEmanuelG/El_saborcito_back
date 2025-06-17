@@ -26,8 +26,7 @@ public class CocinaController {
     @PutMapping("/pedidos/{id}/estado")
     public ResponseEntity<PedidoDTO> actualizarEstado(
             @PathVariable Long id,
-            @RequestParam String nuevoEstado
-    ) {
+            @RequestParam String nuevoEstado) {
         PedidoDTO actualizado = cocinaService.actualizarEstadoPedido(id, nuevoEstado);
         return ResponseEntity.ok(actualizado);
     }
@@ -47,5 +46,11 @@ public class CocinaController {
     public ResponseEntity<PedidoDTO> avanzarEstado(@PathVariable Long id) {
         PedidoDTO pedidoActualizado = pedidoCocinaService.avanzarEstadoPedido(id);
         return ResponseEntity.ok(pedidoActualizado);
+    }
+
+    @PutMapping("/pedidos/{id}/cancelar")
+    public ResponseEntity<PedidoDTO> cancelarPedido(@PathVariable Long id) {
+        PedidoDTO pedidoCancelado = cocinaService.cancelarPedido(id);
+        return ResponseEntity.ok(pedidoCancelado);
     }
 }

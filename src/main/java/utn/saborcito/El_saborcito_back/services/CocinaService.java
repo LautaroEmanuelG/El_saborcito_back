@@ -44,4 +44,25 @@ public class CocinaService {
         pedido.setEstado(estado);
         return pedidoMapper.toDTO(pedidoRepository.save(pedido));
     }
+
+    public PedidoDTO cancelarPedido(Long pedidoId) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+
+        // Verificar que el pedido se pueda cancelar (no debe estar ya entregado o
+        // cancelado)
+        if (pedido.getEstado().getNombre().equals("ENTREGADO") ||
+                pedido.getEstado().getNombre().equals("CANCELADO")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No se puede cancelar un pedido que ya está entregado o cancelado");
+        }
+
+        // Buscar el estado CANCELADO (ID 7 según tu especificación)
+        Estado estadoCancelado = estadoRepository.findById(7L)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Estado CANCELADO no encontrado en el sistema"));
+
+        pedido.setEstado(estadoCancelado);
+        return pedidoMapper.toDTO(pedidoRepository.save(pedido));
+    }
 }
