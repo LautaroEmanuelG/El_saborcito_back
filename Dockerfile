@@ -1,29 +1,24 @@
 # =========================================
-# 🐳 DOCKERFILE OPTIMIZADO PARA RENDER
+# 🐳 DOCKERFILE ALTERNATIVO - SIN GRADLE WRAPPER
 # =========================================
 
-# Etapa 1: Build
+# Etapa 1: Build con Gradle preinstalado
 FROM eclipse-temurin:17-jdk-alpine AS builder
 
 WORKDIR /app
 
-# Instalar curl para health checks
-RUN apk add --no-cache curl
-
-# Copiar archivos de configuración de Gradle
-COPY gradle gradle
-COPY gradlew .
+# Copiar archivos de configuración
 COPY build.gradle .
 COPY settings.gradle .
 
-# Hacer gradlew ejecutable
-RUN chmod +x ./gradlew
+# Descargar dependencias primero (para cache de Docker)
+RUN gradle dependencies --no-daemon || true
 
 # Copiar código fuente
-COPY src src
+COPY src/ src/
 
-# Construir la aplicación
-RUN ./gradlew build -x test --no-daemon
+# Construir la aplicación usando gradle directamente
+RUN gradle build -x test --no-daemon
 
 # Etapa 2: Runtime
 FROM eclipse-temurin:17-jre-alpine
