@@ -34,6 +34,8 @@ Este proyecto implementa los siguientes módulos (Historias de Usuario):
 
 La aplicación utiliza MySQL como sistema de gestión de base de datos para el almacenamiento persistente de datos.
 
+![image](https://github.com/user-attachments/assets/d5c2878e-af61-4a68-886c-fce5cf9b9555)
+
 ## 🔐 Variables de Entorno
 
 El proyecto utiliza un archivo `.env` para gestionar variables de entorno sensibles. Para configurar tu entorno:
@@ -68,7 +70,6 @@ SERVER_PORT=5252
   - io.jsonwebtoken:jjwt-api / jjwt-impl / jjwt-jackson (0.11.5)  
 - **Bases de datos**  
   - MySQL Connector/J (8.0.33)  
-  - PostgreSQL Driver  
 - **Mapeo y generación de código**  
   - Lombok  
   - MapStruct (+ lombok-mapstruct-binding)  
