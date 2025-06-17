@@ -46,8 +46,7 @@ src/test/
 # Bruno API tests
 data/
 
-# Gradle wrapper jar (se regenera)
-gradle/wrapper/gradle-wrapper.jar
+# Nota: NO excluir gradle/wrapper/gradle-wrapper.jar porque es necesario para el build
 
 # Archivos temporales
 *.tmp
