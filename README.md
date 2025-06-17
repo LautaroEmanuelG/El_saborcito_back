@@ -68,7 +68,6 @@ SERVER_PORT=5252
   - io.jsonwebtoken:jjwt-api / jjwt-impl / jjwt-jackson (0.11.5)  
 - **Bases de datos**  
   - MySQL Connector/J (8.0.33)  
-  - PostgreSQL Driver  
 - **Mapeo y generación de código**  
   - Lombok  
   - MapStruct (+ lombok-mapstruct-binding)  
