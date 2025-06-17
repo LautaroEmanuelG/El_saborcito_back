@@ -1,45 +1,56 @@
 package utn.saborcito.El_saborcito_back.controllers;
 
+import com.mercadopago.exceptions.MPApiException;
+import com.mercadopago.exceptions.MPException;
+import com.mercadopago.resources.preference.Preference;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utn.saborcito.El_saborcito_back.dto.DatosMercadoPagoDto;
-import utn.saborcito.El_saborcito_back.mappers.DatosMercadoPagoMapper;
-import utn.saborcito.El_saborcito_back.models.DatosMercadoPago;
 import utn.saborcito.El_saborcito_back.services.DatosMercadoPagoService;
-
-import java.util.List;
+import utn.saborcito.El_saborcito_back.services.PedidoService;
 
 @RestController
-@RequestMapping("/api/datos-mercadopago")
+@RequestMapping("/api/pagos")
 @RequiredArgsConstructor
 public class DatosMercadoPagoController {
-    private final DatosMercadoPagoService service;
-    private final DatosMercadoPagoMapper mapper;
 
-    @GetMapping
-    public List<DatosMercadoPagoDto> getAll() {
-        return service.findAll().stream().map(mapper::toDto).toList();
+    private final DatosMercadoPagoService datosMercadoPagoService;
+    private final PedidoService pedidoService;
+
+    @PostMapping("/crear-preferencia/{pedidoId}")
+    public ResponseEntity<?> crearPreferencia(@PathVariable Long pedidoId) {
+        try {
+            var pedido = pedidoService.findEntityById(pedidoId);
+            Preference preference = datosMercadoPagoService.crearPreferenciaMP(pedido);
+
+            return ResponseEntity.ok().body(
+                    java.util.Map.of(
+                            "preferenceId", preference.getId(),
+                            "initPoint", preference.getInitPoint()
+                    )
+            );
+
+        } catch (MPException | MPApiException e) {
+            return ResponseEntity.badRequest().body("Error con Mercado Pago: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error inesperado: " + e.getMessage());
+        }
     }
 
-    @GetMapping("/{id}")
-    public DatosMercadoPagoDto getById(@PathVariable Long id) {
-        return mapper.toDto(service.findById(id));
-    }
+    @PostMapping("/webhook")
+    public ResponseEntity<?> recibirWebhook(
+            @RequestParam(name = "type", required = false) String type,
+            @RequestParam(name = "data.id", required = false) String paymentId
+    ) {
+        if ("payment".equals(type) && paymentId != null) {
+            try {
+                datosMercadoPagoService.procesarPago(paymentId);
+                return ResponseEntity.ok().body("Webhook procesado correctamente");
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().body("Error procesando el webhook: " + e.getMessage());
+            }
+        }
 
-    @PostMapping
-    public DatosMercadoPagoDto create(@RequestBody DatosMercadoPagoDto dto) {
-        DatosMercadoPago dmp = mapper.toEntity(dto);
-        return mapper.toDto(service.save(dmp));
-    }
-
-    @PutMapping("/{id}")
-    public DatosMercadoPagoDto update(@PathVariable Long id, @RequestBody DatosMercadoPagoDto dto) {
-        DatosMercadoPago dmp = mapper.toEntity(dto);
-        return mapper.toDto(service.update(id, dmp));
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+        return ResponseEntity.badRequest().body("Tipo de webhook no procesado o datos faltantes");
     }
 }
