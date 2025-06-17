@@ -77,8 +77,9 @@ public class ArticuloInsumoService {
                 insumo.setFechaEliminacion(LocalDateTime.now());
             }
 
-            if (dto.getPrecioCompra() == null || dto.getPrecioCompra() <= 0) {
-                throw new Exception("El precio de compra debe ser mayor que cero.");
+            // Permitir 0, solo rechazar negativos
+            if (dto.getPrecioCompra() == null || dto.getPrecioCompra() < 0) {
+                throw new Exception("El precio de compra no puede ser negativo.");
             }
             if (dto.getStockActual() == null || dto.getStockActual() < 0) {
                 throw new Exception("El stock actual no puede ser negativo.");
@@ -131,8 +132,9 @@ public class ArticuloInsumoService {
             insumoExistente.setDenominacion(dto.getDenominacion());
             insumoExistente.setPrecioVenta(dto.getPrecioVenta());
 
-            if (dto.getPrecioCompra() == null || dto.getPrecioCompra() <= 0) {
-                throw new Exception("El precio de compra debe ser mayor que cero.");
+            // Permitir 0, solo rechazar negativos
+            if (dto.getPrecioCompra() == null || dto.getPrecioCompra() < 0) {
+                throw new Exception("El precio de compra no puede ser negativo.");
             }
             insumoExistente.setPrecioCompra(dto.getPrecioCompra());
 

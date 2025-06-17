@@ -82,8 +82,8 @@ public class SucursalController {
     //MOVIMIENTOS MONETARIOS
     @GetMapping("/movimientos")
     public MovimientoMonetarioDTO getMovimientos(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
     ) {
         return service.getMovimientos(desde, hasta);
     }
@@ -133,8 +133,8 @@ public class SucursalController {
 
     @GetMapping("/detalle-costos")
     public List<PedidoCostoDetalleDTO> getDetalleCostos(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
     ) {
         return service.getDetalleCostos(desde, hasta);
     }
@@ -150,9 +150,9 @@ public class SucursalController {
 
     @GetMapping("/exportar-detalle-costos-excel")
     public void exportarDetalleCostosExcel(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
-            HttpServletResponse response
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+      HttpServletResponse response
     ) throws IOException {
         service.exportarDetalleCostosExcel(desde, hasta, response);
     }
