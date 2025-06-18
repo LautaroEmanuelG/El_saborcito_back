@@ -638,6 +638,253 @@ public class DataInitializer {
                     .imagen(imagenDefault)
                     .build());
 
+
+            // ARTICULO INSUMO 27 - Aceite de Oliva
+            ArticuloInsumo insumoAceiteOliva = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                    .denominacion("Aceite de Oliva Extra Virgen")
+                    .precioVenta(2800.0)
+                    .categoria(categoriaInsumos)
+                    .unidadMedida(unidadLitros)
+                    .precioCompra(2200.0)
+                    .stockActual(500)
+                    .stockMinimo(300)
+                    .esParaElaborar(true)
+                    .imagen(imagenDefault)
+                    .build());
+
+            // ARTICULO INSUMO 28 - Oregano
+                        ArticuloInsumo insumoOregano = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Orégano Seco")
+                                .precioVenta(800.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(500.0)
+                                .stockActual(1000)
+                                .stockMinimo(500)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 29 - Sal
+                        ArticuloInsumo insumoSal = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Sal Fina")
+                                .precioVenta(300.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(200.0)
+                                .stockActual(5000)
+                                .stockMinimo(3000)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 30 - Pimienta
+                        ArticuloInsumo insumoPimienta = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Pimienta Negra Molida")
+                                .precioVenta(1200.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(900.0)
+                                .stockActual(800)
+                                .stockMinimo(400)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 31 - Ajo
+                        ArticuloInsumo insumoAjo = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Ajo Fresco")
+                                .precioVenta(1500.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(1100.0)
+                                .stockActual(2000)
+                                .stockMinimo(1000)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 32 - Levadura
+                        ArticuloInsumo insumoLevadura = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Levadura Fresca")
+                                .precioVenta(600.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(400.0)
+                                .stockActual(1500)
+                                .stockMinimo(800)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 33 - Azúcar
+                        ArticuloInsumo insumoAzucar = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Azúcar Blanca")
+                                .precioVenta(800.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(600.0)
+                                .stockActual(3000)
+                                .stockMinimo(2000)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 34 - Huevos
+                        ArticuloInsumo insumoHuevos = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Huevos Frescos")
+                                .precioVenta(2000.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadUnidad)
+                                .precioCompra(1500.0)
+                                .stockActual(500)
+                                .stockMinimo(300)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 35 - Manteca
+                        ArticuloInsumo insumoManteca = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Manteca")
+                                .precioVenta(1800.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(1400.0)
+                                .stockActual(2000)
+                                .stockMinimo(1200)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 36 - Mayonesa
+                        ArticuloInsumo insumoMayonesa = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Mayonesa")
+                                .precioVenta(1000.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(700.0)
+                                .stockActual(1500)
+                                .stockMinimo(1000)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 37 - Ketchup
+                        ArticuloInsumo insumoKetchup = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Ketchup")
+                                .precioVenta(1100.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(800.0)
+                                .stockActual(1200)
+                                .stockMinimo(800)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 38 - Mostaza
+                        ArticuloInsumo insumoMostaza = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Mostaza")
+                                .precioVenta(900.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(600.0)
+                                .stockActual(1000)
+                                .stockMinimo(600)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 39 - Papas
+                        ArticuloInsumo insumoPapas = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Papas para Fritar")
+                                .precioVenta(1200.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(800.0)
+                                .stockActual(8000)
+                                .stockMinimo(5000)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 40 - Morrones
+                        ArticuloInsumo insumoMorrones = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Morrones Rojos")
+                                .precioVenta(1400.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(1000.0)
+                                .stockActual(3000)
+                                .stockMinimo(2000)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 41 - Vinagre
+            ArticuloInsumo insumoVinagre = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                    .denominacion("Vinagre de Alcohol")
+                    .precioVenta(700.0)
+                    .categoria(categoriaInsumos)
+                    .unidadMedida(unidadLitros)
+                    .precioCompra(500.0)
+                    .stockActual(800)
+                    .stockMinimo(400)
+                    .esParaElaborar(true)
+                    .imagen(imagenDefault)
+                    .build());
+
+            // ARTICULO INSUMO 42 - Perejil
+                        ArticuloInsumo insumoPerejil = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Perejil Fresco")
+                                .precioVenta(600.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(400.0)
+                                .stockActual(1200)
+                                .stockMinimo(600)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 43 - Aceitunas
+                        ArticuloInsumo insumoAceitunas = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Aceitunas Verdes")
+                                .precioVenta(1600.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(1200.0)
+                                .stockActual(2000)
+                                .stockMinimo(1000)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 44 - Hongos
+                        ArticuloInsumo insumoHongos = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Hongos Frescos")
+                                .precioVenta(2200.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadGramos)
+                                .precioCompra(1800.0)
+                                .stockActual(1500)
+                                .stockMinimo(800)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 45 - Leche
+                        ArticuloInsumo insumoLeche = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Leche Entera")
+                                .precioVenta(1000.0)
+                                .categoria(categoriaInsumos)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(700.0)
+                                .stockActual(1000)
+                                .stockMinimo(500)
+                                .esParaElaborar(true)
+                                .imagen(imagenDefault)
+                                .build());
             // ARTICULO INSUMO 22
             ArticuloInsumo insumoCocaCola = articuloInsumoRepo.save(ArticuloInsumo.builder()
                     .denominacion("Coca Cola 500ml")
@@ -663,6 +910,8 @@ public class DataInitializer {
                     .esParaElaborar(false)
                     .imagen(imagenAguaMineralNueva)
                     .build());
+
+            //INSUMOS NO PARA ELABORAR (BEBIDAS)
 
             // ARTICULO INSUMO 24
             ArticuloInsumo insumoFernet = articuloInsumoRepo.save(ArticuloInsumo.builder()
@@ -705,6 +954,135 @@ public class DataInitializer {
                             .imagen(imagenJugoDeNaranja)
                             .build());
 
+            // ARTICULO INSUMO 46 - Sprite
+            ArticuloInsumo insumoSprite = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                    .denominacion("Sprite 500ml")
+                    .precioVenta(1700.0)
+                    .categoria(categoriaGaseosas)
+                    .unidadMedida(unidadLitros)
+                    .precioCompra(1200.0)
+                    .stockActual(280)
+                    .stockMinimo(180)
+                    .esParaElaborar(false)
+                    .imagen(imagenGaseosa)
+                    .build());
+
+            // ARTICULO INSUMO 47 - Fanta
+                        ArticuloInsumo insumoFanta = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Fanta 500ml")
+                                .precioVenta(1750.0)
+                                .categoria(categoriaGaseosas)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(1250.0)
+                                .stockActual(260)
+                                .stockMinimo(160)
+                                .esParaElaborar(false)
+                                .imagen(imagenGaseosa)
+                                .build());
+
+            // ARTICULO INSUMO 48 - Agua con Gas
+                        ArticuloInsumo insumoAguaConGas = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Agua con Gas 500ml")
+                                .precioVenta(1300.0)
+                                .categoria(categoriaAguas)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(900.0)
+                                .stockActual(200)
+                                .stockMinimo(120)
+                                .esParaElaborar(false)
+                                .imagen(imagenAgua)
+                                .build());
+
+            // ARTICULO INSUMO 49 - Agua Saborizada
+                        ArticuloInsumo insumoAguaSaborizada = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Agua Saborizada Limón 500ml")
+                                .precioVenta(1400.0)
+                                .categoria(categoriaAguas)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(1000.0)
+                                .stockActual(180)
+                                .stockMinimo(100)
+                                .esParaElaborar(false)
+                                .imagen(imagenAgua)
+                                .build());
+
+            // ARTICULO INSUMO 50 - Cerveza Quilmes
+                        ArticuloInsumo insumoCervezaQuilmes = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Cerveza Quilmes 473ml")
+                                .precioVenta(2000.0)
+                                .categoria(categoriaTragos)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(1400.0)
+                                .stockActual(120)
+                                .stockMinimo(80)
+                                .esParaElaborar(false)
+                                .imagen(imagenCervezaArtesanal)
+                                .build());
+
+            // ARTICULO INSUMO 51 - Vino Tinto
+                        ArticuloInsumo insumoVinoTinto = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Vino Tinto 750ml")
+                                .precioVenta(3500.0)
+                                .categoria(categoriaTragos)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(2500.0)
+                                .stockActual(80)
+                                .stockMinimo(40)
+                                .esParaElaborar(false)
+                                .imagen(imagenTrago)
+                                .build());
+
+            // ARTICULO INSUMO 52 - Jugo de Manzana
+                        ArticuloInsumo insumoJugoManzana = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Jugo de Manzana 500ml")
+                                .precioVenta(1450.0)
+                                .categoria(categoriaBebidas)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(950.0)
+                                .stockActual(150)
+                                .stockMinimo(100)
+                                .esParaElaborar(false)
+                                .imagen(imagenJugoDeNaranja)
+                                .build());
+
+            // ARTICULO INSUMO 53 - Red Bull
+                        ArticuloInsumo insumoRedBull = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Red Bull 250ml")
+                                .precioVenta(3000.0)
+                                .categoria(categoriaBebidas)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(2200.0)
+                                .stockActual(100)
+                                .stockMinimo(60)
+                                .esParaElaborar(false)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 54 - Gatorade
+                        ArticuloInsumo insumoGatorade = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Gatorade 500ml")
+                                .precioVenta(2200.0)
+                                .categoria(categoriaBebidas)
+                                .unidadMedida(unidadLitros)
+                                .precioCompra(1600.0)
+                                .stockActual(120)
+                                .stockMinimo(80)
+                                .esParaElaborar(false)
+                                .imagen(imagenDefault)
+                                .build());
+
+            // ARTICULO INSUMO 55 - Café Instantáneo
+                        ArticuloInsumo insumoCafeInstantaneo = articuloInsumoRepo.save(ArticuloInsumo.builder()
+                                .denominacion("Café Instantáneo")
+                                .precioVenta(1800.0)
+                                .categoria(categoriaBebidas)
+                                .unidadMedida(unidadUnidad)
+                                .precioCompra(1200.0)
+                                .stockActual(200)
+                                .stockMinimo(150)
+                                .esParaElaborar(false)
+                                .imagen(imagenDefault)
+                                .build());
 
             // --------------------------------------------------------------------------------------------------------------------------------
             // CREACIÓN DE ARTÍCULOS MANUFACTURADOS 
@@ -965,172 +1343,211 @@ public class DataInitializer {
                     .articuloInsumo(insumoQueso)
                     .cantidad(50)
                     .build());
-            
+
 
             // --------------------------------------------------------------------------------------------------------------------------------
-            // 10. PROMOCIONES 
+            // 10. PROMOCIONES
             // --------------------------------------------------------------------------------------------------------------------------------
 
-            LocalDate fechaInicio = LocalDate.now();
-            LocalDate fechaFin = LocalDate.now().plusDays(60);
+                        LocalDate fechaInicio = LocalDate.now();
+                        LocalDate fechaFin = LocalDate.now().plusDays(60);
 
-            // 1) 🍺 Cerveza + Hamburguesa
-            Imagen img1 = imagenRepo.save(Imagen.builder()
-                .url("/img/promociones/combo-cerveza-hamburguesa.png")
-                .build());
-            // 2) 🍕 Pizza Margherita + Coca Cola 500ml
-            Imagen img2 = imagenRepo.save(Imagen.builder()
-                .url("/img/promociones/combo-pizza-coca.png")
-                .build());
-            // 3) 🍕 Cuatro Quesos + Cerveza Artesanal
-            Imagen img3 = imagenRepo.save(Imagen.builder()
-                .url("/img/promociones/combo-4q-cerveza.png")
-                .build());
-            // 4) 🥃 Fernet 750ml + Coca Cola 500ml
-            Imagen img4 = imagenRepo.save(Imagen.builder()
-                .url("/img/promociones/combo-fernet-coca.png")
-                .build());
-        
-            // 5) 🥤 Agua Mineral + Jugo de Naranja
-            Imagen img5 = imagenRepo.save(Imagen.builder()
-                .url("/img/promociones/combo-agua-jugo.png")
-                .build());
+            // Imágenes para promociones
+                        Imagen img1 = imagenRepo.save(Imagen.builder()
+                                .url("/img/promociones/combo-cerveza-hamburguesa.png")
+                                .build());
+                        Imagen img2 = imagenRepo.save(Imagen.builder()
+                                .url("/img/promociones/combo-pizza-coca.png")
+                                .build());
+                        Imagen img3 = imagenRepo.save(Imagen.builder()
+                                .url("/img/promociones/combo-4q-cerveza.png")
+                                .build());
+                        Imagen img4 = imagenRepo.save(Imagen.builder()
+                                .url("/img/promociones/combo-fernet-coca.png")
+                                .build());
+                        Imagen img5 = imagenRepo.save(Imagen.builder()
+                                .url("/img/promociones/combo-agua-jugo.png")
+                                .build());
 
+            // PROMO 1 - Cerveza + Hamburguesa
+                        Promocion promo1 = Promocion.builder()
+                                .denominacion("🍺 Cerveza + Hamburguesa")
+                                .fechaDesde(fechaInicio)
+                                .fechaHasta(fechaFin)
+                                .horaDesde(LocalTime.of(18, 0))
+                                .horaHasta(LocalTime.of(23, 59))
+                                .precioPromocional(5500.0)
+                                .sucursal(sucursal)
+                                .imagen(img1)
+                                .build();
 
+            // Crear detalles para PROMO 1
+                        PromocionDetalle detalle1_1 = PromocionDetalle.builder()
+                                .promocion(promo1)
+                                .articulo(insumoCervezaArtesanal)
+                                .cantidadRequerida(1)
+                                .build();
 
-            // PROMO 1
-            Promocion promo1 = promocionRepo.save(Promocion.builder()
-                .denominacion("🍺 Cerveza + Hamburguesa")
-                .fechaDesde(fechaInicio)
-                .fechaHasta(fechaFin)
-                .horaDesde(LocalTime.of(18, 0))
-                .horaHasta(LocalTime.of(23, 59))
-                .precioPromocional(1500.0)
-                .sucursal(sucursal)
-                .imagen(img1)
-                .build());
+                        PromocionDetalle detalle1_2 = PromocionDetalle.builder()
+                                .promocion(promo1)
+                                .articulo(hamburguesaClasica)
+                                .cantidadRequerida(1)
+                                .build();
 
-            // PROMO 2
-            Promocion promo2 = promocionRepo.save(Promocion.builder()
-                .denominacion("🍕 Margherita + Coca Cola")
-                .fechaDesde(fechaInicio)
-                .fechaHasta(fechaFin)
-                .horaDesde(LocalTime.of(11, 0))
-                .horaHasta(LocalTime.of(22, 0))
-                .precioPromocional(5500.0)
-                .sucursal(sucursal)
-                .imagen(img2)
-                .build());
+            // Asignar detalles a la promoción
+                        promo1.setPromocionDetalles(List.of(detalle1_1, detalle1_2));
 
-            // PROMO 3
-            Promocion promo3 = promocionRepo.save(Promocion.builder()
-                .denominacion("🍕 Cuatro Quesos + Cerveza Artesanal")
-                .fechaDesde(fechaInicio)
-                .fechaHasta(fechaFin)
-                .horaDesde(LocalTime.of(12, 0))
-                .horaHasta(LocalTime.of(23, 0))
-                .precioPromocional(7000.0)
-                .sucursal(sucursal)
-                .imagen(img3)
-                .build());
+            // Calcular descuento
+                        double precioTotalPromo1 = insumoCervezaArtesanal.getPrecioVenta() + hamburguesaClasica.getPrecioVenta();
+                        double descuentoPromo1 = 100 - (promo1.getPrecioPromocional() / precioTotalPromo1) * 100;
+                        promo1.setDescuento(Math.round(descuentoPromo1 * 100.0) / 100.0);
 
-            // PROMO 4   
-            Promocion promo4 = promocionRepo.save(Promocion.builder()
-                .denominacion("🥃 Fernet + Coca Cola")
-                .fechaDesde(fechaInicio)
-                .fechaHasta(fechaFin)
-                .horaDesde(LocalTime.of(18, 0))
-                .horaHasta(LocalTime.of(2, 0))
-                .precioPromocional(6800.0)
-                .sucursal(sucursal)
-                .imagen(img4)
-                .build());
+            // Guardar promoción con detalles
+                        promo1 = promocionRepo.save(promo1);
 
-            // PROMO 5
-            Promocion promo5 = promocionRepo.save(Promocion.builder()
-                .denominacion("🥤 Agua + Jugo de Naranja")
-                .fechaDesde(fechaInicio)
-                .fechaHasta(fechaFin)
-                .horaDesde(LocalTime.of(10, 0))
-                .horaHasta(LocalTime.of(20, 0))
-                .precioPromocional(2400.0)
-                .sucursal(sucursal)
-                .imagen(img5)
-                .build());
+            // PROMO 2 - Pizza Margherita + Coca Cola
+                        Promocion promo2 = Promocion.builder()
+                                .denominacion("🍕 Margherita + Coca Cola")
+                                .fechaDesde(fechaInicio)
+                                .fechaHasta(fechaFin)
+                                .horaDesde(LocalTime.of(11, 0))
+                                .horaHasta(LocalTime.of(22, 0))
+                                .precioPromocional(5800.0)
+                                .sucursal(sucursal)
+                                .imagen(img2)
+                                .build();
 
-            // --------------------------------------------------------------------------------------------------------------------------------
-            // DETALLE DE PROMOCIONES
-            // --------------------------------------------------------------------------------------------------------------------------------
+            // Crear detalles para PROMO 2
+                        PromocionDetalle detalle2_1 = PromocionDetalle.builder()
+                                .promocion(promo2)
+                                .articulo(pizzaMargherita)
+                                .cantidadRequerida(1)
+                                .build();
 
-            // DETALLE PROMO 1
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo1)
-                .articulo(insumoCervezaArtesanal)
-                .cantidadRequerida(1)
-                .build());
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo1)
-                .articulo(hamburguesaClasica)
-                .cantidadRequerida(1)
-                .build());
+                        PromocionDetalle detalle2_2 = PromocionDetalle.builder()
+                                .promocion(promo2)
+                                .articulo(insumoCocaCola)
+                                .cantidadRequerida(1)
+                                .build();
 
+            // Asignar detalles a la promoción
+                        promo2.setPromocionDetalles(List.of(detalle2_1, detalle2_2));
 
-            // DETALLE PROMO 2
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo2)
-                .articulo(pizzaMargherita)
-                .cantidadRequerida(1)
-                .build());
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo2)
-                .articulo(insumoCocaCola)
-                .cantidadRequerida(1)
-                .build());
+            // Calcular descuento
+                        double precioTotalPromo2 = pizzaMargherita.getPrecioVenta() + insumoCocaCola.getPrecioVenta();
+                        double descuentoPromo2 = 100 - (promo2.getPrecioPromocional() / precioTotalPromo2) * 100;
+                        promo2.setDescuento(Math.round(descuentoPromo2 * 100.0) / 100.0);
 
+            // Guardar promoción con detalles
+                        promo2 = promocionRepo.save(promo2);
 
+            // PROMO 3 - Cuatro Quesos + Cerveza Artesanal
+                        Promocion promo3 = Promocion.builder()
+                                .denominacion("🍕 Cuatro Quesos + Cerveza Artesanal")
+                                .fechaDesde(fechaInicio)
+                                .fechaHasta(fechaFin)
+                                .horaDesde(LocalTime.of(12, 0))
+                                .horaHasta(LocalTime.of(23, 0))
+                                .precioPromocional(7200.0)
+                                .sucursal(sucursal)
+                                .imagen(img3)
+                                .build();
 
-            // DETALLE PROMO 3
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo3)
-                .articulo(pizzaCuatroQuesos)
-                .cantidadRequerida(1)
-                .build());
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo3)
-                .articulo(insumoCervezaArtesanal)
-                .cantidadRequerida(1)
-                .build());
+            // Crear detalles para PROMO 3
+                        PromocionDetalle detalle3_1 = PromocionDetalle.builder()
+                                .promocion(promo3)
+                                .articulo(pizzaCuatroQuesos)
+                                .cantidadRequerida(1)
+                                .build();
 
+                        PromocionDetalle detalle3_2 = PromocionDetalle.builder()
+                                .promocion(promo3)
+                                .articulo(insumoCervezaArtesanal)
+                                .cantidadRequerida(1)
+                                .build();
 
+            // Asignar detalles a la promoción
+                        promo3.setPromocionDetalles(List.of(detalle3_1, detalle3_2));
 
-            // DETALLE PROMO 4
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo4)
-                .articulo(insumoFernet)
-                .cantidadRequerida(1)
-                .build());
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo4)
-                .articulo(insumoCocaCola)
-                .cantidadRequerida(1)
-                .build());
+            // Calcular descuento
+                        double precioTotalPromo3 = pizzaCuatroQuesos.getPrecioVenta() + insumoCervezaArtesanal.getPrecioVenta();
+                        double descuentoPromo3 = 100 - (promo3.getPrecioPromocional() / precioTotalPromo3) * 100;
+                        promo3.setDescuento(Math.round(descuentoPromo3 * 100.0) / 100.0);
 
+            // Guardar promoción con detalles
+                        promo3 = promocionRepo.save(promo3);
 
+            // PROMO 4 - Fernet + Coca Cola
+                        Promocion promo4 = Promocion.builder()
+                                .denominacion("🥃 Fernet + Coca Cola")
+                                .fechaDesde(fechaInicio)
+                                .fechaHasta(fechaFin)
+                                .horaDesde(LocalTime.of(18, 0))
+                                .horaHasta(LocalTime.of(2, 0))
+                                .precioPromocional(7200.0)
+                                .sucursal(sucursal)
+                                .imagen(img4)
+                                .build();
 
-            // DETALLE PROMO 5
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo5)
-                .articulo(insumoAguaMineral)
-                .cantidadRequerida(1)
-                .build());
-            promocionDetalleRepo.save(PromocionDetalle.builder()
-                .promocion(promo5)
-                .articulo(insumoJugoDeNaranja)
-                .cantidadRequerida(1)
-                .build());
+            // Crear detalles para PROMO 4
+                        PromocionDetalle detalle4_1 = PromocionDetalle.builder()
+                                .promocion(promo4)
+                                .articulo(insumoFernet)
+                                .cantidadRequerida(1)
+                                .build();
 
-                
-             
+                        PromocionDetalle detalle4_2 = PromocionDetalle.builder()
+                                .promocion(promo4)
+                                .articulo(insumoCocaCola)
+                                .cantidadRequerida(1)
+                                .build();
+
+            // Asignar detalles a la promoción
+                        promo4.setPromocionDetalles(List.of(detalle4_1, detalle4_2));
+
+            // Calcular descuento
+                        double precioTotalPromo4 = insumoFernet.getPrecioVenta() + insumoCocaCola.getPrecioVenta();
+                        double descuentoPromo4 = 100 - (promo4.getPrecioPromocional() / precioTotalPromo4) * 100;
+                        promo4.setDescuento(Math.round(descuentoPromo4 * 100.0) / 100.0);
+
+            // Guardar promoción con detalles
+                        promo4 = promocionRepo.save(promo4);
+
+            // PROMO 5 - Agua + Jugo de Naranja
+                        Promocion promo5 = Promocion.builder()
+                                .denominacion("🥤 Agua + Jugo de Naranja")
+                                .fechaDesde(fechaInicio)
+                                .fechaHasta(fechaFin)
+                                .horaDesde(LocalTime.of(10, 0))
+                                .horaHasta(LocalTime.of(20, 0))
+                                .precioPromocional(2500.0)
+                                .sucursal(sucursal)
+                                .imagen(img5)
+                                .build();
+
+            // Crear detalles para PROMO 5
+                        PromocionDetalle detalle5_1 = PromocionDetalle.builder()
+                                .promocion(promo5)
+                                .articulo(insumoAguaMineral)
+                                .cantidadRequerida(1)
+                                .build();
+
+                        PromocionDetalle detalle5_2 = PromocionDetalle.builder()
+                                .promocion(promo5)
+                                .articulo(insumoJugoDeNaranja)
+                                .cantidadRequerida(1)
+                                .build();
+
+            // Asignar detalles a la promoción
+                        promo5.setPromocionDetalles(List.of(detalle5_1, detalle5_2));
+
+            // Calcular descuento
+                        double precioTotalPromo5 = insumoAguaMineral.getPrecioVenta() + insumoJugoDeNaranja.getPrecioVenta();
+                        double descuentoPromo5 = 100 - (promo5.getPrecioPromocional() / precioTotalPromo5) * 100;
+                        promo5.setDescuento(Math.round(descuentoPromo5 * 100.0) / 100.0);
+
+            // Guardar promoción con detalles
+                        promo5 = promocionRepo.save(promo5);
                     
             // --------------------------------------------------------------------------------------------------------------------------------
             // USUARIOS CLIENTE
