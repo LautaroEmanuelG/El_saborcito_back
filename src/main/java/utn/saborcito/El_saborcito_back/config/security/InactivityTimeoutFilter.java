@@ -6,6 +6,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import utn.saborcito.El_saborcito_back.dto.HorarioAtencionDTO;
@@ -20,21 +21,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static utn.saborcito.El_saborcito_back.config.security.JwtConstants.*;
+
+/**
+ * 🔧 Filtro optimizado para manejo de timeout por inactividad
+ * 
+ * Gestiona timeouts diferenciados por tipo de usuario y valida horarios
+ * laborales.
+ * Utiliza constantes centralizadas y está optimizado para el nuevo sistema JWT.
+ */
 @Component
+@RequiredArgsConstructor
 public class InactivityTimeoutFilter implements Filter {
 
-    private static final long CLIENT_TIMEOUT = 5 * 60 * 1000; // 45 minutos en milisegundos
-    private static final long EMPLOYEE_TIMEOUT = 2 * 60 * 1000; // 30 minutos en milisegundos
+    private static final long CLIENT_TIMEOUT = 45 * 60 * 1000; // 45 minutos
+    private static final long EMPLOYEE_TIMEOUT = 30 * 60 * 1000; // 30 minutos
 
     private final UsuarioRepository usuarioRepository;
     private final HorarioAtencionService horarioAtencionService;
-    private static final Map<String, Long> actividadUsuario = new ConcurrentHashMap<>();
-
-    public InactivityTimeoutFilter(UsuarioRepository usuarioRepository,
-                                   HorarioAtencionService horarioAtencionService) {
-        this.usuarioRepository = usuarioRepository;
-        this.horarioAtencionService = horarioAtencionService;
-    }
+    private static final Map<String, Long> ACTIVIDAD_USUARIO = new ConcurrentHashMap<>();
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -55,7 +60,7 @@ public class InactivityTimeoutFilter implements Filter {
                         .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
                 long now = System.currentTimeMillis() / 1000;
-                Long ultimaActividad = actividadUsuario.get(email);
+                Long ultimaActividad = ACTIVIDAD_USUARIO.get(email);
 
                 long timeout = 0;
 
@@ -64,7 +69,8 @@ public class InactivityTimeoutFilter implements Filter {
 
                     // Validar horario laboral si tiene sucursal asignada
                     if (empleado.getSucursal() != null) {
-                        List<HorarioAtencionDTO> horarios = horarioAtencionService.getHorariosDeSucursal(empleado.getSucursal().getId());
+                        List<HorarioAtencionDTO> horarios = horarioAtencionService
+                                .getHorariosDeSucursal(empleado.getSucursal().getId());
 
                         if (!horarioAtencionService.estaEnHorarioLaboral(horarios)) {
                             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Fuera del horario laboral");
@@ -89,7 +95,7 @@ public class InactivityTimeoutFilter implements Filter {
                 }
 
                 // Actualiza la última actividad
-                actividadUsuario.put(email, now);
+                ACTIVIDAD_USUARIO.put(email, now);
 
             } catch (JWTDecodeException e) {
                 httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Token inválido");
