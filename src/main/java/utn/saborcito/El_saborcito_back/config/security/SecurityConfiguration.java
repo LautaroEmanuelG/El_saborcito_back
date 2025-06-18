@@ -42,12 +42,42 @@ public class SecurityConfiguration {
                                 .exceptionHandling(exception -> exception
                                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/api/auth/**").permitAll()
-                                                .requestMatchers(
-                                                                "/api/usuarios/clientes/registrar",
-                                                                "/api/usuarios/empleados/registrar")
-                                                .permitAll()
-                                                .anyRequest().authenticated())
+                                                // ----------------------------------------------------------------
+                                                // 🔓 CONFIGURACIÓN DE ACCESO PÚBLICO TOTAL (SOLO PARA DESARROLLO)
+                                                // ----------------------------------------------------------------
+                                                // Descomentar la siguiente línea para permitir el acceso a TODOS los
+                                                // endpoints sin autenticación.
+                                                .requestMatchers("/**").permitAll()
+
+                                // ----------------------------------------------------------------
+                                // 🔐 EJEMPLO DE CONFIGURACIÓN DE SEGURIDAD POR ROLES
+                                // ----------------------------------------------------------------
+                                // Una vez que la autenticación funcione, comenta la línea
+                                // .requestMatchers("/**").permitAll()
+                                // y descomenta las siguientes líneas para aplicar seguridad real.
+                                /*
+                                 * // Endpoints públicos (login, registro, etc.)
+                                 * .requestMatchers("/api/auth/**").permitAll()
+                                 * .requestMatchers(
+                                 * "/api/usuarios/clientes/registrar",
+                                 * "/api/usuarios/empleados/registrar")
+                                 * .permitAll()
+                                 * 
+                                 * // Endpoints solo para ADMIN
+                                 * .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                 * 
+                                 * // Endpoints para roles de empleado
+                                 * .requestMatchers("/api/pedidos/**").hasAnyRole("ADMIN", "COCINERO", "CAJERO")
+                                 * .requestMatchers("/api/facturas/**")
+                                 * .requestMatchers("/api/insumos/**").hasAnyRole("ADMIN", "COCINERO")
+                                 * 
+                                 * // Endpoints para clientes
+                                 * .requestMatchers("/api/clientes/mi-perfil/**").hasRole("CLIENTE")
+                                 * 
+                                 * // Cualquier otra petición requiere autenticación
+                                 * .anyRequest().authenticated()
+                                 */
+                                )
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
