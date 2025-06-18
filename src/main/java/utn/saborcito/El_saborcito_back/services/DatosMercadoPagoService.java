@@ -99,9 +99,9 @@ public class DatosMercadoPagoService {
         }
 
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success("http://localhost:5173/pedido-exitoso")
-                .failure("http://localhost:5173/pedido-fallido")
-                .pending("http://localhost:5173/pedido-pendiente")
+                .success("https://el-saborcito-front.vercel.app/pedido-exitoso?status=approved")
+                .failure("https://el-saborcito-front.vercel.app/pedido-exitoso?status=rejected")
+                .pending("https://el-saborcito-front.vercel.app/pedido-exitoso?status=pending")
                 .build();
 
         PreferenceRequest request = PreferenceRequest.builder()
