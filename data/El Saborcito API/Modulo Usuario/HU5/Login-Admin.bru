@@ -1,19 +1,19 @@
 meta {
-  name: Login/PrimerLogin
+  name: Login/Admin
   type: http
-  seq: 5
+  seq: 8
 }
 
 post {
-  url: {{API_BASE_URL}}/empleados/login/manual
+  url: {{API_BASE_URL}}/admin/login
   body: json
   auth: none
 }
 
 body:json {
   {
-    "email": "admin@elsaborcito.com",
-    "password": "Admin123!"
+    "email": "elsaborcito2024@gmail.com",
+    "password": "Saborcito123!"
   }
   
 }

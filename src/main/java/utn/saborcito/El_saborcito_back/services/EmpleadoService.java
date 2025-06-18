@@ -226,6 +226,7 @@ public class EmpleadoService {
                 .build();
     }
 
+
     // --- HU08: Baja lógica del empleado ---
     public void bajaLogicaEmpleado(Long id) {
         Empleado empleado = empleadoRepository.findById(id)

@@ -1,8 +1,5 @@
 # 🍔🍟 El Saborcito - Backend
 
-**Integrantes:** Jenifer Contreras, Lautaro Gonzalez, Matias Araya,Eros Mariotti, Pablo Osorio.
-
----
 
 ## ✨ Características Destacadas
 
@@ -14,6 +11,8 @@
 - Arquitectura modular y escalable, lista para producción.
 
 ---
+=======
+**Integrantes:** Pablo Osorio, Jenifer Contreras, Lautaro Gonzalez, Matias Araya y Eros Mariotti.
 
 ## 📜 Descripción del Proyecto
 
@@ -21,9 +20,11 @@ El backend de "El Saborcito" es una aplicación desarrollada en Java 17 con Spri
 
 El sistema implementa autenticación y autorización con Auth0 y JWT, y cuenta con módulos para registro y gestión de clientes, pedidos (cocina, delivery, take away), facturación, administración de rubros, insumos y productos, compras de ingredientes, estadísticas (ranking de clientes y productos, movimientos monetarios), y manejo de promociones. Además, gestiona imágenes con Cloudinary y genera documentos Excel y PDF usando Apache POI y OpenPDF.
 
+
 El proyecto utiliza Gradle como sistema de construcción, incluye herramientas de desarrollo y testing como spring-boot-devtools y spring-boot-starter-test, y documenta sus endpoints y DTOs con Swagger (OpenAPI). El código fuente está organizado en controladores, servicios, repositorios, modelos, DTOs y mappers (MapStruct y Lombok). La configuración de la base de datos y el servidor se realiza mediante variables de entorno y archivos de propiedades.
 
 El backend está preparado para ser ejecutado localmente tras clonar el repositorio, configurar la base de datos y las variables de entorno, construir el proyecto y arrancar la aplicación. La documentación de la API es accesible vía Swagger UI. El sistema está diseñado para ser robusto, seguro y escalable, facilitando la gestión integral de un restaurante.
+
 
 ---
 
@@ -115,6 +116,8 @@ DB_USERNAME=tu_usuario
 DB_PASSWORD=tu_contraseña
 DB_DRIVER=com.mysql.cj.jdbc.Driver
 JPA_DIALECT=org.hibernate.dialect.MySQLDialect
+
+# Configuración del servidor
 SERVER_PORT=5252
 # ...otros valores (Auth0, Cloudinary, etc.)
 ```
@@ -136,7 +139,6 @@ cd El_saborcito_back
 - Copiar `.env.example` a `.env` y completar los valores.
 
 ### 3️⃣ Construir el proyecto
-
 ```bash
 ./gradlew build
 ```

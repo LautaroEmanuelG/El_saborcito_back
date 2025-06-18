@@ -6,9 +6,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.List;
 
 @Entity
+@DiscriminatorValue("MANUFACTURADO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

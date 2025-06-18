@@ -1,0 +1,54 @@
+# =========================================
+# 🐳 DOCKERIGNORE PARA EL SABORCITO
+# =========================================
+
+# Archivos de desarrollo
+.env
+.env.local
+*.env
+
+# Builds anteriores
+build/
+target/
+.gradle/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Scripts de desarrollo
+scripts/build-local.bat
+scripts/validate-local.bat
+
+# Documentación de desarrollo
+README.md
+DEPLOY_GUIDE.md
+DEPLOYMENT_SUMMARY.md
+
+# Tests
+src/test/
+
+# Bruno API tests
+data/
+
+# Nota: NO excluir gradle/wrapper/gradle-wrapper.jar porque es necesario para el build
+
+# Archivos temporales
+*.tmp
+*.temp
+*.cache

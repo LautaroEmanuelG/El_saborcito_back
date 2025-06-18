@@ -36,5 +36,6 @@ public class Promocion {
     private List<PromocionDetalle> promocionDetalles;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean eliminado = false;
 }

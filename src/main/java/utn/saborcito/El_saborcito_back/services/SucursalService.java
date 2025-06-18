@@ -109,51 +109,41 @@ public class SucursalService {
     }
 
 
-    public ProductoRankingConResumenDTO getRankingProductos(LocalDate desde, LocalDate hasta) {
-        Map<Articulo, Long> conteo = new HashMap<>();
-
-        // 1) artículos individuales
-        detallePedidoRepo.findAllByPedido_FechaPedidoBetween(desde, hasta)
-            .forEach(detalle -> 
-                conteo.merge(detalle.getArticulo(),
-                            detalle.getCantidad().longValue(),
-                            Long::sum)
-            );
-
-        // 2) añadir artículos de las promociones
-        detallePromocionRepo.findAllByPedidoFechaPedidoBetween(desde, hasta)
-            .forEach(dpp -> {
-                Promocion promo = dpp.getPromocion();
-                int veces = dpp.getCantidadPromocion();
-                // cada Articulo dentro de la promo
-                promo.getPromocionDetalles().forEach(pd -> {
-                    long unidades = (long) pd.getCantidadRequerida() * veces;
-                    conteo.merge(pd.getArticulo(), unidades, Long::sum);
-                });
-            });
-
-        // 3) armar DTO y resumen
-        List<ProductoRankingDTO> ranking = new ArrayList<>();
-        long totalManu = 0, totalInsumo = 0;
-
-        for (Map.Entry<Articulo, Long> entry : conteo.entrySet()) {
-            Articulo art = entry.getKey();
-            long cant = entry.getValue();
-            String tipo = art instanceof ArticuloManufacturado ? "MANUFACTURADO" : "INSUMO";
-
-            ranking.add(new ProductoRankingDTO(
-                art.getId(),
-                art.getDenominacion(),
-                cant,
-                tipo
-            ));
-            if (tipo.equals("MANUFACTURADO")) totalManu += cant;
-            else                               totalInsumo += cant;
+public ProductoRankingConResumenDTO getRankingProductos(LocalDate desde, LocalDate hasta) {
+    // 1) Primero, contamos sólo los detalles INDIVIDUAL
+    Map<Articulo, Long> conteo = new HashMap<>();
+    List<DetallePedido> detalles = detallePedidoRepo.findAllByPedido_FechaPedidoBetween(desde, hasta);
+    for (DetallePedido det : detalles) {
+        if (det.getOrigen() == OrigenDetalle.INDIVIDUAL) {
+            conteo.merge(det.getArticulo(), det.getCantidad().longValue(), Long::sum);
         }
-
-        ranking.sort(Comparator.comparingLong(ProductoRankingDTO::getCantidadVendida).reversed());
-        return new ProductoRankingConResumenDTO(ranking, totalManu, totalInsumo);
     }
+
+    // 2) Luego, recorremos cada promo aplicada para sumar los artículos que trae
+    List<DetallePedidoPromocion> promos = detallePromocionRepo.findAllByPedidoFechaPedidoBetween(desde, hasta);
+    for (DetallePedidoPromocion dpp : promos) {
+        Promocion promo = dpp.getPromocion();
+        for (PromocionDetalle pd : promo.getPromocionDetalles()) {
+            long unidades = (long) pd.getCantidadRequerida() * dpp.getCantidadPromocion();
+            conteo.merge(pd.getArticulo(), unidades, Long::sum);
+        }
+    }
+
+    // 3) Construir lista DTO y totales
+    List<ProductoRankingDTO> ranking = new ArrayList<>();
+    long totalManu = 0, totalInsumo = 0;
+    for (Map.Entry<Articulo, Long> e : conteo.entrySet()) {
+        Articulo art = e.getKey();
+        long qty = e.getValue();
+        String tipo = (art instanceof ArticuloManufacturado) ? "MANUFACTURADO" : "INSUMO";
+        ranking.add(new ProductoRankingDTO(art.getId(), art.getDenominacion(), qty, tipo));
+        if (tipo.equals("MANUFACTURADO")) totalManu += qty;
+        else totalInsumo += qty;
+    }
+    ranking.sort(Comparator.comparingLong(ProductoRankingDTO::getCantidadVendida).reversed());
+    return new ProductoRankingConResumenDTO(ranking, totalManu, totalInsumo);
+}
+
 
     // RANKING DE CLIENTES
 

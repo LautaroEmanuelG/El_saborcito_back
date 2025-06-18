@@ -10,11 +10,7 @@ import utn.saborcito.El_saborcito_back.dto.*;
 import utn.saborcito.El_saborcito_back.enums.Rol;
 import utn.saborcito.El_saborcito_back.services.ClienteService;
 import utn.saborcito.El_saborcito_back.services.EmpleadoService;
-import utn.saborcito.El_saborcito_back.services.HorarioAtencionService;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
+import utn.saborcito.El_saborcito_back.services.UsuarioService;
 
 @RestController
 @RequestMapping("/api")
@@ -23,7 +19,7 @@ public class AuthController {
 
     private final ClienteService clienteService;
     private final EmpleadoService empleadoService;
-    private final HorarioAtencionService horarioAtencionService;
+    private final UsuarioService usuarioService;
     private final JwtUtil jwtUtil;
 
     // ✅ HU01 - Registro manual de cliente (o desde Auth0)
@@ -103,6 +99,11 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Rol de empleado no válido");
         }
 
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/admin/login")
+    public ResponseEntity<AuthResponseDTO> loginAdmin(@RequestBody LoginRequest dto) {
+        AuthResponseDTO response = usuarioService.loginAdmin(dto);
         return ResponseEntity.ok(response);
     }
 
