@@ -1,0 +1,15 @@
+meta {
+  name: GET /api/auth/rol
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:5252/api/auth/debug-token
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsZ29uemFsZXouc2FnOThAZ21haWwuY29tIiwicm9sIjoiQ0xJRU5URSIsImlhdCI6MTc1MDIxMzEzNiwiZXhwIjoxNzUwMjEzMTM5fQ.oocPKb1w2xoQHUgipXCTXUmzK6WVe1vUpZJZmRfGcWDPzbRNxPshAdhp2BLF16fyUwdAmCSxJSQYgLgnSTV88A
+}
