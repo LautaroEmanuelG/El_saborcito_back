@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 
 @Component
@@ -47,6 +48,17 @@ public class JwtUtil {
                 .compact();
     }
 
+    // 🔧 Generar token con expiración personalizada (para testing)
+    public String generateTokenWithCustomExpiration(String email, String rol, long expirationInMillis) {
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("rol", rol)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationInMillis))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
     // Extraer cualquier claim del token (helper)
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         return claimsResolver.apply(
@@ -76,5 +88,31 @@ public class JwtUtil {
     // Verifica si el token está expirado
     private boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
+
+    // 🔍 Método para debugging - decodifica token sin validar expiración
+    public Map<String, Object> debugDecodeToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return Map.of(
+                    "subject", claims.getSubject(),
+                    "rol", claims.get("rol", String.class),
+                    "issuedAt", claims.getIssuedAt(),
+                    "expiration", claims.getExpiration(),
+                    "isExpired", claims.getExpiration().before(new Date()),
+                    "timeToExpiry", claims.getExpiration().getTime() - System.currentTimeMillis());
+        } catch (Exception e) {
+            return Map.of("error", "Error al decodificar token: " + e.getMessage());
+        }
+    }
+
+    // 🔧 Obtener la expiración configurada actual
+    public long getCurrentExpirationMs() {
+        return expiration;
     }
 }
