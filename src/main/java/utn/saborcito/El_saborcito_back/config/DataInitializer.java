@@ -1343,7 +1343,221 @@ public class DataInitializer {
                     .articuloInsumo(insumoQueso)
                     .cantidad(50)
                     .build());
+            
+            // ARTICULO MANUFACTURADO 11 - Lomo Especial
+            ArticuloManufacturado lomoEspecial = articuloManufacturadoRepo
+                    .save(ArticuloManufacturado.builder()
+                            .denominacion("Lomo Especial")
+                            .descripcion("Lomo con jamón, queso, huevo frito, lechuga y tomate")
+                            .tiempoEstimadoMinutos(25)
+                            .precioVenta(6200.0)
+                            .categoria(categoriaLomos)
+                            .imagen(imagenLomo)
+                            .build());
 
+            // Detalles de articulo manufacturado 11
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoEspecial)
+                                .articuloInsumo(insumoCarneLomo)
+                                .cantidad(220)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoEspecial)
+                                .articuloInsumo(insumoPanLomo)
+                                .cantidad(1)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoEspecial)
+                                .articuloInsumo(insumoJamon)
+                                .cantidad(80)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoEspecial)
+                                .articuloInsumo(insumoQueso)
+                                .cantidad(60)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoEspecial)
+                                .articuloInsumo(insumoHuevos)
+                                .cantidad(1)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoEspecial)
+                                .articuloInsumo(insumoLechuga)
+                                .cantidad(40)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoEspecial)
+                                .articuloInsumo(insumoTomate)
+                                .cantidad(60)
+                                .build());
+
+            // ARTICULO MANUFACTURADO 12 - Hamburguesa Doble
+                        ArticuloManufacturado hamburguesaDoble = articuloManufacturadoRepo
+                                .save(ArticuloManufacturado.builder()
+                                        .denominacion("Hamburguesa Doble")
+                                        .descripcion("Hamburguesa con doble carne, queso cheddar, panceta y vegetales")
+                                        .tiempoEstimadoMinutos(20)
+                                        .precioVenta(5200.0)
+                                        .categoria(categoriaHamburguesas)
+                                        .imagen(imagenHamburguesa)
+                                        .build());
+
+            // Detalles de articulo manufacturado 12
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(hamburguesaDoble)
+                                .articuloInsumo(insumoCarne)
+                                .cantidad(300) // Doble carne
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(hamburguesaDoble)
+                                .articuloInsumo(insumoPan)
+                                .cantidad(1)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(hamburguesaDoble)
+                                .articuloInsumo(insumoQuesoCheddar)
+                                .cantidad(100)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(hamburguesaDoble)
+                                .articuloInsumo(insumoPanceta)
+                                .cantidad(60)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(hamburguesaDoble)
+                                .articuloInsumo(insumoLechuga)
+                                .cantidad(40)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(hamburguesaDoble)
+                                .articuloInsumo(insumoTomate)
+                                .cantidad(50)
+                                .build());
+
+            // ARTICULO MANUFACTURADO 13 - Pizza Napolitana
+                        ArticuloManufacturado pizzaNapolitana = articuloManufacturadoRepo
+                                .save(ArticuloManufacturado.builder()
+                                        .denominacion("Pizza Napolitana")
+                                        .descripcion("Pizza con mozzarella, tomate, ajo y aceitunas")
+                                        .tiempoEstimadoMinutos(22)
+                                        .precioVenta(5100.0)
+                                        .categoria(categoriaPizzas)
+                                        .imagen(imagenPizza)
+                                        .build());
+
+            // Detalles de articulo manufacturado 13
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaNapolitana)
+                                .articuloInsumo(insumoHarina)
+                                .cantidad(200)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaNapolitana)
+                                .articuloInsumo(insumoSalsaTomate)
+                                .cantidad(120)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaNapolitana)
+                                .articuloInsumo(insumoQueso)
+                                .cantidad(180)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaNapolitana)
+                                .articuloInsumo(insumoTomate)
+                                .cantidad(100)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaNapolitana)
+                                .articuloInsumo(insumoAjo)
+                                .cantidad(15)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaNapolitana)
+                                .articuloInsumo(insumoAceitunas)
+                                .cantidad(50)
+                                .build());
+
+            // ARTICULO MANUFACTURADO 14 - Lomo Vegetariano
+                        ArticuloManufacturado lomoVegetariano = articuloManufacturadoRepo
+                                .save(ArticuloManufacturado.builder()
+                                        .denominacion("Lomo Vegetariano")
+                                        .descripcion("Lomo vegetariano con medallón de plantas, queso y vegetales frescos")
+                                        .tiempoEstimadoMinutos(18)
+                                        .precioVenta(4800.0)
+                                        .categoria(categoriaLomos)
+                                        .imagen(imagenLomo)
+                                        .build());
+
+            // Detalles de articulo manufacturado 14
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoVegetariano)
+                                .articuloInsumo(insumoMedallonVegetariano)
+                                .cantidad(2) // Doble medallón vegetariano
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoVegetariano)
+                                .articuloInsumo(insumoPanLomo)
+                                .cantidad(1)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoVegetariano)
+                                .articuloInsumo(insumoQueso)
+                                .cantidad(60)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoVegetariano)
+                                .articuloInsumo(insumoLechuga)
+                                .cantidad(50)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoVegetariano)
+                                .articuloInsumo(insumoTomate)
+                                .cantidad(70)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(lomoVegetariano)
+                                .articuloInsumo(insumoMorrones)
+                                .cantidad(40)
+                                .build());
+
+            // ARTICULO MANUFACTURADO 15 - Pizza Fugazzeta
+                        ArticuloManufacturado pizzaFugazzeta = articuloManufacturadoRepo
+                                .save(ArticuloManufacturado.builder()
+                                        .denominacion("Pizza Fugazzeta")
+                                        .descripcion("Pizza con abundante cebolla, mozzarella y aceite de oliva")
+                                        .tiempoEstimadoMinutos(20)
+                                        .precioVenta(4700.0)
+                                        .categoria(categoriaPizzas)
+                                        .imagen(imagenPizza)
+                                        .build());
+
+            // Detalles de articulo manufacturado 15
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaFugazzeta)
+                                .articuloInsumo(insumoHarina)
+                                .cantidad(200)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaFugazzeta)
+                                .articuloInsumo(insumoQueso)
+                                .cantidad(200) // Extra queso
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaFugazzeta)
+                                .articuloInsumo(insumoCebolla)
+                                .cantidad(150) // Abundante cebolla
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaFugazzeta)
+                                .articuloInsumo(insumoAceiteOliva)
+                                .cantidad(30)
+                                .build());
+                        amdRepo.save(ArticuloManufacturadoDetalle.builder()
+                                .articuloManufacturado(pizzaFugazzeta)
+                                .articuloInsumo(insumoOregano)
+                                .cantidad(10)
+                                .build());
 
             // --------------------------------------------------------------------------------------------------------------------------------
             // 10. PROMOCIONES
