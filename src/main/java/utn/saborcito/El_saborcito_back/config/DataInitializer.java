@@ -1343,7 +1343,7 @@ public class DataInitializer {
                     .articuloInsumo(insumoQueso)
                     .cantidad(50)
                     .build());
-            
+
             // ARTICULO MANUFACTURADO 11 - Lomo Especial
             ArticuloManufacturado lomoEspecial = articuloManufacturadoRepo
                     .save(ArticuloManufacturado.builder()
@@ -2173,6 +2173,85 @@ public class DataInitializer {
                     .primerLogin(true) // Agregando primerLogin como true para el nuevo empleado
                     .build());
 
+            // --------------------------------------------------------------------------------------------------------------------------------
+            // EMPLEADOS ADICIONALES
+            // --------------------------------------------------------------------------------------------------------------------------------
+
+            // EMPLEADO 4 - Segundo Cocinero
+                        Usuario usuarioCocinero2 = usuarioRepo.save(Usuario.builder()
+                                .auth0Id("auth0|9")
+                                .username("cocinero2")
+                                .email("cocinero2@ejemplo.com")
+                                .password("pass")
+                                .nombre("Carlos")
+                                .apellido("Rodríguez")
+                                .telefono("+547777777")
+                                .fechaNacimiento(LocalDate.of(1991, 9, 18))
+                                .rol(Rol.COCINERO)
+                                .estado(true)
+                                .fechaRegistro(LocalDateTime.now())
+                                .fechaUltimaModificacion(LocalDateTime.now())
+                                .build());
+
+                        Empleado empleadoCocinero2 = empleadoRepo.save(Empleado.builder()
+                                .id(usuarioCocinero2.getId())
+                                .auth0Id(usuarioCocinero2.getAuth0Id())
+                                .username(usuarioCocinero2.getUsername())
+                                .email(usuarioCocinero2.getEmail())
+                                .password(usuarioCocinero2.getPassword())
+                                .nombre(usuarioCocinero2.getNombre())
+                                .apellido(usuarioCocinero2.getApellido())
+                                .telefono(usuarioCocinero2.getTelefono())
+                                .fechaNacimiento(usuarioCocinero2.getFechaNacimiento())
+                                .rol(usuarioCocinero2.getRol())
+                                .estado(usuarioCocinero2.getEstado())
+                                .fechaRegistro(usuarioCocinero2.getFechaRegistro())
+                                .fechaUltimaModificacion(usuarioCocinero2.getFechaUltimaModificacion())
+                                .domicilios(usuarioCocinero2.getDomicilios())
+                                .imagen(usuarioCocinero2.getImagen())
+                                .legajo("C002")
+                                .fechaIngreso(LocalDate.now().minusMonths(4))
+                                .sucursal(sucursal)
+                                .primerLogin(true)
+                                .build());
+
+            // EMPLEADO 5 - Segundo Delivery
+                        Usuario usuarioDelivery2 = usuarioRepo.save(Usuario.builder()
+                                .auth0Id("auth0|10")
+                                .username("delivery2")
+                                .email("delivery2@ejemplo.com")
+                                .password("pass")
+                                .nombre("Luis")
+                                .apellido("Fernández")
+                                .telefono("+548888888")
+                                .fechaNacimiento(LocalDate.of(1996, 12, 5))
+                                .rol(Rol.DELIVERY)
+                                .estado(true)
+                                .fechaRegistro(LocalDateTime.now())
+                                .fechaUltimaModificacion(LocalDateTime.now())
+                                .build());
+
+                        Empleado empleadoDelivery2 = empleadoRepo.save(Empleado.builder()
+                                .id(usuarioDelivery2.getId())
+                                .auth0Id(usuarioDelivery2.getAuth0Id())
+                                .username(usuarioDelivery2.getUsername())
+                                .email(usuarioDelivery2.getEmail())
+                                .password(usuarioDelivery2.getPassword())
+                                .nombre(usuarioDelivery2.getNombre())
+                                .apellido(usuarioDelivery2.getApellido())
+                                .telefono(usuarioDelivery2.getTelefono())
+                                .fechaNacimiento(usuarioDelivery2.getFechaNacimiento())
+                                .rol(usuarioDelivery2.getRol())
+                                .estado(usuarioDelivery2.getEstado())
+                                .fechaRegistro(usuarioDelivery2.getFechaRegistro())
+                                .fechaUltimaModificacion(usuarioDelivery2.getFechaUltimaModificacion())
+                                .domicilios(usuarioDelivery2.getDomicilios())
+                                .imagen(usuarioDelivery2.getImagen())
+                                .legajo("D002")
+                                .fechaIngreso(LocalDate.now().minusWeeks(2))
+                                .sucursal(sucursal)
+                                .primerLogin(true)
+                                .build());
 
 
             // --------------------------------------------------------------------------------------------------------------------------------
