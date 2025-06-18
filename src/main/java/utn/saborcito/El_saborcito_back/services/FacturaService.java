@@ -137,4 +137,14 @@ public class FacturaService {
         }
         facturaRepository.deleteById(id);
     }
+
+    // NUEVO: Reenviar factura por email
+    public void reenviarFacturaPorEmail(Long facturaId) throws IOException {
+        Factura factura = findEntityById(facturaId);
+        facturaRenderService.cargarDetallesPedido(factura.getPedido());
+        List<DetalleFacturaRenderizadoDTO> renderItems = facturaRenderService.construirDetalleFactura(factura.getPedido());
+        byte[] pdfBytes = facturaPdfGenerator.generarFacturaPdf(factura, renderItems);
+        String emailCliente = factura.getPedido().getCliente().getEmail();
+        emailService.enviarFacturaPorEmail(emailCliente, pdfBytes, "factura_" + factura.getId() + ".pdf");
+    }
 }
