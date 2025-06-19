@@ -15,4 +15,6 @@ public class UnidadMedida {
 
     private String denominacion;
 
+    @Builder.Default
+    private Boolean eliminado = false; // ← NUEVO CAMPO
 }

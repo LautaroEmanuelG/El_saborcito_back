@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class UnidadMedidaDTO {
     private Long id;
     private String denominacion;
+    private Boolean eliminado; // ← NUEVO CAMPO
 }
