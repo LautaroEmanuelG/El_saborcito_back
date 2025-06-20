@@ -21,8 +21,10 @@ import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,6 +60,39 @@ public class ArticuloManufacturadoService {
         return repo.findByIdNotDeleted(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Artículo manufacturado no encontrado"));
+    }
+
+    // NUEVO: Verificar si un artículo manufacturado puede ser restaurado
+    public Map<String, Object> canRestoreArticulo(Long id) {
+        Map<String, Object> result = new HashMap<>();
+
+        // Buscar el artículo por ID (debe estar eliminado)
+        ArticuloManufacturado articulo = repo.findByIdDeleted(id)
+                .orElse(null);
+
+        if (articulo == null) {
+            result.put("canRestore", false);
+            result.put("message", "Artículo no encontrado o no está eliminado");
+            return result;
+        }
+
+        // Verificar que la categoría del artículo no esté eliminada
+        Categoria categoria = categoriaRepository.findById(articulo.getCategoria().getId()).orElse(null);
+        if (categoria == null || categoria.isEliminado()) {
+            result.put("canRestore", false);
+            result.put("message", "No se puede restaurar este artículo porque su categoría está eliminada");
+            return result;
+        }
+
+        // Si la categoría es una subcategoría, verificar también su padre
+        if (categoria.getTipoCategoria() != null && categoria.getTipoCategoria().isEliminado()) {
+            result.put("canRestore", false);
+            result.put("message", "No se puede restaurar este artículo porque la categoría padre está eliminada");
+            return result;
+        }
+
+        result.put("canRestore", true);
+        return result;
     }
 
     @Transactional

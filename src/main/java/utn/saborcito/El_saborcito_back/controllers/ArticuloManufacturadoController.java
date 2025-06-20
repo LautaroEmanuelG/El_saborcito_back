@@ -13,6 +13,7 @@ import utn.saborcito.El_saborcito_back.services.ArticuloManufacturadoService;
 import utn.saborcito.El_saborcito_back.services.ProduccionAnalisisService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/manufacturados")
@@ -81,6 +82,12 @@ public class ArticuloManufacturadoController {
     @GetMapping("/{id}/can-be-manufactured")
     public boolean canBeManufactured(@PathVariable Long id) {
         return produccionAnalisisService.puedeProducirseArticuloManufacturado(id);
+    }
+
+    // Verificar si un artículo puede ser restaurado
+    @GetMapping("/{id}/can-restore")
+    public Map<String, Object> canRestoreArticulo(@PathVariable Long id) {
+        return service.canRestoreArticulo(id);
     }
 
     // 🔴 NUEVOS ENDPOINTS PARA VALIDACIÓN DE DUPLICADOS

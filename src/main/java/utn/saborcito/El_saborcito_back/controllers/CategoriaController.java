@@ -6,6 +6,7 @@ import utn.saborcito.El_saborcito_back.dto.CategoriaDTO;
 import utn.saborcito.El_saborcito_back.services.CategoriaService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categorias")
@@ -29,6 +30,12 @@ public class CategoriaController {
     @GetMapping("/{id}")
     public CategoriaDTO getOne(@PathVariable Long id) {
         return service.findById(id);
+    }
+
+    // NUEVO: Verificar si una categoría puede ser restaurada
+    @GetMapping("/{id}/can-restore")
+    public Map<String, Object> canRestoreCategoria(@PathVariable Long id) {
+        return service.canRestoreCategoria(id);
     }
 
     @PostMapping
