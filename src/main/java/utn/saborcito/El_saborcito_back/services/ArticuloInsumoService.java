@@ -16,6 +16,8 @@ import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 import utn.saborcito.El_saborcito_back.repositories.UnidadMedidaRepository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -233,6 +235,13 @@ public class ArticuloInsumoService {
 
     @Transactional
     public ArticuloInsumoDTO restoreDeleted(Long id) {
+        // Verificar si se puede restaurar el artículo
+        Map<String, Object> canRestore = canRestoreArticuloInsumo(id);
+        if (!(Boolean) canRestore.get("canRestore")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    (String) canRestore.get("message"));
+        }
+
         ArticuloInsumo articulo = articuloInsumoRepository.findByIdDeleted(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Artículo insumo eliminado no encontrado"));
@@ -337,6 +346,39 @@ public class ArticuloInsumoService {
         } catch (Exception e) {
             throw new Exception("Error al procesar imagen: " + e.getMessage());
         }
+    }
+
+    // NUEVO: Verificar si un artículo insumo puede ser restaurado
+    public Map<String, Object> canRestoreArticuloInsumo(Long id) {
+        Map<String, Object> result = new HashMap<>();
+
+        // Buscar el artículo por ID (debe estar eliminado)
+        ArticuloInsumo articulo = articuloInsumoRepository.findByIdDeleted(id)
+                .orElse(null);
+
+        if (articulo == null) {
+            result.put("canRestore", false);
+            result.put("message", "Artículo insumo no encontrado o no está eliminado");
+            return result;
+        }
+
+        // Verificar que la categoría del artículo no esté eliminada
+        Categoria categoria = categoriaRepository.findById(articulo.getCategoria().getId()).orElse(null);
+        if (categoria == null || categoria.isEliminado()) {
+            result.put("canRestore", false);
+            result.put("message", "No se puede restaurar este insumo porque su categoría está eliminada");
+            return result;
+        }
+
+        // Si la categoría es una subcategoría, verificar también su padre
+        if (categoria.getTipoCategoria() != null && categoria.getTipoCategoria().isEliminado()) {
+            result.put("canRestore", false);
+            result.put("message", "No se puede restaurar este insumo porque la categoría padre está eliminada");
+            return result;
+        }
+
+        result.put("canRestore", true);
+        return result;
     }
 
     // MÉTODO NUEVO: Consulta si el insumo puede venderse (tiene stock)
