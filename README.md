@@ -153,6 +153,9 @@ cd El_saborcito_back
 
 - Swagger UI: [http://localhost:5252/swagger-ui.html](http://localhost:5252/swagger-ui.html)
 
+### 6️⃣ Registración como Admin
+Para iniciar como ADMIN y poder visualizar los paneles correspondientes y crear empleado, debemos logrearnos con Auth0 y modificar en la db el rol a ADMIN de este nuevo usuario.
+
 ---
 
 ## 🛠️ Requisitos
