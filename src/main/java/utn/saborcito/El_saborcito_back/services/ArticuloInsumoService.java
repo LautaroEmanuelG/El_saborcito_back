@@ -67,6 +67,11 @@ public class ArticuloInsumoService {
     @Transactional
     public ArticuloInsumoDTO save(ArticuloInsumoDTO dto) throws Exception {
         try {
+            // 🔍 Validar duplicados de denominación
+            if (dto.getDenominacion() != null && existsByDenominacion(dto.getDenominacion())) {
+                throw new Exception("Ya existe un insumo activo con la denominación: " + dto.getDenominacion());
+            }
+
             ArticuloInsumo insumo = articuloInsumoMapper.toEntity(dto);
 
             // Inicializar campos de delete lógico si no están establecidos
@@ -128,6 +133,13 @@ public class ArticuloInsumoService {
         try {
             ArticuloInsumo insumoExistente = articuloInsumoRepository.findById(id)
                     .orElseThrow(() -> new Exception("No se encontró el artículo insumo con el ID: " + id));
+
+            // 🔍 Validar duplicados de denominación (solo si cambió)
+            if (dto.getDenominacion() != null &&
+                    !dto.getDenominacion().equals(insumoExistente.getDenominacion()) &&
+                    existsByDenominacion(dto.getDenominacion())) {
+                throw new Exception("Ya existe un insumo activo con la denominación: " + dto.getDenominacion());
+            }
 
             insumoExistente.setDenominacion(dto.getDenominacion());
             insumoExistente.setPrecioVenta(dto.getPrecioVenta());
@@ -332,5 +344,29 @@ public class ArticuloInsumoService {
         ArticuloInsumo insumo = findEntityById(id);
         // Considera sin stock si el stock actual es 0 o menor al mínimo
         return insumo.getStockActual() != null && insumo.getStockActual() > 0;
+    }
+
+    // 🔍 **MÉTODOS PARA VALIDACIÓN DE DUPLICADOS - DENOMINACIÓN**
+
+    /**
+     * Verifica si existe un insumo con la denominación dada (solo activos)
+     */
+    @Transactional
+    public boolean existsByDenominacion(String denominacion) {
+        if (denominacion == null || denominacion.trim().isEmpty()) {
+            return false;
+        }
+        return articuloInsumoRepository.existsByDenominacionAndEliminadoFalse(denominacion.trim());
+    }
+
+    /**
+     * Verifica si existe un insumo con la denominación dada (incluyendo eliminados)
+     */
+    @Transactional
+    public boolean existsByDenominacionIncludingDeleted(String denominacion) {
+        if (denominacion == null || denominacion.trim().isEmpty()) {
+            return false;
+        }
+        return articuloInsumoRepository.existsByDenominacionIncludingDeleted(denominacion.trim());
     }
 }

@@ -62,6 +62,9 @@ public class ArticuloManufacturadoService {
 
     @Transactional
     public ArticuloManufacturadoDTO save(ArticuloManufacturadoDTO dto) {
+        // Validar denominación al inicio del método
+        validateDenominacion(dto.getDenominacion(), null);
+
         ArticuloManufacturado articuloManufacturado = mapper.toEntity(dto);
 
         // Inicializar campos de delete lógico si no están establecidos
@@ -132,6 +135,9 @@ public class ArticuloManufacturadoService {
 
     @Transactional
     public ArticuloManufacturadoDTO update(Long id, ArticuloManufacturadoDTO dto) {
+        // Validar denominación al inicio del método
+        validateDenominacion(dto.getDenominacion(), id);
+
         ArticuloManufacturado articuloExistente = repo.findByIdNotDeleted(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Artículo manufacturado no encontrado para actualizar"));
@@ -250,8 +256,68 @@ public class ArticuloManufacturadoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Artículo manufacturado eliminado no encontrado"));
         repo.delete(articulo);
-    } // Métodos auxiliares
+    }
 
+    // 🔴 NUEVOS MÉTODOS PARA VALIDACIÓN DE DUPLICADOS
+    /**
+     * Valida si existe un artículo manufacturado con la denominación dada
+     * @param denominacion denominación a validar
+     * @param excludeId ID a excluir de la validación (para edición)
+     * @return true si existe un duplicado
+     */
+    public boolean existsByDenominacion(String denominacion, Long excludeId) {
+        if (denominacion == null || denominacion.trim().isEmpty()) {
+            return false;
+        }
+
+        String cleanDenominacion = denominacion.trim();
+
+        if (excludeId != null) {
+            return repo.existsByDenominacionIgnoreCaseAndIdNot(cleanDenominacion, excludeId);
+        } else {
+            return repo.existsByDenominacionIgnoreCase(cleanDenominacion);
+        }
+    }
+
+    /**
+     * Valida si existe un artículo manufacturado con la denominación dada (incluyendo eliminados)
+     * @param denominacion denominación a validar
+     * @param excludeId ID a excluir de la validación (para edición)
+     * @return true si existe un duplicado
+     */
+    public boolean existsByDenominacionIncludingDeleted(String denominacion, Long excludeId) {
+        if (denominacion == null || denominacion.trim().isEmpty()) {
+            return false;
+        }
+
+        String cleanDenominacion = denominacion.trim();
+
+        if (excludeId != null) {
+            return repo.existsByDenominacionIgnoreCaseAndIdNotIncludingDeleted(cleanDenominacion, excludeId);
+        } else {
+            return repo.existsByDenominacionIgnoreCaseIncludingDeleted(cleanDenominacion);
+        }
+    }
+
+    /**
+     * Valida denominación antes de guardar/actualizar
+     * @param denominacion denominación a validar
+     * @param excludeId ID a excluir (null para creación)
+     * @throws ResponseStatusException si hay duplicado
+     */
+    private void validateDenominacion(String denominacion, Long excludeId) {
+        if (denominacion == null || denominacion.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La denominación es obligatoria");
+        }
+
+        if (existsByDenominacion(denominacion, excludeId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Ya existe un artículo manufacturado con la denominación: " + denominacion.trim());
+        }
+    }
+
+    // Métodos auxiliares
     public List<ArticuloManufacturadoDTO> findAllByCategoriaId(Long categoriaId) {
         return repo.findAllByCategoria_Id(categoriaId).stream()
                 .map(mapper::toDTO)
@@ -354,7 +420,7 @@ public class ArticuloManufacturadoService {
      */
     @Transactional
     public utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto uploadAndAssignImagen(Long articuloId,
-            org.springframework.web.multipart.MultipartFile file) {
+                                                                                             org.springframework.web.multipart.MultipartFile file) {
         try {
             // Verificar que el artículo existe
             ArticuloManufacturado articulo = repo.findByIdNotDeleted(articuloId)

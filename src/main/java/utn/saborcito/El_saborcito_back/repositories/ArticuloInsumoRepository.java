@@ -39,4 +39,14 @@ public interface ArticuloInsumoRepository extends JpaRepository<ArticuloInsumo, 
 
     @Query("SELECT ai FROM ArticuloInsumo ai WHERE ai.id = :id AND ai.eliminado = true")
     Optional<ArticuloInsumo> findByIdDeleted(@Param("id") Long id);
+
+    // 🔍 **MÉTODOS PARA VALIDACIÓN DE DUPLICADOS - DENOMINACIÓN**
+
+    // Verificar si existe una denominación entre los insumos activos
+    @Query("SELECT CASE WHEN COUNT(ai) > 0 THEN true ELSE false END FROM ArticuloInsumo ai WHERE LOWER(ai.denominacion) = LOWER(:denominacion) AND ai.eliminado = false")
+    boolean existsByDenominacionAndEliminadoFalse(@Param("denominacion") String denominacion);
+
+    // Verificar si existe una denominación entre todos los insumos (incluyendo eliminados)
+    @Query("SELECT CASE WHEN COUNT(ai) > 0 THEN true ELSE false END FROM ArticuloInsumo ai WHERE LOWER(ai.denominacion) = LOWER(:denominacion)")
+    boolean existsByDenominacionIncludingDeleted(@Param("denominacion") String denominacion);
 }

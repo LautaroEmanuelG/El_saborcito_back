@@ -83,7 +83,31 @@ public class ArticuloManufacturadoController {
         return produccionAnalisisService.puedeProducirseArticuloManufacturado(id);
     }
 
-    // 🌟 Nuevo endpoint para subir imagen a artículo manufacturado
+    // 🔴 NUEVOS ENDPOINTS PARA VALIDACIÓN DE DUPLICADOS
+
+    /**
+     * 🔍 Endpoint para validar denominación (solo artículos activos)
+     */
+    @GetMapping("/validate-denominacion")
+    public ResponseEntity<Boolean> validateDenominacion(
+            @RequestParam String denominacion,
+            @RequestParam(required = false) Long excludeId) {
+        boolean exists = service.existsByDenominacion(denominacion, excludeId);
+        return ResponseEntity.ok(exists);
+    }
+
+    /**
+     * 🔍 Endpoint para validar denominación (incluyendo artículos eliminados)
+     */
+    @GetMapping("/validate-denominacion-all")
+    public ResponseEntity<Boolean> validateDenominacionIncludingDeleted(
+            @RequestParam String denominacion,
+            @RequestParam(required = false) Long excludeId) {
+        boolean exists = service.existsByDenominacionIncludingDeleted(denominacion, excludeId);
+        return ResponseEntity.ok(exists);
+    }
+
+    // 🌟 Endpoint para subir imagen a artículo manufacturado
     @PostMapping(value = "/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImagenUploadResponseDto> uploadImagenArticuloManufacturado(
             @PathVariable Long id,

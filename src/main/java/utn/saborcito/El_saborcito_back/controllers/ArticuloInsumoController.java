@@ -102,6 +102,30 @@ public class ArticuloInsumoController {
         }
     }
 
+    // 🔍 **ENDPOINTS PARA VALIDACIÓN DE DUPLICADOS - DENOMINACIÓN**
+
+    @GetMapping("/validate-denominacion")
+    public ResponseEntity<Boolean> validateDenominacion(@RequestParam String denominacion) {
+        try {
+            boolean exists = articuloInsumoService.existsByDenominacion(denominacion);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            log.error("Error al validar denominación de insumo: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
+
+    @GetMapping("/validate-denominacion-all")
+    public ResponseEntity<Boolean> validateDenominacionIncludingDeleted(@RequestParam String denominacion) {
+        try {
+            boolean exists = articuloInsumoService.existsByDenominacionIncludingDeleted(denominacion);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            log.error("Error al validar denominación de insumo (incluyendo eliminados): {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
+
     @PostMapping("/deleted/{id}/restore")
     public ResponseEntity<ArticuloInsumoDTO> restore(@PathVariable Long id) {
         try {
