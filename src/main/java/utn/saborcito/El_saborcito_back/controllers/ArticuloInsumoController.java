@@ -11,6 +11,8 @@ import utn.saborcito.El_saborcito_back.dto.ArticuloInsumoDTO;
 import utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto;
 import utn.saborcito.El_saborcito_back.services.ArticuloInsumoService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -98,6 +100,44 @@ public class ArticuloInsumoController {
             boolean puedeVenderse = articuloInsumoService.puedeVenderse(id);
             return ResponseEntity.ok(puedeVenderse);
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
+
+    // Verificar si un artículo insumo puede ser restaurado
+    @GetMapping("/{id}/can-restore")
+    public ResponseEntity<Map<String, Object>> canRestoreArticuloInsumo(@PathVariable Long id) {
+        try {
+            Map<String, Object> response = articuloInsumoService.canRestoreArticuloInsumo(id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("canRestore", false);
+            errorResponse.put("message", "Error al verificar si se puede restaurar: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    // 🔍 **ENDPOINTS PARA VALIDACIÓN DE DUPLICADOS - DENOMINACIÓN**
+
+    @GetMapping("/validate-denominacion")
+    public ResponseEntity<Boolean> validateDenominacion(@RequestParam String denominacion) {
+        try {
+            boolean exists = articuloInsumoService.existsByDenominacion(denominacion);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            log.error("Error al validar denominación de insumo: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
+
+    @GetMapping("/validate-denominacion-all")
+    public ResponseEntity<Boolean> validateDenominacionIncludingDeleted(@RequestParam String denominacion) {
+        try {
+            boolean exists = articuloInsumoService.existsByDenominacionIncludingDeleted(denominacion);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            log.error("Error al validar denominación de insumo (incluyendo eliminados): {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
     }

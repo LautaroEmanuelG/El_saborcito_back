@@ -15,7 +15,9 @@ import utn.saborcito.El_saborcito_back.repositories.ArticuloInsumoRepository;
 import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,6 +44,38 @@ public class CategoriaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Categoría no encontrada con ID: " + id));
         return categoriaMapper.toDTO(categoria);
+    }
+
+    // NUEVO: Verificar si una categoría puede ser restaurada
+    public Map<String, Object> canRestoreCategoria(Long id) {
+        Map<String, Object> result = new HashMap<>();
+
+        // Buscar la categoría por ID (eliminada o no)
+        Categoria categoria = repo.findById(id)
+                .orElse(null);
+
+        if (categoria == null || !categoria.isEliminado()) {
+            result.put("canRestore", false);
+            result.put("message", "Categoría no encontrada o no está eliminada");
+            return result;
+        }
+
+        // Si es una categoría padre (tipoCategoria == null), siempre se puede restaurar
+        if (categoria.getTipoCategoria() == null) {
+            result.put("canRestore", true);
+            return result;
+        }
+
+        // Si es una subcategoría, verificar que su padre no esté eliminado
+        Categoria categoriaPadre = categoria.getTipoCategoria();
+        if (categoriaPadre.isEliminado()) {
+            result.put("canRestore", false);
+            result.put("message", "No se puede restaurar esta subcategoría porque su categoría padre está eliminada");
+            return result;
+        }
+
+        result.put("canRestore", true);
+        return result;
     }
 
     public CategoriaDTO save(CategoriaDTO categoriaDTO) {

@@ -29,4 +29,18 @@ public interface ArticuloManufacturadoRepository extends JpaRepository<ArticuloM
 
     @Query("SELECT am FROM ArticuloManufacturado am WHERE am.id = :id AND am.eliminado = true")
     Optional<ArticuloManufacturado> findByIdDeleted(@Param("id") Long id);
+
+    // Agregar estos métodos al final de la clase
+    @Query("SELECT COUNT(am) > 0 FROM ArticuloManufacturado am WHERE LOWER(am.denominacion) = LOWER(:denominacion) AND am.eliminado = false")
+    boolean existsByDenominacionIgnoreCase(@Param("denominacion") String denominacion);
+
+    @Query("SELECT COUNT(am) > 0 FROM ArticuloManufacturado am WHERE LOWER(am.denominacion) = LOWER(:denominacion) AND am.id != :id AND am.eliminado = false")
+    boolean existsByDenominacionIgnoreCaseAndIdNot(@Param("denominacion") String denominacion, @Param("id") Long id);
+
+    // Opcional: Para validar contra todos (incluso eliminados)
+    @Query("SELECT COUNT(am) > 0 FROM ArticuloManufacturado am WHERE LOWER(am.denominacion) = LOWER(:denominacion)")
+    boolean existsByDenominacionIgnoreCaseIncludingDeleted(@Param("denominacion") String denominacion);
+
+    @Query("SELECT COUNT(am) > 0 FROM ArticuloManufacturado am WHERE LOWER(am.denominacion) = LOWER(:denominacion) AND am.id != :id")
+    boolean existsByDenominacionIgnoreCaseAndIdNotIncludingDeleted(@Param("denominacion") String denominacion, @Param("id") Long id);
 }
