@@ -24,7 +24,7 @@ public class ProduccionAnalisisService {
 
     /**
      * 🎯 Verifica si un artículo manufacturado específico puede fabricarse
-     * 
+     *
      * @param manufacturadoId ID del artículo manufacturado
      * @return true si puede fabricarse, false si no
      */
@@ -34,18 +34,18 @@ public class ProduccionAnalisisService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Artículo manufacturado no encontrado"));
 
-        return puedeProducirseManufacturado(manufacturado, 1);
+        return puedeProducirseManufacturado(manufacturado, 1.0);
     }
 
     /**
      * 🎯 Verifica si un artículo manufacturado puede fabricarse con una cantidad
      * específica
-     * 
+     *
      * @param manufacturado El artículo manufacturado
      * @param cantidad      Cantidad a producir
      * @return true si puede fabricarse, false si no
      */
-    public boolean puedeProducirseManufacturado(ArticuloManufacturado manufacturado, Integer cantidad) {
+    public boolean puedeProducirseManufacturado(ArticuloManufacturado manufacturado, Double cantidad) {
         if (manufacturado.getArticuloManufacturadoDetalles() == null ||
                 manufacturado.getArticuloManufacturadoDetalles().isEmpty()) {
             return false;
@@ -55,20 +55,20 @@ public class ProduccionAnalisisService {
             if (detalle.getArticuloInsumo() == null || detalle.getCantidad() == null) {
                 return false;
             }
-            Integer stockActual = detalle.getArticuloInsumo().getStockActual();
-            Integer cantidadNecesaria = detalle.getCantidad() * cantidad;
+            Double stockActual = detalle.getArticuloInsumo().getStockActual();
+            Double cantidadNecesaria = detalle.getCantidad() * cantidad;
             return stockActual != null && stockActual >= cantidadNecesaria;
         });
     }
 
     /**
      * 🎯 Verifica si un artículo insumo tiene stock suficiente
-     * 
+     *
      * @param insumo   El artículo insumo
      * @param cantidad Cantidad requerida
      * @return true si hay stock suficiente, false si no
      */
-    public boolean tieneStockSuficienteInsumo(ArticuloInsumo insumo, Integer cantidad) {
+    public boolean tieneStockSuficienteInsumo(ArticuloInsumo insumo, Double cantidad) {
         if (insumo.getStockActual() == null) {
             return false;
         }
@@ -81,15 +81,18 @@ public class ProduccionAnalisisService {
 
     /**
      * 🎯 Análisis completo de producción para múltiples artículos
-     * 
+     *
      * @param articulosConCantidad Mapa de ID de artículo -> cantidad
      * @return DTO con análisis completo
      */
     @Transactional(readOnly = true)
-    public ProduccionAnalisisDTO analizarProduccionCompleta(Map<Long, Integer> articulosConCantidad) {
-        ProduccionAnalisisDTO resultado = new ProduccionAnalisisDTO(); // Mapa para almacenar la cantidad máxima
-                                                                       // producible de cada artículo
-        Map<Long, Integer> maximoProducible = new HashMap<>();// Lista de productos con problemas
+    public ProduccionAnalisisDTO analizarProduccionCompleta(Map<Long, Double> articulosConCantidad) {
+        ProduccionAnalisisDTO resultado = new ProduccionAnalisisDTO();
+
+        // Mapa para almacenar la cantidad máxima producible de cada artículo
+        Map<Long, Double> maximoProducible = new HashMap<>();
+
+        // Lista de productos con problemas
         List<ProduccionAnalisisDTO.ProductoConProblema> productosConProblemas = new ArrayList<>();
 
         // Lista de insumos insuficientes
@@ -97,9 +100,9 @@ public class ProduccionAnalisisService {
 
         boolean sePuedeProducirCompleto = true;
 
-        for (Map.Entry<Long, Integer> entrada : articulosConCantidad.entrySet()) {
+        for (Map.Entry<Long, Double> entrada : articulosConCantidad.entrySet()) {
             Long articuloId = entrada.getKey();
-            Integer cantidad = entrada.getValue();
+            Double cantidad = entrada.getValue();
 
             // Intentar encontrar como ArticuloInsumo
             Optional<ArticuloInsumo> articuloInsumo = articuloInsumoRepository.findByIdNotDeleted(articuloId);
@@ -115,7 +118,7 @@ public class ProduccionAnalisisService {
                     if (manufacturado.isEmpty()) {
                         // Es un insumo solo para elaborar, no se puede vender
                         agregarProductoConProblema(productosConProblemas, articuloId,
-                                "Artículo es solo para elaboración, no se puede vender directamente", 0);
+                                "Artículo es solo para elaboración, no se puede vender directamente", 0.0);
                         sePuedeProducirCompleto = false;
                         continue;
                     }
@@ -128,7 +131,7 @@ public class ProduccionAnalisisService {
                     agregarProductoConProblema(productosConProblemas, articuloId,
                             "Stock insuficiente", insumo.getStockActual());
                     sePuedeProducirCompleto = false;
-                    maximoProducible.put(articuloId, insumo.getStockActual() != null ? insumo.getStockActual() : 0);
+                    maximoProducible.put(articuloId, insumo.getStockActual() != null ? insumo.getStockActual() : 0.0);
                 } else {
                     maximoProducible.put(articuloId, insumo.getStockActual());
                 }
@@ -145,21 +148,21 @@ public class ProduccionAnalisisService {
                 if (manufacturado.getArticuloManufacturadoDetalles() == null ||
                         manufacturado.getArticuloManufacturadoDetalles().isEmpty()) {
                     agregarProductoConProblema(productosConProblemas, articuloId,
-                            "No tiene receta definida", 0);
+                            "No tiene receta definida", 0.0);
                     sePuedeProducirCompleto = false;
-                    maximoProducible.put(articuloId, 0);
+                    maximoProducible.put(articuloId, 0.0);
                     continue;
                 }
 
                 // Calcular cantidad máxima que se puede producir
-                int cantidadMaxima = calcularCantidadMaximaManufacturado(manufacturado);
+                double cantidadMaxima = calcularCantidadMaximaManufacturado(manufacturado);
                 maximoProducible.put(articuloId, cantidadMaxima);
 
                 if (cantidadMaxima < cantidad) {
                     // Agregar problemas específicos de insumos
                     for (ArticuloManufacturadoDetalle detalle : manufacturado.getArticuloManufacturadoDetalles()) {
                         ArticuloInsumo insumo = detalle.getArticuloInsumo();
-                        Integer cantidadNecesaria = detalle.getCantidad() * cantidad;
+                        Double cantidadNecesaria = detalle.getCantidad() * cantidad;
 
                         if (insumo.getStockActual() == null || insumo.getStockActual() < cantidadNecesaria) {
                             agregarInsumoInsuficiente(insumosInsuficientes, insumo.getId(),
@@ -176,10 +179,12 @@ public class ProduccionAnalisisService {
 
             // Si no se encuentra ni como insumo ni como manufacturado
             agregarProductoConProblema(productosConProblemas, articuloId,
-                    "Artículo no encontrado", 0);
+                    "Artículo no encontrado", 0.0);
             sePuedeProducirCompleto = false;
-            maximoProducible.put(articuloId, 0);
-        } // Completar resultado
+            maximoProducible.put(articuloId, 0.0);
+        }
+
+        // Completar resultado
         resultado.setSePuedeProducirCompleto(sePuedeProducirCompleto);
         resultado.setProductosConProblemas(productosConProblemas);
         resultado.setInsumosInsuficientes(insumosInsuficientes);
@@ -193,25 +198,25 @@ public class ProduccionAnalisisService {
     /**
      * 🔢 Calcula la cantidad máxima que se puede producir de un manufacturado
      */
-    private int calcularCantidadMaximaManufacturado(ArticuloManufacturado manufacturado) {
+    private double calcularCantidadMaximaManufacturado(ArticuloManufacturado manufacturado) {
         return manufacturado.getArticuloManufacturadoDetalles().stream()
-                .mapToInt(detalle -> {
+                .mapToDouble(detalle -> {
                     ArticuloInsumo insumo = detalle.getArticuloInsumo();
                     if (insumo.getStockActual() == null || detalle.getCantidad() == null
-                            || detalle.getCantidad() == 0) {
-                        return 0;
+                            || detalle.getCantidad() == 0.0) {
+                        return 0.0;
                     }
                     return insumo.getStockActual() / detalle.getCantidad();
                 })
                 .min()
-                .orElse(0);
+                .orElse(0.0);
     }
 
     /**
      * 📝 Agrega un producto con problema a la lista
      */
     private void agregarProductoConProblema(List<ProduccionAnalisisDTO.ProductoConProblema> lista,
-            Long articuloId, String problema, Integer cantidadMaxima) {
+                                            Long articuloId, String problema, Double cantidadMaxima) {
         ProduccionAnalisisDTO.ProductoConProblema producto = ProduccionAnalisisDTO.ProductoConProblema.builder()
                 .articuloId(articuloId)
                 .denominacion(problema)
@@ -225,7 +230,7 @@ public class ProduccionAnalisisService {
      * 📝 Agrega un insumo insuficiente a la lista
      */
     private void agregarInsumoInsuficiente(List<ProduccionAnalisisDTO.InsumoInsuficiente> lista,
-            Long insumoId, String nombre, Integer stockActual, Integer cantidadNecesaria) {
+                                           Long insumoId, String nombre, Double stockActual, Double cantidadNecesaria) {
         // Verificar si ya existe en la lista y sumar
         Optional<ProduccionAnalisisDTO.InsumoInsuficiente> existente = lista.stream()
                 .filter(i -> i.getInsumoId().equals(insumoId))
@@ -235,14 +240,14 @@ public class ProduccionAnalisisService {
             Double stockRequeridoAnterior = existente.get().getCantidadNecesaria();
             existente.get().setCantidadNecesaria(stockRequeridoAnterior + cantidadNecesaria);
             existente.get().setStockFaltante(
-                    Math.max(0.0, existente.get().getCantidadNecesaria() - stockActual));
+                    Math.max(0.0, existente.get().getCantidadNecesaria() - (stockActual != null ? stockActual : 0.0)));
         } else {
             ProduccionAnalisisDTO.InsumoInsuficiente insumo = ProduccionAnalisisDTO.InsumoInsuficiente.builder()
                     .insumoId(insumoId)
                     .denominacion(nombre)
-                    .stockDisponible(stockActual != null ? stockActual.doubleValue() : 0.0)
-                    .cantidadNecesaria(cantidadNecesaria.doubleValue())
-                    .stockFaltante(Math.max(0.0, cantidadNecesaria - (stockActual != null ? stockActual : 0)))
+                    .stockDisponible(stockActual != null ? stockActual : 0.0)
+                    .cantidadNecesaria(cantidadNecesaria)
+                    .stockFaltante(Math.max(0.0, cantidadNecesaria - (stockActual != null ? stockActual : 0.0)))
                     .build();
             lista.add(insumo);
         }

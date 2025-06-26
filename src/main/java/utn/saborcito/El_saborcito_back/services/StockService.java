@@ -25,7 +25,7 @@ public class StockService {
 
     /**
      * Descuenta stock para un pedido completo incluyendo promociones
-     * 
+     *
      * @param pedido El pedido del cual descontar stock
      */
     @Transactional
@@ -41,9 +41,9 @@ public class StockService {
         // Descontar stock de detalles normales
         for (DetallePedido detalle : pedido.getDetalles()) {
             if (detalle.getArticulo() instanceof ArticuloInsumo insumo) {
-                descontarStockInsumo(insumo, detalle.getCantidad());
+                descontarStockInsumo(insumo, detalle.getCantidad().doubleValue());    // ✅ Conversión a Double
             } else if (detalle.getArticulo() instanceof ArticuloManufacturado manufacturado) {
-                descontarStockManufacturado(manufacturado, detalle.getCantidad());
+                descontarStockManufacturado(manufacturado, detalle.getCantidad().doubleValue());    // ✅ Conversión a Double
             }
         }
 
@@ -59,24 +59,27 @@ public class StockService {
      * Valida que hay suficiente stock antes de procesar el pedido incluyendo
      * promociones
      * Usa el servicio unificado de producción para evitar duplicación
-     * 
+     *
      * @param pedido El pedido a validar
      */
     private void validarStockSuficienteConPromociones(Pedido pedido) {
         // Convertir el pedido a formato Map para usar el servicio unificado
-        Map<Long, Integer> articulosMap = new HashMap<>();
+        Map<Long, Double> articulosMap = new HashMap<>();    // ✅ Cambio Integer a Double
 
         // Agregar artículos de detalles normales
         for (DetallePedido detalle : pedido.getDetalles()) {
-            articulosMap.merge(detalle.getArticulo().getId(), detalle.getCantidad(), Integer::sum);
+            articulosMap.merge(detalle.getArticulo().getId(),
+                    detalle.getCantidad().doubleValue(),    // ✅ Conversión a Double
+                    Double::sum);    // ✅ Cambio Integer::sum a Double::sum
         }
 
         // Agregar artículos de promociones (si existen)
         if (pedido.getPromociones() != null) {
             for (DetallePedidoPromocion promocion : pedido.getPromociones()) {
                 for (PromocionDetalle detalle : promocion.getPromocion().getPromocionDetalles()) {
-                    Integer cantidadTotal = detalle.getCantidadRequerida() * promocion.getCantidadPromocion();
-                    articulosMap.merge(detalle.getArticulo().getId(), cantidadTotal, Integer::sum);
+                    Double cantidadTotal = detalle.getCantidadRequerida().doubleValue() *
+                            promocion.getCantidadPromocion().doubleValue();    // ✅ Conversión a Double
+                    articulosMap.merge(detalle.getArticulo().getId(), cantidadTotal, Double::sum);    // ✅ Double::sum
                 }
             }
         }
@@ -93,7 +96,7 @@ public class StockService {
 
     /**
      * 🎁 Descuenta stock específico por una promoción aplicada
-     * 
+     *
      * @param promocion La promoción aplicada
      */
     private void descontarStockPorPromocion(DetallePedidoPromocion promocion) {
@@ -102,7 +105,8 @@ public class StockService {
         }
 
         for (PromocionDetalle detalle : promocion.getPromocion().getPromocionDetalles()) {
-            Integer cantidadTotal = detalle.getCantidadRequerida() * promocion.getCantidadPromocion();
+            Double cantidadTotal = detalle.getCantidadRequerida().doubleValue() *
+                    promocion.getCantidadPromocion().doubleValue();    // ✅ Conversión a Double
 
             if (detalle.getArticulo() instanceof ArticuloInsumo insumo) {
                 // Nota: El stock ya se descontó en el detalle normal,
@@ -118,29 +122,29 @@ public class StockService {
 
     /**
      * Descuenta stock de un insumo
-     * 
+     *
      * @param insumo   El insumo
      * @param cantidad Cantidad a descontar
      */
-    private void descontarStockInsumo(ArticuloInsumo insumo, Integer cantidad) {
+    private void descontarStockInsumo(ArticuloInsumo insumo, Double cantidad) {    // ✅ Cambio Integer a Double
         insumo.setStockActual(insumo.getStockActual() - cantidad);
         articuloInsumoRepository.save(insumo);
     }
 
     /**
      * Descuenta stock para un artículo manufacturado
-     * 
+     *
      * @param manufacturado El artículo manufacturado
      * @param cantidad      Cantidad de manufacturados a producir
      */
-    private void descontarStockManufacturado(ArticuloManufacturado manufacturado, Integer cantidad) {
+    private void descontarStockManufacturado(ArticuloManufacturado manufacturado, Double cantidad) {    // ✅ Cambio Integer a Double
         if (manufacturado.getArticuloManufacturadoDetalles() == null) {
             return;
         }
 
         for (ArticuloManufacturadoDetalle detalle : manufacturado.getArticuloManufacturadoDetalles()) {
             ArticuloInsumo insumo = detalle.getArticuloInsumo();
-            Integer cantidadADescontar = detalle.getCantidad() * cantidad;
+            Double cantidadADescontar = detalle.getCantidad() * cantidad;    // ✅ Ya son Double ambos
             descontarStockInsumo(insumo, cantidadADescontar);
         }
     }

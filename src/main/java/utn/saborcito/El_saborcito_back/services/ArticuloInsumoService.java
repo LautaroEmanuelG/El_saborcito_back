@@ -88,10 +88,10 @@ public class ArticuloInsumoService {
             if (dto.getPrecioCompra() == null || dto.getPrecioCompra() < 0) {
                 throw new Exception("El precio de compra no puede ser negativo.");
             }
-            if (dto.getStockActual() == null || dto.getStockActual() < 0) {
+            if (dto.getStockActual() == null || dto.getStockActual() < 0.0) {
                 throw new Exception("El stock actual no puede ser negativo.");
             }
-            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0) {
+            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0.0) {
                 throw new Exception("El stock mínimo no puede ser negativo.");
             }
             if (dto.getEsParaElaborar() == null) {
@@ -152,12 +152,12 @@ public class ArticuloInsumoService {
             }
             insumoExistente.setPrecioCompra(dto.getPrecioCompra());
 
-            if (dto.getStockActual() == null || dto.getStockActual() < 0) {
+            if (dto.getStockActual() == null || dto.getStockActual() < 0.0) {
                 throw new Exception("El stock actual no puede ser negativo.");
             }
             insumoExistente.setStockActual(dto.getStockActual());
 
-            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0) {
+            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0.0) {
                 throw new Exception("El stock mínimo no puede ser negativo.");
             }
             insumoExistente.setStockMinimo(dto.getStockMinimo());
@@ -385,7 +385,7 @@ public class ArticuloInsumoService {
     public boolean puedeVenderse(Long id) throws Exception {
         ArticuloInsumo insumo = findEntityById(id);
         // Considera sin stock si el stock actual es 0 o menor al mínimo
-        return insumo.getStockActual() != null && insumo.getStockActual() > 0;
+        return insumo.getStockActual() != null && insumo.getStockActual() > 0.0;
     }
 
     // 🔍 **MÉTODOS PARA VALIDACIÓN DE DUPLICADOS - DENOMINACIÓN**

@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class ArticuloInsumoDTO extends ArticuloDTO {
     private Double precioCompra;
-    private Integer stockActual;
-    private Integer stockMinimo; // Cambiado aquí
+    private Double stockActual;    // ✅ Cambio de Integer a Double
+    private Double stockMinimo;    // ✅ Cambio de Integer a Double
     private Boolean esParaElaborar;
     private UnidadMedidaDTO unidadMedida; // Para mapear completo
     private CategoriaDTO categoria;

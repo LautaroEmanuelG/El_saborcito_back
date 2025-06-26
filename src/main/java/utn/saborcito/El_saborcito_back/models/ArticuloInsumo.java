@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 public class ArticuloInsumo extends Articulo {
 
     private Double precioCompra;
-    private Integer stockActual;
-    private Integer stockMinimo; // Cambiado aquí
+    private Double stockActual;    // ✅ Cambio de Integer a Double
+    private Double stockMinimo;    // ✅ Cambio de Integer a Double
     private Boolean esParaElaborar;
 }

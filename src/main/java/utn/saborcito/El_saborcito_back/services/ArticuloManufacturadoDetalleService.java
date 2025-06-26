@@ -60,8 +60,8 @@ public class ArticuloManufacturadoDetalleService {
         detalle.setArticuloManufacturado(manufacturado);
 
         // Validar cantidad
-        if (dto.getCantidad() == null || dto.getCantidad() <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser un entero positivo.");
+        if (dto.getCantidad() == null || dto.getCantidad() <= 0.0) {
+            throw new IllegalArgumentException("La cantidad debe ser un número positivo.");
         }
         detalle.setCantidad(dto.getCantidad());
 
@@ -76,8 +76,8 @@ public class ArticuloManufacturadoDetalleService {
                         "Detalle de artículo manufacturado no encontrado con id: " + id));
 
         // Actualizar cantidad
-        if (dto.getCantidad() == null || dto.getCantidad() <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser un entero positivo.");
+        if (dto.getCantidad() == null || dto.getCantidad() <= 0.0) {
+            throw new IllegalArgumentException("La cantidad debe ser un número positivo.");
         }
         existingDetalle.setCantidad(dto.getCantidad());
 

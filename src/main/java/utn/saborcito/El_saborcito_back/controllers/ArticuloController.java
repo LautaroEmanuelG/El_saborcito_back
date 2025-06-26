@@ -80,12 +80,11 @@ public class ArticuloController {
     @PostMapping("/analizar-produccion")
     public ProduccionAnalisisDTO analizarProduccion(@RequestBody ProduccionAnalisisRequestDTO requestDTO) {
         // Convertir la lista de objetos ArticuloCantidad a un mapa de ID -> cantidad
-        Map<Long, Integer> articulosMap = new HashMap<>();
+        Map<Long, Double> articulosMap = new HashMap<>();    // ✅ Cambio Integer a Double
 
         for (ProduccionAnalisisRequestDTO.ArticuloCantidad articulo : requestDTO.getArticulos()) {
-            // Si ya existe el ID en el mapa, sumar las cantidades (para artículos
-            // repetidos)
-            articulosMap.merge(articulo.getArticuloId(), articulo.getCantidad(), Integer::sum);
+            // Si ya existe el ID en el mapa, sumar las cantidades (para artículos repetidos)
+            articulosMap.merge(articulo.getArticuloId(), articulo.getCantidad(), Double::sum);    // ✅ Cambio Integer::sum a Double::sum
         }
 
         // Llamar al servicio unificado que hace el análisis real

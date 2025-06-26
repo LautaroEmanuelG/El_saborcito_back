@@ -31,7 +31,7 @@ public class ArticuloValidacionService {
     /**
      * 🎯 Busca y valida un artículo por ID
      * Determina si es ArticuloInsumo o ArticuloManufacturado
-     * 
+     *
      * @param articuloId ID del artículo a buscar
      * @return El artículo encontrado
      */
@@ -60,7 +60,7 @@ public class ArticuloValidacionService {
 
     /**
      * 🏷️ Busca promociones activas para una combinación de artículos
-     * 
+     *
      * @param detalles   Lista de detalles del pedido
      * @param sucursalId ID de la sucursal
      * @return Lista de promociones aplicables
@@ -84,17 +84,17 @@ public class ArticuloValidacionService {
 
     /**
      * ✅ Valida que un artículo insumo tenga stock suficiente
-     * 
+     *
      * @param insumo             El artículo insumo
      * @param cantidadSolicitada Cantidad solicitada
      */
-    public void validarStockInsumo(ArticuloInsumo insumo, Integer cantidadSolicitada) {
+    public void validarStockInsumo(ArticuloInsumo insumo, Double cantidadSolicitada) {    // ✅ Cambio Integer a Double
         if (insumo.getStockActual() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "El insumo " + insumo.getDenominacion() + " no tiene stock definido");
         }
 
-        if (insumo.getStockActual() < cantidadSolicitada) {
+        if (insumo.getStockActual() < cantidadSolicitada) {    // ✅ Comparación con Double
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Stock insuficiente para " + insumo.getDenominacion() +
                             ". Stock disponible: " + insumo.getStockActual() +
@@ -112,11 +112,11 @@ public class ArticuloValidacionService {
     /**
      * 🏭 Valida que un artículo manufacturado se pueda producir
      * Usa el servicio unificado para evitar duplicación
-     * 
+     *
      * @param manufacturado      El artículo manufacturado
      * @param cantidadSolicitada Cantidad solicitada
      */
-    public void validarStockManufacturado(ArticuloManufacturado manufacturado, Integer cantidadSolicitada) {
+    public void validarStockManufacturado(ArticuloManufacturado manufacturado, Double cantidadSolicitada) {    // ✅ Cambio Integer a Double
         if (manufacturado.getArticuloManufacturadoDetalles() == null ||
                 manufacturado.getArticuloManufacturadoDetalles().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -126,7 +126,7 @@ public class ArticuloValidacionService {
 
         // Usar el servicio unificado para la validación
         boolean sePuedeProducir = produccionAnalisisService.puedeProducirseManufacturado(manufacturado,
-                cantidadSolicitada);
+                cantidadSolicitada);    // ✅ Ahora es compatible con Double
 
         if (!sePuedeProducir) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -151,7 +151,7 @@ public class ArticuloValidacionService {
 
     /**
      * 🏷️ Aplica promoción si corresponde
-     * 
+     *
      * @param articulo  El artículo
      * @param promocion La promoción a aplicar
      * @return El precio con promoción aplicada
@@ -175,5 +175,21 @@ public class ArticuloValidacionService {
 
         // Si no tiene ninguno, precio original
         return articulo.getPrecioVenta().doubleValue();
+    }
+
+    // ✅ Métodos sobrecargados para mantener compatibilidad con código existente que use Integer
+
+    /**
+     * ✅ Sobrecarga para compatibilidad con Integer
+     */
+    public void validarStockInsumo(ArticuloInsumo insumo, Integer cantidadSolicitada) {
+        validarStockInsumo(insumo, cantidadSolicitada.doubleValue());
+    }
+
+    /**
+     * 🏭 Sobrecarga para compatibilidad con Integer
+     */
+    public void validarStockManufacturado(ArticuloManufacturado manufacturado, Integer cantidadSolicitada) {
+        validarStockManufacturado(manufacturado, cantidadSolicitada.doubleValue());
     }
 }

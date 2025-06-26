@@ -6,7 +6,7 @@ import lombok.*;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class CompraDetalleDTO {
     private Long insumoId;
-    private Integer cantidad;
+    private Double cantidad;    // ✅ Cambio de Integer a Double
     private Double precioUnitario;
     private Double subtotal;
 }
