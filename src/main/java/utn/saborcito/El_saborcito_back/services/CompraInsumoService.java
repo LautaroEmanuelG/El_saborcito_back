@@ -22,23 +22,24 @@ public class CompraInsumoService {
 
     @Transactional
     public CompraInsumoDTO registrarCompra(NuevaCompraDTO dto) {
-        // 1) Calcular subtotales y total
         List<CompraDetalle> lineas = dto.getDetalles().stream()
-            .map(det -> {
-                ArticuloInsumo ins = insumoRepo.findById(det.getInsumoId())
-                    .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
-                double sub = det.getCantidad() * det.getPrecioUnitario();
-                // Actualizo stock y precio
-                ins.setPrecioCompra(det.getPrecioUnitario());
-                ins.setStockActual(ins.getStockActual() + det.getCantidad());
-                insumoRepo.save(ins);
-                return CompraDetalle.builder()
-                    .insumo(ins)
-                    .cantidad(det.getCantidad())
-                    .precioUnitario(det.getPrecioUnitario())
-                    .subtotal(sub)
-                    .build();
-            }).collect(Collectors.toList());
+                .map(det -> {
+                    ArticuloInsumo ins = insumoRepo.findById(det.getInsumoId())
+                            .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
+                    double sub = det.getCantidad() * det.getPrecioUnitario();
+
+                    // ✅ Actualizar stock con Double
+                    ins.setPrecioCompra(det.getPrecioUnitario());
+                    ins.setStockActual(ins.getStockActual() + det.getCantidad());
+                    insumoRepo.save(ins);
+
+                    return CompraDetalle.builder()
+                            .insumo(ins)
+                            .cantidad(det.getCantidad())    // Ya es Double
+                            .precioUnitario(det.getPrecioUnitario())
+                            .subtotal(sub)
+                            .build();
+                }).collect(Collectors.toList());
 
         double total = lineas.stream()
             .mapToDouble(CompraDetalle::getSubtotal)

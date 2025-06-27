@@ -31,6 +31,6 @@ public class ProduccionAnalisisRequestDTO {
         /**
          * Cantidad deseada a producir
          */
-        private Integer cantidad;
+        private Double cantidad;    // ✅ Cambio de Integer a Double
     }
 }

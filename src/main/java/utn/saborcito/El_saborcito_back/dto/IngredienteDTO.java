@@ -7,6 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class IngredienteDTO {
     private String nombre;
-    private Integer cantidad;
+    private Double cantidad;    // ✅ Cambio de Integer a Double
     private String unidadMedida;
 }

@@ -12,7 +12,7 @@ public class ArticuloManufacturadoDetalle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer cantidad;
+    private Double cantidad;    // ✅ Cambio de Integer a Double
 
     @ManyToOne
     @JoinColumn(name = "articulo_manufacturado_id")

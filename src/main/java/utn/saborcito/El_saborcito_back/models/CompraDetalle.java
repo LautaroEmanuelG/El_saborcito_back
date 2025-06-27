@@ -16,7 +16,7 @@ public class CompraDetalle {
     @ManyToOne @JoinColumn(name = "insumo_id")
     private ArticuloInsumo insumo;
 
-    private Integer cantidad;
+    private Double cantidad;    // ✅ Double para cantidades
     private Double precioUnitario;
     private Double subtotal;   // = cantidad * precioUnitario
 }

@@ -16,6 +16,8 @@ import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 import utn.saborcito.El_saborcito_back.repositories.UnidadMedidaRepository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,6 +69,11 @@ public class ArticuloInsumoService {
     @Transactional
     public ArticuloInsumoDTO save(ArticuloInsumoDTO dto) throws Exception {
         try {
+            // 🔍 Validar duplicados de denominación
+            if (dto.getDenominacion() != null && existsByDenominacion(dto.getDenominacion())) {
+                throw new Exception("Ya existe un insumo activo con la denominación: " + dto.getDenominacion());
+            }
+
             ArticuloInsumo insumo = articuloInsumoMapper.toEntity(dto);
 
             // Inicializar campos de delete lógico si no están establecidos
@@ -81,10 +88,10 @@ public class ArticuloInsumoService {
             if (dto.getPrecioCompra() == null || dto.getPrecioCompra() < 0) {
                 throw new Exception("El precio de compra no puede ser negativo.");
             }
-            if (dto.getStockActual() == null || dto.getStockActual() < 0) {
+            if (dto.getStockActual() == null || dto.getStockActual() < 0.0) {
                 throw new Exception("El stock actual no puede ser negativo.");
             }
-            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0) {
+            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0.0) {
                 throw new Exception("El stock mínimo no puede ser negativo.");
             }
             if (dto.getEsParaElaborar() == null) {
@@ -129,6 +136,13 @@ public class ArticuloInsumoService {
             ArticuloInsumo insumoExistente = articuloInsumoRepository.findById(id)
                     .orElseThrow(() -> new Exception("No se encontró el artículo insumo con el ID: " + id));
 
+            // 🔍 Validar duplicados de denominación (solo si cambió)
+            if (dto.getDenominacion() != null &&
+                    !dto.getDenominacion().equals(insumoExistente.getDenominacion()) &&
+                    existsByDenominacion(dto.getDenominacion())) {
+                throw new Exception("Ya existe un insumo activo con la denominación: " + dto.getDenominacion());
+            }
+
             insumoExistente.setDenominacion(dto.getDenominacion());
             insumoExistente.setPrecioVenta(dto.getPrecioVenta());
 
@@ -138,12 +152,12 @@ public class ArticuloInsumoService {
             }
             insumoExistente.setPrecioCompra(dto.getPrecioCompra());
 
-            if (dto.getStockActual() == null || dto.getStockActual() < 0) {
+            if (dto.getStockActual() == null || dto.getStockActual() < 0.0) {
                 throw new Exception("El stock actual no puede ser negativo.");
             }
             insumoExistente.setStockActual(dto.getStockActual());
 
-            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0) {
+            if (dto.getStockMinimo() == null || dto.getStockMinimo() < 0.0) {
                 throw new Exception("El stock mínimo no puede ser negativo.");
             }
             insumoExistente.setStockMinimo(dto.getStockMinimo());
@@ -221,6 +235,13 @@ public class ArticuloInsumoService {
 
     @Transactional
     public ArticuloInsumoDTO restoreDeleted(Long id) {
+        // Verificar si se puede restaurar el artículo
+        Map<String, Object> canRestore = canRestoreArticuloInsumo(id);
+        if (!(Boolean) canRestore.get("canRestore")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    (String) canRestore.get("message"));
+        }
+
         ArticuloInsumo articulo = articuloInsumoRepository.findByIdDeleted(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Artículo insumo eliminado no encontrado"));
@@ -327,10 +348,67 @@ public class ArticuloInsumoService {
         }
     }
 
+    // NUEVO: Verificar si un artículo insumo puede ser restaurado
+    public Map<String, Object> canRestoreArticuloInsumo(Long id) {
+        Map<String, Object> result = new HashMap<>();
+
+        // Buscar el artículo por ID (debe estar eliminado)
+        ArticuloInsumo articulo = articuloInsumoRepository.findByIdDeleted(id)
+                .orElse(null);
+
+        if (articulo == null) {
+            result.put("canRestore", false);
+            result.put("message", "Artículo insumo no encontrado o no está eliminado");
+            return result;
+        }
+
+        // Verificar que la categoría del artículo no esté eliminada
+        Categoria categoria = categoriaRepository.findById(articulo.getCategoria().getId()).orElse(null);
+        if (categoria == null || categoria.isEliminado()) {
+            result.put("canRestore", false);
+            result.put("message", "No se puede restaurar este insumo porque su categoría está eliminada");
+            return result;
+        }
+
+        // Si la categoría es una subcategoría, verificar también su padre
+        if (categoria.getTipoCategoria() != null && categoria.getTipoCategoria().isEliminado()) {
+            result.put("canRestore", false);
+            result.put("message", "No se puede restaurar este insumo porque la categoría padre está eliminada");
+            return result;
+        }
+
+        result.put("canRestore", true);
+        return result;
+    }
+
     // MÉTODO NUEVO: Consulta si el insumo puede venderse (tiene stock)
     public boolean puedeVenderse(Long id) throws Exception {
         ArticuloInsumo insumo = findEntityById(id);
         // Considera sin stock si el stock actual es 0 o menor al mínimo
-        return insumo.getStockActual() != null && insumo.getStockActual() > 0;
+        return insumo.getStockActual() != null && insumo.getStockActual() > 0.0;
+    }
+
+    // 🔍 **MÉTODOS PARA VALIDACIÓN DE DUPLICADOS - DENOMINACIÓN**
+
+    /**
+     * Verifica si existe un insumo con la denominación dada (solo activos)
+     */
+    @Transactional
+    public boolean existsByDenominacion(String denominacion) {
+        if (denominacion == null || denominacion.trim().isEmpty()) {
+            return false;
+        }
+        return articuloInsumoRepository.existsByDenominacionAndEliminadoFalse(denominacion.trim());
+    }
+
+    /**
+     * Verifica si existe un insumo con la denominación dada (incluyendo eliminados)
+     */
+    @Transactional
+    public boolean existsByDenominacionIncludingDeleted(String denominacion) {
+        if (denominacion == null || denominacion.trim().isEmpty()) {
+            return false;
+        }
+        return articuloInsumoRepository.existsByDenominacionIncludingDeleted(denominacion.trim());
     }
 }

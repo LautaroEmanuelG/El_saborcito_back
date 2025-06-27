@@ -13,6 +13,7 @@ import utn.saborcito.El_saborcito_back.services.ArticuloManufacturadoService;
 import utn.saborcito.El_saborcito_back.services.ProduccionAnalisisService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/manufacturados")
@@ -83,7 +84,37 @@ public class ArticuloManufacturadoController {
         return produccionAnalisisService.puedeProducirseArticuloManufacturado(id);
     }
 
-    // 🌟 Nuevo endpoint para subir imagen a artículo manufacturado
+    // Verificar si un artículo puede ser restaurado
+    @GetMapping("/{id}/can-restore")
+    public Map<String, Object> canRestoreArticulo(@PathVariable Long id) {
+        return service.canRestoreArticulo(id);
+    }
+
+    // 🔴 NUEVOS ENDPOINTS PARA VALIDACIÓN DE DUPLICADOS
+
+    /**
+     * 🔍 Endpoint para validar denominación (solo artículos activos)
+     */
+    @GetMapping("/validate-denominacion")
+    public ResponseEntity<Boolean> validateDenominacion(
+            @RequestParam String denominacion,
+            @RequestParam(required = false) Long excludeId) {
+        boolean exists = service.existsByDenominacion(denominacion, excludeId);
+        return ResponseEntity.ok(exists);
+    }
+
+    /**
+     * 🔍 Endpoint para validar denominación (incluyendo artículos eliminados)
+     */
+    @GetMapping("/validate-denominacion-all")
+    public ResponseEntity<Boolean> validateDenominacionIncludingDeleted(
+            @RequestParam String denominacion,
+            @RequestParam(required = false) Long excludeId) {
+        boolean exists = service.existsByDenominacionIncludingDeleted(denominacion, excludeId);
+        return ResponseEntity.ok(exists);
+    }
+
+    // 🌟 Endpoint para subir imagen a artículo manufacturado
     @PostMapping(value = "/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImagenUploadResponseDto> uploadImagenArticuloManufacturado(
             @PathVariable Long id,

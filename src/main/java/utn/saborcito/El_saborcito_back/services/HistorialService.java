@@ -66,7 +66,7 @@ public class HistorialService {
                         List<IngredienteDTO> receta = manufacturado.getArticuloManufacturadoDetalles().stream()
                                 .map(ing -> new IngredienteDTO(
                                         ing.getArticuloInsumo().getDenominacion(),
-                                        ing.getCantidad(),
+                                        ing.getCantidad(),    // ✅ Ahora es compatible: Double → Double
                                         ing.getArticuloInsumo().getUnidadMedida().getDenominacion()
                                 ))
                                 .collect(Collectors.toList());
@@ -84,6 +84,7 @@ public class HistorialService {
         dto.setDetalles(detalles);
         return dto;
     }
+
     public byte[] generarPdfPedido(Long id) {
         PedidoConRecetasDTO dto = obtenerDetalleCompletoPedido(id);
 

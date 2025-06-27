@@ -51,8 +51,8 @@ public class ProduccionAnalisisDTO {
     public static class ProductoAnalisis {
         private Long articuloId;
         private String denominacion;
-        private Integer cantidadSolicitada;
-        private Integer cantidadPosible;
+        private Double cantidadSolicitada;    // ✅ Cambio de Integer a Double
+        private Double cantidadPosible;       // ✅ Cambio de Integer a Double
         private boolean sePuedeProducir;
         private List<InsumoNecesario> insumosNecesarios;
     }
@@ -68,8 +68,8 @@ public class ProduccionAnalisisDTO {
         private Long articuloId;
         private String denominacion;
         private String motivoProblema;
-        private Integer cantidadSolicitada;
-        private Integer cantidadMaximaPosible;
+        private Double cantidadSolicitada;      // ✅ Cambio de Integer a Double
+        private Double cantidadMaximaPosible;   // ✅ Cambio de Integer a Double
     }
 
     /**
@@ -114,8 +114,8 @@ public class ProduccionAnalisisDTO {
     public static class PromocionValidacionDTO {
         private Long promocionId;
         private String promocionDenominacion;
-        private Integer cantidadSolicitada;
-        private Integer cantidadMaximaAplicable;
+        private Double cantidadSolicitada;        // ✅ Cambio de Integer a Double
+        private Double cantidadMaximaAplicable;   // ✅ Cambio de Integer a Double
         private boolean esValida;
         private String motivoNoValida;
         private List<ProductoConProblema> productosConProblemas;

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ArticuloManufacturadoDetalleDTO {
     private Long id;
-    private Integer cantidad;
+    private Double cantidad;    // ✅ Cambio de Integer a Double
     private ArticuloInsumoDTO articuloInsumo; // Usar ArticuloInsumoDTO para el insumo
     // private Long articuloManufacturadoId; // Opcional: si se necesita el ID del
     // manufacturado padre
