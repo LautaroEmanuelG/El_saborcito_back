@@ -50,6 +50,17 @@ public class UnidadMedidaService {
     }
 
     /**
+     * Buscar unidad de medida por ID (incluyendo eliminadas)
+     * Este método es para uso interno cuando necesitas acceder a eliminadas
+     */
+    public UnidadMedidaDTO findByIdIncludingDeleted(Long id) {
+        UnidadMedida unidad = repo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Unidad de medida no encontrada"));
+        return mapper.toDTO(unidad);
+    }
+
+    /**
      * Crear nueva unidad de medida
      * Incluye validación de duplicados por denominación (case insensitive)
      */
@@ -80,10 +91,11 @@ public class UnidadMedidaService {
     /**
      * Actualizar unidad de medida existente
      * Incluye validación de duplicados excluyendo la unidad actual
+     * Permite actualizar tanto entidades activas como eliminadas
      */
     public UnidadMedidaDTO update(Long id, UnidadMedidaDTO dto) {
-        // Buscar la unidad existente
-        UnidadMedida existing = repo.findByIdActive(id)
+        // Buscar la unidad existente (incluyendo eliminadas)
+        UnidadMedida existing = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Unidad de medida no encontrada"));
 
@@ -158,11 +170,19 @@ public class UnidadMedidaService {
     }
 
     /**
+     * Eliminación lógica de unidad de medida (operación por defecto)
+     * Marca la unidad como eliminada sin borrarla físicamente
+     */
+    public void delete(Long id) {
+        bajaLogicaUnidadMedida(id);
+    }
+
+    /**
      * Eliminación física de unidad de medida
      * ⚠️ CUIDADO: Esta operación es irreversible
      * Solo usar cuando sea absolutamente necesario
      */
-    public void delete(Long id) {
+    public void deletePhysically(Long id) {
         UnidadMedida unidad = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Unidad de medida no encontrada"));
@@ -171,8 +191,8 @@ public class UnidadMedidaService {
         // que no esté siendo usada en insumos activos
         // Ejemplo:
         // if (insumoRepository.existsByUnidadMedidaIdAndEliminadoFalse(id)) {
-        //     throw new ResponseStatusException(HttpStatus.CONFLICT,
-        //         "No se puede eliminar: la unidad está siendo usada por insumos activos");
+        // throw new ResponseStatusException(HttpStatus.CONFLICT,
+        // "No se puede eliminar: la unidad está siendo usada por insumos activos");
         // }
 
         repo.deleteById(id);

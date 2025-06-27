@@ -58,10 +58,17 @@ public class UnidadMedidaController {
         return ResponseEntity.noContent().build();
     }
 
-    // Eliminación física (opcional)
+    // Eliminación lógica (operación por defecto)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Eliminación física (solo para casos especiales)
+    @DeleteMapping("/{id}/fisico")
+    public ResponseEntity<Void> deletePhysically(@PathVariable Long id) {
+        service.deletePhysically(id);
         return ResponseEntity.noContent().build();
     }
 }

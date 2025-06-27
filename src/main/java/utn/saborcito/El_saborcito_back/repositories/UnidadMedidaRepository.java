@@ -19,6 +19,10 @@ public interface UnidadMedidaRepository extends JpaRepository<UnidadMedida, Long
     @Query("SELECT u FROM UnidadMedida u WHERE u.id = :id AND u.eliminado = false")
     Optional<UnidadMedida> findByIdActive(Long id);
 
+    // Buscar por ID incluyendo eliminadas (para uso interno)
+    @Query("SELECT u FROM UnidadMedida u WHERE u.id = :id")
+    Optional<UnidadMedida> findByIdIncludingDeleted(Long id);
+
     // Buscar por denominación (case insensitive) excluyendo eliminadas
     @Query("SELECT u FROM UnidadMedida u WHERE LOWER(u.denominacion) = LOWER(:denominacion) AND u.eliminado = false")
     Optional<UnidadMedida> findByDenominacionIgnoreCaseAndNotDeleted(String denominacion);
