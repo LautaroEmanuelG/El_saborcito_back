@@ -476,7 +476,7 @@ public ProductoRankingConResumenDTO getRankingProductos(LocalDate desde, LocalDa
     public List<PedidoCostoDetalleDTO> getDetalleCostos(LocalDate desde, LocalDate hasta) {
         // Leer desde compra_insumo en lugar de pedidos
         return compraRepo.findAllByFechaCompraBetween(desde, hasta).stream()
-            .filter(c -> c.getTotalCompra() != null && c.getTotalCompra() > 0)
+            .filter(c -> c.getTotalCompra() != null)
             .map(c -> new PedidoCostoDetalleDTO(
                 c.getId(), c.getFechaCompra(), c.getTotalCompra()
             ))
