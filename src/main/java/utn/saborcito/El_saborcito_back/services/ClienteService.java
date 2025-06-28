@@ -22,6 +22,7 @@ import utn.saborcito.El_saborcito_back.repositories.UsuarioRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -308,24 +309,40 @@ public class ClienteService {
     private ClienteDTO actualizarDatosAuth0(ClienteDTO clienteDTO, RegistroAuth0DTO auth0User) {
         boolean datosActualizados = false;
 
-        if (!clienteDTO.getNombre().equals(auth0User.getGivenName())) {
-            clienteDTO.setNombre(auth0User.getGivenName());
+        // ✅ ARREGLO: Manejar null values en nombre
+        String nombreActual = clienteDTO.getNombre();
+        String nuevoNombre = auth0User.getGivenName();
+
+        if (!Objects.equals(nombreActual, nuevoNombre)) {
+            clienteDTO.setNombre(nuevoNombre);
             datosActualizados = true;
         }
-        if (!clienteDTO.getApellido().equals(auth0User.getFamilyName())) {
-            clienteDTO.setApellido(auth0User.getFamilyName());
+
+        // ✅ ARREGLO: Manejar null values en apellido
+        String apellidoActual = clienteDTO.getApellido();
+        String nuevoApellido = auth0User.getFamilyName();
+
+        if (!Objects.equals(apellidoActual, nuevoApellido)) {
+            clienteDTO.setApellido(nuevoApellido);
             datosActualizados = true;
         }
-        if (!clienteDTO.getEmail().equals(auth0User.getEmail())) {
-            usuarioService.validarEmailUnico(auth0User.getEmail());
-            usuarioService.isValidEmail(auth0User.getEmail());
-            clienteDTO.setEmail(auth0User.getEmail());
+
+        // ✅ ARREGLO: Manejar null values en email (aunque debería existir siempre)
+        String emailActual = clienteDTO.getEmail();
+        String nuevoEmail = auth0User.getEmail();
+
+        if (!Objects.equals(emailActual, nuevoEmail)) {
+            usuarioService.validarEmailUnico(nuevoEmail);
+            usuarioService.isValidEmail(nuevoEmail);
+            clienteDTO.setEmail(nuevoEmail);
             datosActualizados = true;
         }
+
         if (datosActualizados) {
             Cliente clienteEntity = clienteMapper.toEntity(clienteDTO);
             repo.save(clienteEntity);
         }
+
         return clienteDTO;
     }
 }
