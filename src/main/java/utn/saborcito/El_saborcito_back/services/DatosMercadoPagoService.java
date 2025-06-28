@@ -98,6 +98,23 @@ public class DatosMercadoPagoService {
             throw new RuntimeException("No hay items válidos para crear la preferencia de MP");
         }
 
+        // AJUSTE GENERICO: igualar el total del carrito con el de Mercado Pago
+        double sumaItems = items.stream()
+                .mapToDouble(i -> i.getUnitPrice().doubleValue() * i.getQuantity())
+                .sum();
+        double totalPedido = pedido.getTotal() != null ? pedido.getTotal() : sumaItems;
+        double diferencia = Math.round((totalPedido - sumaItems) * 100.0) / 100.0; // Redondeo a 2 decimales
+        if (Math.abs(diferencia) > 0.01) {
+            // Si hay diferencia, agregar un ítem de ajuste
+            PreferenceItemRequest ajuste = PreferenceItemRequest.builder()
+                    .title("Ajuste (envío/descuento)")
+                    .quantity(1)
+                    .unitPrice(BigDecimal.valueOf(diferencia))
+                    .currencyId("ARS")
+                    .build();
+            items.add(ajuste);
+        }
+
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
                 .success("https://el-saborcito-front.vercel.app/pedido-exitoso?status=approved")
                 .failure("https://el-saborcito-front.vercel.app/pedido-exitoso?status=rejected")
