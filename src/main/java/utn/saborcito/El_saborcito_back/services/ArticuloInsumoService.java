@@ -6,15 +6,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import utn.saborcito.El_saborcito_back.dto.ArticuloInsumoDTO;
+import utn.saborcito.El_saborcito_back.dto.ArticuloManufacturadoDTO;
 import utn.saborcito.El_saborcito_back.mappers.ArticuloInsumoMapper;
-import utn.saborcito.El_saborcito_back.models.ArticuloInsumo;
-import utn.saborcito.El_saborcito_back.models.Categoria;
-import utn.saborcito.El_saborcito_back.models.Imagen;
-import utn.saborcito.El_saborcito_back.models.UnidadMedida;
+import utn.saborcito.El_saborcito_back.mappers.ArticuloManufacturadoMapper;
+import utn.saborcito.El_saborcito_back.models.*;
 import utn.saborcito.El_saborcito_back.repositories.ArticuloInsumoRepository;
 import utn.saborcito.El_saborcito_back.repositories.CategoriaRepository;
 import utn.saborcito.El_saborcito_back.repositories.ImagenRepository;
 import utn.saborcito.El_saborcito_back.repositories.UnidadMedidaRepository;
+import utn.saborcito.El_saborcito_back.repositories.ArticuloManufacturadoDetalleRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +42,13 @@ public class ArticuloInsumoService {
 
     @Autowired
     private CloudinaryService cloudinaryService;
+
+    @Autowired
+    private ArticuloManufacturadoDetalleRepository articuloManufacturadoDetalleRepository;
+
+    @Autowired
+    private ArticuloManufacturadoMapper articuloManufacturadoMapper;
+
 
     // Métodos principales con delete lógico
     @Transactional
@@ -410,5 +417,27 @@ public class ArticuloInsumoService {
             return false;
         }
         return articuloInsumoRepository.existsByDenominacionIncludingDeleted(denominacion.trim());
+    }
+    /**
+
+     Obtiene todos los artículos manufacturados que utilizan un insumo específico*/@Transactional
+    public List<ArticuloManufacturadoDTO> findArticulosManufacturadosByInsumoId(Long insumoId) throws Exception {// Verificar que el insumo existe
+        ArticuloInsumo insumo = articuloInsumoRepository.findByIdNotDeleted(insumoId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"No se encontró el artículo insumo con el ID: " + insumoId));
+
+        // Buscar todos los detalles que usan este insumo
+        List<ArticuloManufacturadoDetalle> detalles = articuloManufacturadoDetalleRepository
+                .findByArticuloInsumoIdAndEliminadoFalse(insumoId);
+
+        // Extraer los artículos manufacturados únicos
+        List<ArticuloManufacturado> manufacturados = detalles.stream()
+                .map(ArticuloManufacturadoDetalle::getArticuloManufacturado)
+                .filter(manufacturado -> manufacturado != null && !manufacturado.getEliminado())
+                .distinct()
+                .collect(Collectors.toList());
+
+        // Convertir a DTO usando el mapper
+        return manufacturados.stream()
+                .map(articuloManufacturadoMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

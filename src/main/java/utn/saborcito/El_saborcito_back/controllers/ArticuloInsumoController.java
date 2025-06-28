@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import utn.saborcito.El_saborcito_back.dto.ArticuloInsumoDTO;
+import utn.saborcito.El_saborcito_back.dto.ArticuloManufacturadoDTO;
 import utn.saborcito.El_saborcito_back.dto.ImagenUploadResponseDto;
 import utn.saborcito.El_saborcito_back.services.ArticuloInsumoService;
 
@@ -198,4 +199,15 @@ public class ArticuloInsumoController {
                             .build());
         }
     }
+    /**
+
+     🔍 Endpoint para obtener todos los artículos manufacturados que utilizan un insumo específico*/
+    @GetMapping("/{id}/manufacturados")
+    public ResponseEntity<List<ArticuloManufacturadoDTO>> getManufacturadosQueUsanInsumo(@PathVariable Long id) {
+        try {
+            List<ArticuloManufacturadoDTO> manufacturados = articuloInsumoService.findArticulosManufacturadosByInsumoId(id);
+            return ResponseEntity.ok(manufacturados);} catch (Exception e) {
+            log.error("Error al obtener artículos manufacturados para el insumo {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();}}
 }
+
