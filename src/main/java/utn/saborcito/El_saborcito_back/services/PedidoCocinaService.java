@@ -39,18 +39,20 @@ public class PedidoCocinaService {
 
         Long estadoActualId = pedido.getEstado().getId();
 
-        // 🔒 Validaciones de transición
-        if (estadoActualId.equals(ESTADO_PENDIENTE_ID) &&
-                !(nuevoEstadoId.equals(ESTADO_EN_PREPARACION_ID) || nuevoEstadoId.equals(ESTADO_DEMORADO_ID))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Desde PENDIENTE solo puede ir a EN_PREPARACION o DEMORADO");
-        }
-
-        if ((estadoActualId.equals(ESTADO_EN_PREPARACION_ID) || estadoActualId.equals(ESTADO_DEMORADO_ID)) &&
-                !nuevoEstadoId.equals(ESTADO_LISTO_ID)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Desde este estado solo puede ir a LISTO");
-        }
-
-        if (estadoActualId.equals(ESTADO_LISTO_ID)) {
+        // Permitir transiciones válidas según la lógica de cocina
+        if (estadoActualId.equals(ESTADO_PENDIENTE_ID)) {
+            if (!(nuevoEstadoId.equals(ESTADO_EN_PREPARACION_ID) || nuevoEstadoId.equals(ESTADO_DEMORADO_ID))) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Desde PENDIENTE solo puede ir a EN_PREPARACION o DEMORADO");
+            }
+        } else if (estadoActualId.equals(ESTADO_EN_PREPARACION_ID)) {
+            if (!(nuevoEstadoId.equals(ESTADO_LISTO_ID) || nuevoEstadoId.equals(ESTADO_DEMORADO_ID))) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Desde EN_PREPARACION solo puede ir a LISTO o DEMORADO");
+            }
+        } else if (estadoActualId.equals(ESTADO_DEMORADO_ID)) {
+            if (!(nuevoEstadoId.equals(ESTADO_LISTO_ID) || nuevoEstadoId.equals(ESTADO_EN_PREPARACION_ID))) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Desde DEMORADO solo puede ir a LISTO o EN_PREPARACION");
+            }
+        } else if (estadoActualId.equals(ESTADO_LISTO_ID)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El pedido ya está en estado LISTO");
         }
 
