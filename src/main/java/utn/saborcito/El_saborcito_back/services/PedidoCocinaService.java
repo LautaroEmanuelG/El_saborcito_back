@@ -24,11 +24,11 @@ public class PedidoCocinaService {
     private final HistorialPedidoService historialPedidoService;
     private final PedidoService pedidoService;
 
-    // ✅ IDs de estados
-    private static final Long ESTADO_PENDIENTE_ID = 1L;
-    private static final Long ESTADO_EN_PREPARACION_ID = 3L;
+    // ✅ IDs de estados (ajustados a la base de datos real)
+    private static final Long ESTADO_PENDIENTE_ID = 8L;
+    private static final Long ESTADO_EN_PREPARACION_ID = 2L;
     private static final Long ESTADO_LISTO_ID = 4L;
-    private static final Long ESTADO_DEMORADO_ID = 8L;
+    private static final Long ESTADO_DEMORADO_ID = 3L;
 
     /**
      * Cambia el estado de un pedido según el flujo de cocina.
