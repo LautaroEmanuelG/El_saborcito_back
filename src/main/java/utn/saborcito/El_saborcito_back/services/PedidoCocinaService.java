@@ -75,54 +75,55 @@ public class PedidoCocinaService {
                 .map(pedidoMapper::toDTO)
                 .collect(Collectors.toList());
     }
+    
     public PedidoDTO avanzarEstadoPedido(Long pedidoId) {
-        Pedido pedido = pedidoService.findEntityById(pedidoId);
-        Long estadoIdActual = pedido.getEstado().getId();
-        Estado nuevoEstado;
+    Pedido pedido = pedidoService.findEntityById(pedidoId);
+    Long estadoIdActual = pedido.getEstado().getId();
+    Estado nuevoEstado;
 
-        switch (estadoIdActual.intValue()) {
-            case 1: // PENDIENTE
-                boolean tieneManufacturados = pedido.getDetalles().stream()
-                        .anyMatch(d -> d.getArticulo() instanceof ArticuloManufacturado);
+    switch (estadoIdActual.intValue()) {
+        case 8: // PENDIENTE (ID = 8)
+            boolean tieneManufacturados = pedido.getDetalles().stream()
+                    .anyMatch(d -> d.getArticulo() instanceof ArticuloManufacturado);
 
-                if (tieneManufacturados) {
-                    nuevoEstado = estadoService.findById(3L); // EN_PREPARACION
-                } else {
-                    nuevoEstado = estadoService.findById(4L); // LISTO
-                    historialPedidoService.registrarPedido(pedido.getCliente().getId(), pedidoId, "Pedido pasó directo a LISTO (sin manufacturados)");
-                }
-                break;
+            if (tieneManufacturados) {
+                nuevoEstado = estadoService.findById(2L); // EN_PREPARACION (ID = 2)
+            } else {
+                nuevoEstado = estadoService.findById(4L); // LISTO (ID = 4)
+                historialPedidoService.registrarPedido(pedido.getCliente().getId(), pedidoId, "Pedido pasó directo a LISTO (sin manufacturados)");
+            }
+            break;
 
-            case 3: // EN_PREPARACION
-            case 8: // DEMORADO
-                nuevoEstado = estadoService.findById(4L); // LISTO
-                historialPedidoService.registrarPedido(pedido.getCliente().getId(), pedidoId, "Pedido marcado como LISTO");
-                break;
+        case 2: // EN_PREPARACION (ID = 2)
+        case 3: // DEMORADO (ID = 3)
+            nuevoEstado = estadoService.findById(4L); // LISTO (ID = 4)
+            historialPedidoService.registrarPedido(pedido.getCliente().getId(), pedidoId, "Pedido marcado como LISTO");
+            break;
 
-            case 4: // LISTO
-                String tipoEnvio = pedido.getTipoEnvio().getNombre();
-                if ("DELIVERY".equalsIgnoreCase(tipoEnvio)) {
-                    nuevoEstado = estadoService.findById(5L); // DELIVERY
-                } else {
-                    nuevoEstado = estadoService.findById(6L); // ENTREGADO
-                }
-                break;
+        case 4: // LISTO (ID = 4)
+            String tipoEnvio = pedido.getTipoEnvio().getNombre();
+            if ("DELIVERY".equalsIgnoreCase(tipoEnvio)) {
+                nuevoEstado = estadoService.findById(5L); // EN_DELIVERY (ID = 5)
+            } else {
+                nuevoEstado = estadoService.findById(6L); // ENTREGADO (ID = 6)
+            }
+            break;
 
-            case 5: // DELIVERY
-                nuevoEstado = estadoService.findById(6L); // ENTREGADO
-                break;
+        case 5: // EN_DELIVERY (ID = 5)
+            nuevoEstado = estadoService.findById(6L); // ENTREGADO (ID = 6)
+            break;
 
-            case 6: // ENTREGADO
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El pedido ya fue entregado");
+        case 6: // ENTREGADO (ID = 6)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El pedido ya fue entregado");
 
-            default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estado no válido para avanzar");
-        }
-
-        pedido.setEstado(nuevoEstado);
-        Pedido actualizado = pedidoRepository.save(pedido);
-        return pedidoMapper.toDTO(actualizado);
+        default:
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estado no válido para avanzar");
     }
+
+    pedido.setEstado(nuevoEstado);
+    Pedido actualizado = pedidoRepository.save(pedido);
+    return pedidoMapper.toDTO(actualizado);
+}
 
 
 }
