@@ -36,6 +36,7 @@ public class PedidoServiceMejorado {
     private final CalculadoraPedidoService calculadoraService;
     private final ArticuloValidacionService articuloValidacionService;
     private final PromocionComboService promocionComboService;
+    private final ProduccionAnalisisService produccionAnalisisService;
     private final PedidoMapper pedidoMapper;
 
     // Constantes para lógicas de negocio
@@ -75,6 +76,11 @@ public class PedidoServiceMejorado {
     public PedidoConFacturaDTO crearPedidoCompleto(PedidoCreacionDTO dto) {
         try {
             validarDatosCreacion(dto);
+
+            // 🎯 Validar que todos los artículos se puedan producir ANTES de crear el
+            // pedido
+            // Usa la misma lógica que el endpoint /analizar-produccion
+            validarProducibilidadPedido(dto);
 
             Pedido pedido = crearPedidoBase(dto);
             List<DetallePedido> detalles = crearDetallesPedido(pedido, dto.getDetalles());
@@ -155,6 +161,9 @@ public class PedidoServiceMejorado {
                         "El pedido debe tener al menos un detalle o una promoción");
             }
         }
+
+        // NUEVO: Validar producibilidad antes de crear el pedido
+        validarProducibilidadPedido(dto);
     }
 
     private Pedido crearPedidoBase(PedidoCreacionDTO dto) {
@@ -239,15 +248,10 @@ public class PedidoServiceMejorado {
             detalle.setCantidadConPromocion(0);
             detalle.setPedido(pedido);
 
+            // 🎯 Solo buscar y validar que el artículo existe - NO validar stock aquí
+            // La validación de stock se hace posteriormente de manera unificada en
+            // StockService
             Articulo articulo = articuloValidacionService.buscarYValidarArticulo(dto.getArticuloId());
-
-            if (articuloValidacionService.esArticuloInsumo(articulo)) {
-                ArticuloInsumo insumo = (ArticuloInsumo) articulo;
-                articuloValidacionService.validarStockInsumo(insumo, dto.getCantidad());
-            } else if (articuloValidacionService.esArticuloManufacturado(articulo)) {
-                ArticuloManufacturado manufacturado = (ArticuloManufacturado) articulo;
-                articuloValidacionService.validarStockManufacturado(manufacturado, dto.getCantidad());
-            }
 
             detalle.setArticulo(articulo);
             detalle.calcularYEstablecerSubtotal();
@@ -374,5 +378,67 @@ public class PedidoServiceMejorado {
         info.put("vigente", fechaValida && horarioValido);
 
         return info;
+    }
+
+    /**
+     * 🎯 Valida que todos los artículos del pedido puedan ser producidos/obtenidos
+     * Usa la misma lógica que el endpoint /analizar-produccion para consistencia
+     *
+     * @param dto Los datos del pedido a validar
+     */
+    private void validarProducibilidadPedido(PedidoCreacionDTO dto) {
+        // Convertir detalles del pedido al mismo formato que usa el endpoint de
+        // análisis
+        Map<Long, Double> articulosMap = new HashMap<>();
+
+        // Agregar artículos de detalles normales
+        if (dto.getDetalles() != null) {
+            for (PedidoCreacionDTO.DetallePedidoCreacionDTO detalle : dto.getDetalles()) {
+                articulosMap.merge(detalle.getArticuloId(), detalle.getCantidad().doubleValue(), Double::sum);
+            }
+        }
+
+        // Agregar artículos de promociones (si existen)
+        if (dto.getPromocionesSeleccionadas() != null) {
+            for (PromocionSeleccionadaDTO promocionSeleccionada : dto.getPromocionesSeleccionadas()) {
+                Promocion promocion = promocionRepository.findById(promocionSeleccionada.getPromocionId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Promoción no encontrada: " + promocionSeleccionada.getPromocionId()));
+
+                if (promocion.getPromocionDetalles() != null) {
+                    for (PromocionDetalle detalle : promocion.getPromocionDetalles()) {
+                        Double cantidadTotal = detalle.getCantidadRequerida() *
+                                promocionSeleccionada.getCantidad().doubleValue();
+                        articulosMap.merge(detalle.getArticulo().getId(), cantidadTotal, Double::sum);
+                    }
+                }
+            }
+        }
+
+        // Usar exactamente la misma validación que el endpoint de análisis
+        var analisis = produccionAnalisisService.analizarProduccionCompleta(articulosMap);
+
+        if (!analisis.isSePuedeProducirCompleto()) {
+            StringBuilder mensaje = new StringBuilder("No se puede procesar el pedido: ");
+
+            if (!analisis.getProductosConProblemas().isEmpty()) {
+                mensaje.append("Productos con problemas: ");
+                for (var problema : analisis.getProductosConProblemas()) {
+                    mensaje.append(problema.getArticuloId()).append(" (").append(problema.getMotivoProblema())
+                            .append("), ");
+                }
+            }
+
+            if (!analisis.getInsumosInsuficientes().isEmpty()) {
+                mensaje.append("Insumos insuficientes: ");
+                for (var insumo : analisis.getInsumosInsuficientes()) {
+                    mensaje.append(insumo.getDenominacion())
+                            .append(" (disponible: ").append(insumo.getStockDisponible())
+                            .append(", necesario: ").append(insumo.getCantidadNecesaria()).append("), ");
+                }
+            }
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, mensaje.toString());
+        }
     }
 }
