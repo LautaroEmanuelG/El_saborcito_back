@@ -296,6 +296,15 @@
 //                    .save(Imagen.builder().url("/img/default.png")
 //                            .build());
 //
+//
+//            // Nuevas imágenes para lomos específicos
+//            Imagen imagenLomoEspecial = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/lomos/lomoespecial.png")
+//                            .build());
+//            Imagen imagenLomoVegetariano = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/lomos/lomovegetariano.png")
+//                            .build());
+//
 //            // Nuevas imágenes para pizzas
 //            Imagen imagenPizzaMuzarella = imagenRepo
 //                    .save(Imagen.builder().url("/img/productos/pizza/pizzamuzarella.png")
@@ -311,6 +320,12 @@
 //                            .build());
 //            Imagen imagenPizzaPepperoni = imagenRepo
 //                    .save(Imagen.builder().url("/img/productos/pizza/pizzapepperoni.png")
+//                            .build());
+//            Imagen imagenPizzaNapolitana = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/pizza/pizzanapolitana.png")
+//                            .build());
+//            Imagen imagenPizzaFugazzeta = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/pizza/pizzafugazzeta.png")
 //                            .build());
 //
 //            // Nuevas imágenes para hamburguesas
@@ -330,6 +345,9 @@
 //                    .save(Imagen.builder().url(
 //                                    "/img/productos/hamburguesas/hamburguesavegetariana.png")
 //                            .build());
+//            Imagen imagenHamburguesaDoble = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/hamburguesas/hamburguesadoble.png")
+//                            .build());
 //
 //            // Nuevas imágenes para bebidas
 //            Imagen imagenAguaMineralNueva = imagenRepo
@@ -344,6 +362,36 @@
 //                            .build());
 //            Imagen imagenJugoDeNaranja = imagenRepo
 //                    .save(Imagen.builder().url("/img/productos/bebidas/jugodenaranja.png")
+//                            .build());
+//            Imagen imagenSprite = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/sprite500.png")
+//                            .build());
+//            Imagen imagenFanta = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/fanta500.png")
+//                            .build());
+//            Imagen imagenPepsi = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/pepsi500.png")
+//                            .build());
+//            Imagen imagenSevenUp = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/sevenup500.png")
+//                            .build());
+//            Imagen imagenAguaConGas = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/soda500ml.png")
+//                            .build());
+//            Imagen imagenAguaSaborizada = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/agualimon500.png")
+//                            .build());
+//            Imagen imagenCervezaStella = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/cervezastella.png")
+//                            .build());
+//            Imagen imagenQuilmes = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/cervezaquilmes.png")
+//                            .build());
+//            Imagen imagenJugoManzana = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/jugodemanzana.png")
+//                            .build());
+//            Imagen imagenJugoPomelo = imagenRepo
+//                    .save(Imagen.builder().url("/img/productos/bebidas/jugodepomelo.png")
 //                            .build());
 //
 //            // 6. Unidades de medida
@@ -958,7 +1006,7 @@
 //                                .stockActual(280.00)
 //                                .stockMinimo(180.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenGaseosa)
+//                                .imagen(imagenSprite)
 //                                .build());
 //
 //            // ARTICULO INSUMO 47 - Fanta
@@ -971,7 +1019,7 @@
 //                                .stockActual(260.00)
 //                                .stockMinimo(160.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenGaseosa)
+//                                .imagen(imagenFanta)
 //                                .build());
 //
 //            // ARTICULO INSUMO 48 - Agua con Gas
@@ -984,7 +1032,7 @@
 //                                .stockActual(200.00)
 //                                .stockMinimo(120.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenAgua)
+//                                .imagen(imagenAguaConGas)
 //                                .build());
 //
 //            // ARTICULO INSUMO 49 - Agua Saborizada
@@ -997,7 +1045,7 @@
 //                                .stockActual(180.00)
 //                                .stockMinimo(100.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenAgua)
+//                                .imagen(imagenAguaSaborizada)
 //                                .build());
 //
 //            // ARTICULO INSUMO 50 - Cerveza Quilmes
@@ -1010,7 +1058,7 @@
 //                                .stockActual(120.00)
 //                                .stockMinimo(80.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenCervezaArtesanal)
+//                                .imagen(imagenQuilmes)
 //                                .build());
 //
 //            // ARTICULO INSUMO 52 - Jugo de Manzana
@@ -1023,7 +1071,7 @@
 //                                .stockActual(150.00)
 //                                .stockMinimo(100.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenJugoDeNaranja)
+//                                .imagen(imagenJugoManzana)
 //                                .build());
 //
 //            // ARTICULO INSUMO 53 - Pepsi
@@ -1036,7 +1084,7 @@
 //                    .stockActual(220.00)
 //                    .stockMinimo(140.00)
 //                    .esParaElaborar(false)
-//                    .imagen(imagenGaseosa)
+//                    .imagen(imagenPepsi)
 //                    .build());
 //
 //            // ARTICULO INSUMO 54 - Seven Up
@@ -1049,7 +1097,7 @@
 //                                .stockActual(190.00)
 //                                .stockMinimo(120.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenGaseosa)
+//                                .imagen(imagenSevenUp)
 //                                .build());
 //
 //            // ARTICULO INSUMO 55 - Cerveza Stella Artois
@@ -1062,7 +1110,7 @@
 //                                .stockActual(110.00)
 //                                .stockMinimo(70.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenCervezaArtesanal)
+//                                .imagen(imagenCervezaStella)
 //                                .build());
 //
 //            // ARTICULO INSUMO 56 - Jugo de Pomelo
@@ -1075,7 +1123,7 @@
 //                                .stockActual(160.00)
 //                                .stockMinimo(90.00)
 //                                .esParaElaborar(false)
-//                                .imagen(imagenJugoDeNaranja)
+//                                .imagen(imagenJugoPomelo)
 //                                .build());
 //
 //            // --------------------------------------------------------------------------------------------------------------------------------
@@ -1344,7 +1392,7 @@
 //                                        .tiempoEstimadoMinutos(25)
 //                                        .precioVenta(6200.0)
 //                                        .categoria(categoriaLomos)
-//                                        .imagen(imagenLomo)
+//                                        .imagen(imagenLomoEspecial)
 //                                        .build());
 //
 //            // Detalles de articulo manufacturado 11
@@ -1392,7 +1440,7 @@
 //                                        .tiempoEstimadoMinutos(20)
 //                                        .precioVenta(5200.0)
 //                                        .categoria(categoriaHamburguesas)
-//                                        .imagen(imagenHamburguesa)
+//                                        .imagen(imagenHamburguesaDoble)
 //                                        .build());
 //
 //            // Detalles de articulo manufacturado 12
@@ -1435,7 +1483,7 @@
 //                                        .tiempoEstimadoMinutos(22)
 //                                        .precioVenta(5100.0)
 //                                        .categoria(categoriaPizzas)
-//                                        .imagen(imagenPizza)
+//                                        .imagen(imagenPizzaNapolitana)
 //                                        .build());
 //
 //            // Detalles de articulo manufacturado 13
@@ -1478,7 +1526,7 @@
 //                                        .tiempoEstimadoMinutos(18)
 //                                        .precioVenta(4800.0)
 //                                        .categoria(categoriaLomos)
-//                                        .imagen(imagenLomo)
+//                                        .imagen(imagenLomoVegetariano)
 //                                        .build());
 //
 //            // Detalles de articulo manufacturado 14
@@ -1521,7 +1569,7 @@
 //                                        .tiempoEstimadoMinutos(20)
 //                                        .precioVenta(4700.0)
 //                                        .categoria(categoriaPizzas)
-//                                        .imagen(imagenPizza)
+//                                        .imagen(imagenPizzaFugazzeta)
 //                                        .build());
 //
 //            // Detalles de articulo manufacturado 15
@@ -1561,19 +1609,19 @@
 //
 //            // Imágenes para promociones
 //                        Imagen img1 = imagenRepo.save(Imagen.builder()
-//                                .url("/img/promociones/combo-cerveza-hamburguesa.png")
+//                                .url("/img/promociones/cervezahamburguesa.png")
 //                                .build());
 //                        Imagen img2 = imagenRepo.save(Imagen.builder()
-//                                .url("/img/promociones/combo-pizza-coca.png")
+//                                .url("/img/promociones/pizzacocacola.png")
 //                                .build());
 //                        Imagen img3 = imagenRepo.save(Imagen.builder()
-//                                .url("/img/promociones/combo-4q-cerveza.png")
+//                                .url("/img/promociones/pizzacerveza.png")
 //                                .build());
 //                        Imagen img4 = imagenRepo.save(Imagen.builder()
-//                                .url("/img/promociones/combo-fernet-coca.png")
+//                                .url("/img/promociones/lomococacola.png")
 //                                .build());
 //                        Imagen img5 = imagenRepo.save(Imagen.builder()
-//                                .url("/img/promociones/combo-agua-jugo.png")
+//                                .url("/img/promociones/aguajugodenaranja.png")
 //                                .build());
 //
 //            // PROMO 1 - Cerveza + Hamburguesa
@@ -1677,7 +1725,7 @@
 //
 //            // PROMO 4 - Lomo Completo + Sprite
 //            Promocion promo4 = Promocion.builder()
-//                    .denominacion("🥪 Lomo Completo + Sprite")
+//                    .denominacion("🥪 Lomo Completo + Coca Cola")
 //                    .fechaDesde(fechaInicio)
 //                    .fechaHasta(fechaFin)
 //                    .horaDesde(LocalTime.of(12, 0))
